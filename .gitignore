@@ -1,0 +1,14 @@
+# Ignore sensitive information
+.secrets
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore node modules if any
+node_modules/
+
+# Ignore terraform state files
+*.tfstate
+*.tfstate.backup
+.terraform/

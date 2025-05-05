@@ -1,0 +1,130 @@
+# GitHub Actions workflow to deploy the application to AWS S3
+# This workflow automatically deploys the app when files outside the infrastructure/ directory are modified
+
+name: Deploy Application
+
+# Trigger on pushes to the master branch when files outside the infrastructure/ directory change
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - 'infrastructure/**'
+      - '.github/workflows/deploy-infrastructure.yml'
+      - '**.md'
+
+# Environment variables used throughout the workflow
+env:
+  NODE_VERSION: '20'  # Specify the Node.js version to use
+  S3_BUCKET: 'dollar-game-firemandecko'  # Target S3 bucket for deployment
+  AWS_PAGER: ""  # Disable AWS CLI pagination
+
+jobs:
+  # Combined job for local testing with act
+  deploy:
+    name: Build and Deploy Application
+    runs-on: ubuntu-latest
+    container:
+      # Using image with both Node.js and AWS CLI pre-installed
+      image: nikolaik/python-nodejs:python3.9-nodejs20
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: us-east-1
+        AWS_PAGER: ""
+    
+    steps:
+      # Step 1: Check out the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # Step 2: Install pnpm
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm
+      
+      # Step 3: Install dependencies
+      - name: Install dependencies
+        run: |
+          pnpm install
+      
+      # Step 4: Build application
+      - name: Build application
+        run: |
+          cd apps/frontend
+          pnpm build
+          
+      # Step 5: Install AWS CLI
+      - name: Install AWS CLI
+        run: |
+          pip install --upgrade awscli
+      
+      # Step 6: Set up AWS profile
+      - name: Set up AWS profile
+        run: |
+          mkdir -p ~/.aws
+          echo "[dollar-game]" > ~/.aws/credentials
+          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          echo "[dollar-game]" > ~/.aws/config
+          echo "region=us-east-1" >> ~/.aws/config
+      
+      # Step 7: Deploy to S3
+      - name: Deploy to S3
+        run: |
+          aws s3 sync apps/frontend/dist/ s3://${{ env.S3_BUCKET }} --delete
+      
+      # Step 8: Verify deployment
+      - name: Verify deployment
+        id: verify_deployment
+        run: |
+          # Check if the index.html file exists in the S3 bucket
+          if aws s3 ls s3://${{ env.S3_BUCKET }}/index.html; then
+            echo "Deployment verified successfully"
+            echo "success=true" >> $GITHUB_OUTPUT
+          else
+            echo "Deployment verification failed"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      # Step 9: Invalidate CloudFront cache
+      - name: Invalidate CloudFront cache
+        run: |
+          # Get the CloudFront distribution ID
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?contains(@, 'dollar-game.firemandecko.com')]].Id" --output text)
+          
+          if [ -n "$DISTRIBUTION_ID" ]; then
+            echo "Invalidating CloudFront distribution: $DISTRIBUTION_ID"
+            # Create invalidation for all files
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+            echo "CloudFront invalidation created successfully"
+          else
+            echo "CloudFront distribution ID not found. Skipping invalidation."
+            echo "Please check the CloudFront distribution configuration."
+          fi
+      
+      # Step 10: Output the deployment status and URLs
+      - name: Deployment Status
+        run: |
+          echo "Application deployment completed"
+          
+          # Get URLs from Terraform outputs
+          if [ -d "infrastructure" ]; then
+            cd infrastructure
+            if command -v tofu &> /dev/null; then
+              echo "S3 Website URL (internal only):"
+              tofu output s3_website_url || echo "http://${{ env.S3_BUCKET }}.s3-website-us-east-1.amazonaws.com"
+              echo "CloudFront URL:"
+              tofu output cloudfront_url || echo "CloudFront URL not available yet"
+              echo "Custom Domain (once DNS is configured):"
+              tofu output custom_domain || echo "https://dollar-game.firemandecko.com"
+            else
+              echo "OpenTofu not available. Using default URLs:"
+              echo "S3 Website URL (internal only): http://${{ env.S3_BUCKET }}.s3-website-us-east-1.amazonaws.com"
+              echo "Custom Domain: https://dollar-game.firemandecko.com"
+            fi
+          else
+            echo "S3 Website URL (internal only): http://${{ env.S3_BUCKET }}.s3-website-us-east-1.amazonaws.com"
+            echo "Custom Domain: https://dollar-game.firemandecko.com"
+          fi
