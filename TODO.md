@@ -28,6 +28,7 @@ Use time difference between now and the last commit timestamp for the developmen
    - https://github.com/declanshanaghy/rizz-power-up/actions/runs/14829279648
    - https://github.com/declanshanaghy/rizz-power-up/actions/runs/14829279639
    - Fixed by updating GitHub secrets and correcting license mismatch in package.json files
+- [x] There seem to be duplicate GitHub action, remove the duplicates
 
 
 ## Frontend Tasks
