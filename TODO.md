@@ -20,11 +20,16 @@ Use time difference between now and the last commit timestamp for the developmen
    - Run all the rest of the required infrastructure resources with OpenTofu and ensure they create successfully
 - [x] Rewrite the copied GitHub actions inside .github to handle the rizz-power-up app, instead of dollar-game
 - [x] Run the github actions locally using act to ensure that they deploy properly
-- [] Commit all changes to git, push to origin, and validate that the actions are succeeding
-- [] Change the License to Apache 2.0 and remove the requests for contributors in README.md
-   - Add a LICENSE.md file to the root of the project with the Apache 2.0 license text in it.
+- [x] Commit all changes to git, push to origin, and validate that the actions are succeeding
+- [x] Change the License to Apache 2.0 and remove the requests for contributors in README.md
+   - [x] Add a LICENSE.md file to the root of the project with the Apache 2.0 license text in it.
 
 ## Frontend Tasks
+- [] Refine image filenames
+   - Read the prompts in apps/frontend/public/memes/rizz_image_prompts_no_text_overlay.md 
+   - Rename the files in the bood and bad subdirectories to be URL compatible
+      - Only use chars from regex /[0-9a-zA-Z-.]+/ and .png extension
+      - Generate a typescript file for the frontend app that can be used to reference both the good and bad images images for displays
 - [] Create a vaporwave-inspired TailwindCSS theme
   - Generate a theme for the app based on ./design/mockups/mock1.png and mock2.png
   - Use ./design/mockups/ui.html as a reference, it's an implementation-ready HTML+Tailwind component
