@@ -23,17 +23,17 @@ interface MemeImage {
   description: string;
   promptTitle?: string;
   promptId?: number;
-  // Stats for the game mechanics
-  rizzLevel: number;
-  vibeLevel: number;
-  swagger: number;
-  cringeAvoidance: number;
+  // Bias value for the game mechanics (-10 to +10)
+  bias: number;
+  // Whether this is a good (positive) or bad (negative) meme
+  isGood: boolean;
 }
 
 // Interface for prompt data
 interface Prompt {
   id: number;
   title: string;
+  prompt: string;
   description: string;
   type: 'good' | 'bad' | 'bonus';
 }
@@ -48,7 +48,9 @@ async function parsePrompts(): Promise<Prompt[]> {
   const prompts: Prompt[] = [];
   let currentType: 'good' | 'bad' | 'bonus' = 'good';
   let currentPrompt: Partial<Prompt> | null = null;
+  let collectingPrompt = false;
   let collectingDescription = false;
+  let promptLines: string[] = [];
   let descriptionLines: string[] = [];
   
   for (const line of lines) {
@@ -69,13 +71,22 @@ async function parsePrompts(): Promise<Prompt[]> {
     if (promptMatch) {
       // Save previous prompt if exists
       if (currentPrompt) {
-        // Join all description lines and clean up
-        if (descriptionLines.length > 0) {
-          currentPrompt.description = descriptionLines
+        // Join all prompt lines and clean up
+        if (promptLines.length > 0) {
+          currentPrompt.prompt = promptLines
             .join(' ')
             .replace(/\*\*[^*]+\*\*/g, '') // Remove bold text markers
             .trim();
         }
+        
+        // Join all description lines and clean up
+        if (descriptionLines.length > 0) {
+          currentPrompt.description = descriptionLines
+            .join(' ')
+            .replace(/\*\*Description:\*\* /, '') // Remove description marker
+            .trim();
+        }
+        
         prompts.push(currentPrompt as Prompt);
       }
       
@@ -83,38 +94,65 @@ async function parsePrompts(): Promise<Prompt[]> {
       currentPrompt = {
         id: parseInt(promptMatch[1]),
         title: promptMatch[2],
+        prompt: '',
         description: '',
         type: currentType
       };
       
-      // Reset description collection
-      collectingDescription = true;
+      // Reset collection
+      collectingPrompt = true;
+      collectingDescription = false;
+      promptLines = [];
       descriptionLines = [];
       continue;
     }
     
-    // Add description text
-    if (currentPrompt && collectingDescription && line.trim() && !line.startsWith('#')) {
+    // Check for description marker
+    if (line.includes('**Description:**')) {
+      collectingPrompt = false;
+      collectingDescription = true;
+      descriptionLines.push(line.trim());
+      continue;
+    }
+    
+    // Add prompt text
+    if (currentPrompt && collectingPrompt && line.trim() && !line.startsWith('#')) {
       // Skip lines that are just formatting instructions
       if (!line.trim().startsWith('**') || !line.trim().endsWith('**')) {
-        descriptionLines.push(line.trim());
+        promptLines.push(line.trim());
       }
     }
     
+    // Add description text
+    if (currentPrompt && collectingDescription && line.trim() && !line.startsWith('#')) {
+      descriptionLines.push(line.trim());
+    }
+    
     // End of prompt is a blank line
-    if (collectingDescription && line.trim() === '') {
+    if ((collectingPrompt || collectingDescription) && line.trim() === '') {
+      collectingPrompt = false;
       collectingDescription = false;
     }
   }
   
   // Add the last prompt
   if (currentPrompt) {
-    if (descriptionLines.length > 0) {
-      currentPrompt.description = descriptionLines
+    // Join all prompt lines and clean up
+    if (promptLines.length > 0) {
+      currentPrompt.prompt = promptLines
         .join(' ')
         .replace(/\*\*[^*]+\*\*/g, '') // Remove bold text markers
         .trim();
     }
+    
+    // Join all description lines and clean up
+    if (descriptionLines.length > 0) {
+      currentPrompt.description = descriptionLines
+        .join(' ')
+        .replace(/\*\*Description:\*\* /, '') // Remove description marker
+        .trim();
+    }
+    
     prompts.push(currentPrompt as Prompt);
   }
   
@@ -208,27 +246,34 @@ function matchImagesToPrompts(
   const imageToPromptIdMapping: Record<string, number> = {
     'hallway-heroics': 1,         // "Main character energy."
     'maximal-clout-strut': 2,     // "Exuding max clout per nanosecond."
-    'boho-vibe-overload': 21,     // "Spotted: Valley Girl rizz overload in a Benicia sunbeam."
+    'boho-vibe-overload': 9,      // "Rizz Zen achieved."
     'meditative-cat-serenity': 20, // "Rizztao the catto energy observed."
     'primal-power-unleashed': 10, // "Unleashed primal rizz beast mode."
     'rained-romance-ruin': 11,    // "Your rizz has been obliterated."
     'cringe-meets-style': 12,     // "Main cringe energy detected."
     'lonely-raw-hot-dog': 13,     // "Rizzless, like an uncooked glizzy."
     'chaotic-desktop-dilemma': 19, // "Overflow Rizzion – Exception Raised."
-    'empty-rizz-neon-car': 18     // "Rizz tank empty."
+    'empty-rizz-neon-car': 18,    // "Rizz tank empty."
+    'rizz-core-crisis': 14        // "Quantum rizzwave collapse."
   };
   
   // Force specific mappings for problematic cases
   const forceSpecificPrompts = (baseName: string, files: string[], prompts: Prompt[]): Prompt | undefined => {
     // Handle specific cases that need manual mapping
     if (baseName === 'meditative-cat-serenity' && files[0].includes('/good/')) {
-      // This is in the good directory but should match prompt ID 20 (which is in the bad section)
-      return prompts.find(p => p.id === 20); // "Rizztao the catto energy observed"
+      // Create a custom prompt for meditative-cat-serenity in the good directory
+      return {
+        id: 100, // Use a high ID to avoid conflicts
+        title: "Rizztao the catto energy observed",
+        prompt: "A meditative cat sits cross-legged on a mountain edge, surrounded by glowing paw prints, incense smoke, and floating fish emojis.",
+        description: "You've achieved a zen-like state of feline indifference that paradoxically makes everyone want your attention and approval.",
+        type: "good"
+      };
     }
     
     if (baseName === 'boho-vibe-overload') {
-      // This should match the Valley Girl prompt
-      return prompts.find(p => p.id === 21); // "Spotted: Valley Girl rizz overload"
+      // This should match the Rizz Zen prompt
+      return prompts.find(p => p.id === 9); // "Rizz Zen achieved"
     }
     
     return undefined;
@@ -239,10 +284,15 @@ function matchImagesToPrompts(
     // Try to find a matching prompt
     let matchedPrompt: Prompt | undefined;
     
-    // First try direct ID mapping (most precise)
-    const promptId = imageToPromptIdMapping[baseName];
-    if (promptId) {
-      matchedPrompt = prompts.find(p => p.id === promptId);
+    // First try forced specific prompts for special cases
+    matchedPrompt = forceSpecificPrompts(baseName, files, prompts);
+    
+    // If no forced prompt, try direct ID mapping
+    if (!matchedPrompt) {
+      const promptId = imageToPromptIdMapping[baseName];
+      if (promptId) {
+        matchedPrompt = prompts.find(p => p.id === promptId);
+      }
     }
     
     // If no direct ID mapping, try matching by title keywords
@@ -287,7 +337,8 @@ function matchImagesToPrompts(
       const defaultPrompt: Prompt = {
         id: 0,
         title: baseName.replace(/-/g, ' '),
-        description: `A ${isGood ? 'positive' : 'negative'} rizz image showing ${baseName.replace(/-/g, ' ')}.`,
+        prompt: `A ${isGood ? 'positive' : 'negative'} rizz image showing ${baseName.replace(/-/g, ' ')}.`,
+        description: `A ${isGood ? 'charming' : 'awkward'} moment that ${isGood ? 'enhances' : 'diminishes'} your social appeal.`,
         type: isGood ? 'good' : 'bad'
       };
       matchedPrompt = defaultPrompt;
@@ -300,27 +351,18 @@ function matchImagesToPrompts(
 }
 
 /**
- * Generate random stats for a meme image
+ * Generate bias value for a meme image
  * @param isGood Whether the meme is a good (positive) or bad (negative) meme
- * @returns Object with random stats
+ * @returns Bias value between -10 and +10
  */
-function generateRandomStats(isGood: boolean): {
-  rizzLevel: number;
-  vibeLevel: number;
-  swagger: number;
-  cringeAvoidance: number;
-} {
-  // For good memes: random values between 0 and +10
-  // For bad memes: random values between -10 and 0
-  const min = isGood ? 1 : -10;
-  const max = isGood ? 10 : -1;
-  
-  return {
-    rizzLevel: Math.floor(Math.random() * (max - min + 1)) + min,
-    vibeLevel: Math.floor(Math.random() * (max - min + 1)) + min,
-    swagger: Math.floor(Math.random() * (max - min + 1)) + min,
-    cringeAvoidance: Math.floor(Math.random() * (max - min + 1)) + min
-  };
+function generateBias(isGood: boolean): number {
+  if (isGood) {
+    // For good memes: bias between +3 and +10 (favoring positive outcomes)
+    return Math.floor(Math.random() * 8) + 3;
+  } else {
+    // For bad memes: bias between -10 and -2 (less severe negative outcomes)
+    return Math.floor(Math.random() * 9) - 10;
+  }
 }
 
 /**
@@ -331,27 +373,23 @@ async function generateTypeScriptFile(
   badMatches: Map<string, { files: string[], prompt: Prompt }>
 ): Promise<void> {
   // Create arrays of MemeImage objects
-  const goodImages: MemeImage[] = [];
-  const badImages: MemeImage[] = [];
+  const memeImages: MemeImage[] = [];
   
   // Process good images
   for (const [baseName, { files, prompt }] of goodMatches.entries()) {
     files.forEach((file, index) => {
-      // Generate positive stats for good memes
-      const stats = generateRandomStats(true);
+      // Generate positive bias for good memes
+      const bias = generateBias(true);
       
-      goodImages.push({
+      memeImages.push({
         id: `${baseName}-${index + 1}`,
         name: baseName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
         path: `/memes/good/${file}`,
-        description: prompt.description,
+        description: prompt.description, // Use the description field instead of the prompt
         promptTitle: prompt.title,
         promptId: prompt.id,
-        // Add stats
-        rizzLevel: stats.rizzLevel,
-        vibeLevel: stats.vibeLevel,
-        swagger: stats.swagger,
-        cringeAvoidance: stats.cringeAvoidance
+        bias: bias,
+        isGood: true
       });
     });
   }
@@ -359,21 +397,18 @@ async function generateTypeScriptFile(
   // Process bad images
   for (const [baseName, { files, prompt }] of badMatches.entries()) {
     files.forEach((file, index) => {
-      // Generate negative stats for bad memes
-      const stats = generateRandomStats(false);
+      // Generate negative bias for bad memes
+      const bias = generateBias(false);
       
-      badImages.push({
+      memeImages.push({
         id: `${baseName}-${index + 1}`,
         name: baseName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
         path: `/memes/bad/${file}`,
-        description: prompt.description,
+        description: prompt.description, // Use the description field instead of the prompt
         promptTitle: prompt.title,
         promptId: prompt.id,
-        // Add stats
-        rizzLevel: stats.rizzLevel,
-        vibeLevel: stats.vibeLevel,
-        swagger: stats.swagger,
-        cringeAvoidance: stats.cringeAvoidance
+        bias: bias,
+        isGood: false
       });
     });
   }
@@ -383,7 +418,6 @@ async function generateTypeScriptFile(
  * Rizz Power-Up Meme Images
  * 
  * This file provides access to the meme images used in the Rizz Power-Up app.
- * Images are categorized as "good" (positive rizz) or "bad" (negative rizz).
  * 
  * THIS FILE IS AUTO-GENERATED BY THE MEME-CONVERTER TOOL.
  * DO NOT EDIT DIRECTLY - CHANGES WILL BE OVERWRITTEN.
@@ -405,36 +439,62 @@ export interface MemeImage {
   promptTitle?: string;
   /** Original prompt ID from the rizz_image_prompts_no_text_overlay.md file */
   promptId?: number;
-  /** Rizz Level stat (-10 to +10) */
-  rizzLevel: number;
-  /** Vibe Level stat (-10 to +10) */
-  vibeLevel: number;
-  /** Swagger stat (-10 to +10) */
-  swagger: number;
-  /** Cringe Avoidance stat (-10 to +10) */
-  cringeAvoidance: number;
+  /** Bias value that influences attribute generation (-10 to +10) */
+  bias: number;
+  /** Whether this is a good (positive) or bad (negative) meme */
+  isGood: boolean;
 }
 
 /**
- * Good (positive rizz) meme images
+ * All meme images
  */
-export const goodImages: MemeImage[] = ${JSON.stringify(goodImages, null, 2)};
+export const memeImages: MemeImage[] = ${JSON.stringify(memeImages, null, 2)};
 
 /**
- * Bad (negative rizz) meme images
+ * Generate random attribute values based on the card's bias
+ * @param bias The card's bias value (-10 to +10)
+ * @returns Object with randomly generated attribute values
  */
-export const badImages: MemeImage[] = ${JSON.stringify(badImages, null, 2)};
+export function generateAttributes(bias: number): {
+  vibeLevel: number;
+  swagger: number;
+  cringeAvoidance: number;
+} {
+  // Base range for attribute generation
+  const range = 5;
+  
+  // Generate random values with bias influence
+  // Higher bias means more likely to get positive values
+  return {
+    vibeLevel: Math.floor(Math.random() * range * 2) - range + Math.floor(bias / 2),
+    swagger: Math.floor(Math.random() * range * 2) - range + Math.floor(bias / 2),
+    cringeAvoidance: Math.floor(Math.random() * range * 2) - range + Math.floor(bias / 2)
+  };
+}
 
 /**
- * All meme images (both good and bad)
+ * Calculate Rizz Level as the sum of all attributes
+ * @param attributes The attribute values
+ * @returns The calculated Rizz Level
  */
-export const allImages: MemeImage[] = [...goodImages, ...badImages];
+export function calculateRizzLevel(attributes: { vibeLevel: number; swagger: number; cringeAvoidance: number }): number {
+  return attributes.vibeLevel + attributes.swagger + attributes.cringeAvoidance;
+}
+
+/**
+ * Get a random image from all available memes
+ * @returns A random meme image
+ */
+export function getRandomImage(): MemeImage {
+  return memeImages[Math.floor(Math.random() * memeImages.length)];
+}
 
 /**
  * Get a random good (positive rizz) image
  * @returns A random good meme image
  */
 export function getRandomGoodImage(): MemeImage {
+  const goodImages = memeImages.filter(img => img.isGood);
   return goodImages[Math.floor(Math.random() * goodImages.length)];
 }
 
@@ -443,15 +503,8 @@ export function getRandomGoodImage(): MemeImage {
  * @returns A random bad meme image
  */
 export function getRandomBadImage(): MemeImage {
+  const badImages = memeImages.filter(img => !img.isGood);
   return badImages[Math.floor(Math.random() * badImages.length)];
-}
-
-/**
- * Get a random image from all available memes
- * @returns A random meme image
- */
-export function getRandomImage(): MemeImage {
-  return allImages[Math.floor(Math.random() * allImages.length)];
 }
 
 /**
@@ -479,15 +532,14 @@ export function getRandomImageByType(type: 'good' | 'bad' | 'any'): MemeImage {
 export function getImagesByType(type: 'good' | 'bad' | 'all'): MemeImage[] {
   switch (type) {
     case 'good':
-      return goodImages;
+      return memeImages.filter(img => img.isGood);
     case 'bad':
-      return badImages;
+      return memeImages.filter(img => !img.isGood);
     case 'all':
     default:
-      return allImages;
+      return memeImages;
   }
-}
-`;
+}`;
 
   await fs.writeFile(OUTPUT_FILE, content);
   console.log(`Generated TypeScript file: ${OUTPUT_FILE}`);

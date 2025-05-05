@@ -1,4 +1,61 @@
 import { useState, useEffect, useRef } from 'react'
+import RizzButton from './RizzButton'
+import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages.ts'
+import attributeEmojis from './rizz_attributes_emojis.json'
+
+// Add keyframe animations for cards
+const addKeyframeStyles = () => {
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `
+    @keyframes cardEntrance {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.3) rotate(-15deg);
+      }
+      40% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+      }
+      60% {
+        transform: translate(-50%, -50%) scale(0.95) rotate(-2deg);
+      }
+      80% {
+        transform: translate(-50%, -50%) scale(1.05) rotate(1deg);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1) rotate(0);
+      }
+    }
+    
+    @keyframes cardGlow {
+      0% {
+        box-shadow: 0 0 20px #F15BB5, 0 0 40px #00BBF9;
+      }
+      50% {
+        box-shadow: 0 0 30px #00F5D4, 0 0 50px #9B5DE5;
+      }
+      100% {
+        box-shadow: 0 0 20px #F15BB5, 0 0 40px #00BBF9;
+      }
+    }
+    
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0);
+      }
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8) rotate(5deg);
+      }
+    }
+    
+    .fadeOut {
+      animation: fadeOut 0.5s ease-out forwards !important;
+    }
+  `;
+  document.head.appendChild(styleEl);
+};
 
 // Helper function for fullscreen
 const toggleFullScreen = () => {
@@ -25,82 +82,165 @@ function App() {
   // State to track content scaling factor and screen size
   const [contentScale, setContentScale] = useState(1)
   const [isMobile, setIsMobile] = useState(false)
+  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
+  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
+  
+  // State for card display
+  const [currentCard, setCurrentCard] = useState<MemeImage | null>(null)
+  const [currentAttributes, setCurrentAttributes] = useState<{
+    vibeLevel: number;
+    swagger: number;
+    cringeAvoidance: number;
+  } | null>(null)
+  const [showCard, setShowCard] = useState(false)
+  const [showBankOptions, setShowBankOptions] = useState(false)
+  const [highScore, setHighScore] = useState(0)
   
   // Function to calculate optimal dimensions for 18:9 aspect ratio
   const calculateOptimalDimensions = () => {
     try {
-      const aspectRatio = 18 / 9 // 2:1 ratio
-      const maxWidth = window.innerWidth * 0.95
-      const maxHeight = window.innerHeight * 0.95
+      // Get current window dimensions
+      const windowWidth = window.innerWidth
+      const windowHeight = window.innerHeight
+      const isPortrait = windowHeight > windowWidth
       
-      // Calculate dimensions based on available space
+      // Determine if we're on a mobile device
+      const isMobileDevice = windowWidth <= 768
+      setIsMobile(isMobileDevice)
+      
+      // Use a more flexible approach to aspect ratio
+      // Default target is 18:9 (2:1) but we'll adjust based on device orientation
+      let targetAspectRatio = 18 / 9 // Default 2:1 ratio
+      
+      // Adjust aspect ratio based on orientation for better fit
+      if (isPortrait) {
+        // In portrait, use a taller container (less wide)
+        targetAspectRatio = isMobileDevice ? 9 / 16 : 9 / 14
+      }
+      
+      // Calculate available space (with margins)
+      const maxWidth = windowWidth * (isMobileDevice ? 0.98 : 0.95)
+      const maxHeight = windowHeight * (isMobileDevice ? 0.98 : 0.95)
+      
+      // Calculate dimensions based on available space and target aspect ratio
       let width, height
       
-      if (maxWidth / maxHeight > aspectRatio) {
+      if (maxWidth / maxHeight > targetAspectRatio) {
         // Window is wider than our target aspect ratio
         height = maxHeight
-        width = height * aspectRatio
+        width = height * targetAspectRatio
       } else {
         // Window is taller than our target aspect ratio
         width = maxWidth
-        height = width / aspectRatio
+        height = width / targetAspectRatio
       }
       
       // Calculate content scaling factor based on container size
-      // This helps ensure text and UI elements scale appropriately
-      const baseWidth = 500 // Base design width
-      const scaleFactor = Math.max(0.75, Math.min(1.25, width / baseWidth))
+      // Base design width varies based on orientation
+      const baseWidth = isPortrait ? 400 : 500
+      
+      // Adjust scaling limits based on device type
+      const minScale = isMobileDevice ? 0.65 : 0.75
+      const maxScale = isMobileDevice ? 1.35 : 1.25
+      
+      const scaleFactor = Math.max(minScale, Math.min(maxScale, width / baseWidth))
       
       setContentScale(scaleFactor)
       setContainerDimensions({
         width: `${width}px`,
         height: `${height}px`
       })
+      
+      // Log dimensions for debugging
+      if (showDebug) {
+        console.log(`Window: ${windowWidth}x${windowHeight}, Container: ${width}x${height}, Scale: ${scaleFactor}`)
+      }
     } catch (error) {
       // Fallback for browsers with issues
       console.warn('Error calculating dimensions, using fallback', error)
-      setContainerDimensions({
-        width: '95vw',
-        height: '47.5vw' // 95vw ÷ 2 for 18:9 ratio
-      })
+      const isPortrait = window.innerHeight > window.innerWidth
+      
+      if (isPortrait) {
+        setContainerDimensions({
+          width: '95vw',
+          height: '170vw' // Taller in portrait
+        })
+      } else {
+        setContainerDimensions({
+          width: '95vw',
+          height: '47.5vw' // 95vw ÷ 2 for 18:9 ratio in landscape
+        })
+      }
     }
   }
   
   // Set up resize listener and fullscreen change detection
+  // Use ResizeObserver for more accurate container size tracking
   useEffect(() => {
+    // Add keyframe animations
+    addKeyframeStyles();
+    
     calculateOptimalDimensions()
     
     const handleResize = () => {
+      const newIsPortrait = window.innerHeight > window.innerWidth
+      if (isPortrait !== newIsPortrait) {
+        setIsPortrait(newIsPortrait)
+      }
       calculateOptimalDimensions()
-      // Check if screen is mobile size
-      setIsMobile(window.innerWidth <= 768)
+    }
+    
+    const handleOrientationChange = () => {
+      // Add a small delay to ensure dimensions are calculated after orientation change completes
+      setTimeout(() => {
+        setIsPortrait(window.innerHeight > window.innerWidth)
+        calculateOptimalDimensions()
+      }, 100)
     }
     
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement)
+      // Recalculate dimensions after fullscreen change
+      setTimeout(calculateOptimalDimensions, 100)
     }
     
     // Initial check for mobile
     setIsMobile(window.innerWidth <= 768)
     
+    // Add event listeners
     window.addEventListener('resize', handleResize)
+    window.addEventListener('orientationchange', handleOrientationChange)
     document.addEventListener('fullscreenchange', handleFullscreenChange)
+    
+    // Set up ResizeObserver to monitor container size changes
+    let resizeObserver: ResizeObserver | null = null
+    if (containerRef.current) {
+      resizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const { width, height } = entry.contentRect
+          setContainerSize({ width, height })
+          
+          if (showDebug) {
+            console.log(`Container observed size: ${width}x${height}`)
+          }
+        }
+      })
+      
+      resizeObserver.observe(containerRef.current)
+    }
     
     return () => {
       window.removeEventListener('resize', handleResize)
+      window.removeEventListener('orientationchange', handleOrientationChange)
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
+      
+      if (resizeObserver) {
+        resizeObserver.disconnect()
+      }
     }
-  }, [])
+  }, [showDebug, isPortrait]) // Add dependencies
   
-  // Sample quotes - in a real app, this would be a larger database
-  const quotes = [
-    "Your vibe just went up by 10 points!",
-    "That's some serious swagger right there!",
-    "Cringe levels decreasing... Rizz increasing!",
-    "You're radiating pure charisma now!",
-    "Your Rizz power is growing stronger!",
-    "Your aura just disrupted the algorithm."
-  ]
+  // Stats that increase with each tap
   
   // Stats that increase with each tap
   const [stats, setStats] = useState({
@@ -109,29 +249,163 @@ function App() {
     cringeAvoidance: 0
   })
   
+  // Helper function to get emoji for attribute score
+  const getEmojiForScore = (attribute: string, score: number) => {
+    // Scale the score from -10 to 10 range to -500 to 500 range
+    const scaledScore = Math.round(score * 50);
+    
+    // Get the appropriate attribute mapping
+    const attributeMap = attributeEmojis[attribute as keyof typeof attributeEmojis];
+    if (!attributeMap) return '❓'; // Fallback emoji if attribute not found
+    
+    // Find the closest available score in the emoji mapping
+    const availableScores = Object.keys(attributeMap)
+      .map(Number)
+      .sort((a, b) => a - b);
+    
+    let closestScore = availableScores[0];
+    for (const availableScore of availableScores) {
+      if (Math.abs(availableScore - scaledScore) < Math.abs(closestScore - scaledScore)) {
+        closestScore = availableScore;
+      }
+    }
+    
+    // Safely access the emoji with the closest score
+    const emoji = attributeMap[closestScore.toString() as keyof typeof attributeMap];
+    return emoji || '❓'; // Fallback emoji if not found
+  };
+  
   // Handle button tap
   const handleRizzTap = () => {
-    // Increase Rizz level
-    const newRizzLevel = rizzLevel + 1
-    setRizzLevel(newRizzLevel)
+    if (showCard || showBankOptions) return; // Don't allow new cards while one is showing
     
-    // Update stats
-    setStats({
-      vibeLevel: stats.vibeLevel + Math.floor(Math.random() * 3) + 1,
-      swagger: stats.swagger + Math.floor(Math.random() * 3) + 1,
-      cringeAvoidance: stats.cringeAvoidance + Math.floor(Math.random() * 3) + 1
-    })
+    // Deal a random card
+    const card = getRandomImage();
     
-    // Get a random quote
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
-    setQuote(randomQuote)
+    // Generate random attributes based on the card's bias
+    const attributes = generateAttributes(card.bias);
+    setCurrentAttributes(attributes);
+    
+    setCurrentCard(card);
+    setShowCard(true);
+    
+    // Set the quote to the card description
+    setQuote(card.description);
+    
+    // Update stats based on generated attributes
+    const newStats = {
+      vibeLevel: stats.vibeLevel + attributes.vibeLevel,
+      swagger: stats.swagger + attributes.swagger,
+      cringeAvoidance: stats.cringeAvoidance + attributes.cringeAvoidance
+    };
+    setStats(newStats);
+    
+    // Calculate the new Rizz level as the sum of all attributes
+    const calculatedRizzLevel = newStats.vibeLevel + newStats.swagger + newStats.cringeAvoidance;
+    setRizzLevel(calculatedRizzLevel);
+    
+    // Make card disappear after a few seconds
+    setTimeout(() => {
+      // Add fadeOut class to the card
+      const cardElement = document.querySelector('.card-display');
+      if (cardElement) {
+        cardElement.classList.add('fadeOut');
+        
+        // Wait for animation to complete before hiding
+        setTimeout(() => {
+          setShowCard(false);
+          setShowBankOptions(true);
+        }, 500); // Match this to the fadeOut animation duration
+      } else {
+        setShowCard(false);
+        setShowBankOptions(true);
+      }
+    }, 4500); // Show card for 4.5 seconds before starting fadeOut
     
     // Check for special event (every 10 taps)
-    if (newRizzLevel % 10 === 0) {
-      setShowSpecialEvent(true)
-      setTimeout(() => setShowSpecialEvent(false), 3000)
+    if (calculatedRizzLevel % 10 === 0) {
+      setShowSpecialEvent(true);
+      setTimeout(() => setShowSpecialEvent(false), 3000);
     }
-  }
+  };
+  
+  // Handle banking the score
+  const handleBankScore = () => {
+    if (rizzLevel > highScore) {
+      setHighScore(rizzLevel);
+    }
+    // Reset game
+    setRizzLevel(0);
+    setStats({
+      vibeLevel: 0,
+      swagger: 0,
+      cringeAvoidance: 0
+    });
+    setShowBankOptions(false);
+    setQuote('Tap the button to increase your Rizz!');
+  };
+  
+  // Handle dealing another card
+  const handleDealAgain = () => {
+    setShowBankOptions(false);
+    
+    // Ensure we're not in a state where a card is already showing
+    if (showCard) {
+      setShowCard(false);
+    }
+    
+    // Automatically deal another card after a short delay
+    setTimeout(() => {
+      // Get a random card
+      const card = getRandomImage();
+      
+      // Generate random attributes based on the card's bias
+      const attributes = generateAttributes(card.bias);
+      setCurrentAttributes(attributes);
+      
+      setCurrentCard(card);
+      setShowCard(true);
+      
+      // Set the quote to the card description
+      setQuote(card.description);
+      
+      // Update stats based on generated attributes
+      const newStats = {
+        vibeLevel: stats.vibeLevel + attributes.vibeLevel,
+        swagger: stats.swagger + attributes.swagger,
+        cringeAvoidance: stats.cringeAvoidance + attributes.cringeAvoidance
+      };
+      setStats(newStats);
+      
+      // Calculate the new Rizz level as the sum of all attributes
+      const calculatedRizzLevel = newStats.vibeLevel + newStats.swagger + newStats.cringeAvoidance;
+      setRizzLevel(calculatedRizzLevel);
+      
+      // Make card disappear after a few seconds
+      setTimeout(() => {
+        // Add fadeOut class to the card
+        const cardElement = document.querySelector('.card-display');
+        if (cardElement) {
+          cardElement.classList.add('fadeOut');
+          
+          // Wait for animation to complete before hiding
+          setTimeout(() => {
+            setShowCard(false);
+            setShowBankOptions(true);
+          }, 500); // Match this to the fadeOut animation duration
+        } else {
+          setShowCard(false);
+          setShowBankOptions(true);
+        }
+      }, 4500); // Show card for 4.5 seconds before starting fadeOut
+      
+      // Check for special event (every 10 taps)
+      if (calculatedRizzLevel % 10 === 0) {
+        setShowSpecialEvent(true);
+        setTimeout(() => setShowSpecialEvent(false), 3000);
+      }
+    }, 300);
+  };
 
   return (
     <div style={{
@@ -208,6 +482,7 @@ function App() {
       {/* Main content container */}
       <div
         ref={containerRef}
+        className="aspect-container"
         style={{
           position: 'relative',
           width: containerDimensions.width,
@@ -218,7 +493,8 @@ function App() {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '1rem'
+          padding: isMobile ? '0.5rem' : '1rem',
+          overflow: 'hidden' // Ensure content stays within container
         }}
       >
         {/* Debug overlay */}
@@ -235,9 +511,11 @@ function App() {
             fontFamily: 'monospace',
             borderRadius: '0 0 4px 0'
           }}>
-            <div>Aspect: 18:9 (2:1)</div>
-            <div>Width: {containerDimensions.width}</div>
-            <div>Height: {containerDimensions.height}</div>
+            <div>Mode: {isPortrait ? 'Portrait' : 'Landscape'}</div>
+            <div>Device: {isMobile ? 'Mobile' : 'Desktop'}</div>
+            <div>Window: {window.innerWidth}x{window.innerHeight}</div>
+            <div>Container: {containerDimensions.width}x{containerDimensions.height}</div>
+            <div>Observed: {containerSize.width.toFixed(0)}x{containerSize.height.toFixed(0)}</div>
             <div>Scale: {contentScale.toFixed(2)}x</div>
           </div>
         )}
@@ -245,144 +523,358 @@ function App() {
         {/* Game content */}
         <div style={{
           width: '100%',
-          maxWidth: '500px',
+          maxWidth: isMobile ? '100%' : '500px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: '1.5rem',
+          gap: isMobile ? '0.5rem' : '0.75rem', // Reduced gap between elements
           transform: `scale(${contentScale})`,
-          transformOrigin: 'center top',
-          transition: 'transform 0.2s ease'
+          transformOrigin: 'center center', // Center origin for better scaling
+          transition: 'transform 0.3s ease',
+          height: '100%',
+          justifyContent: 'center', // Center content vertically
+          // Prevent content from overflowing during scaling
+          maxHeight: isPortrait ? '170vh' : '80vh',
+          overflowY: 'hidden'
         }}>
-          {/* Header */}
-          <h1 style={{
-            fontSize: '2.5rem',
-            textAlign: 'center',
-            fontFamily: '"Playfair Display", serif',
-            color: '#FF1B6B',
-            textShadow: '0 0 10px #FF1B6B, 0 0 20px #FF1B6B, 0 0 30px #FF1B6B',
-            marginBottom: '0.5rem',
-            lineHeight: '1.2',
-            letterSpacing: '2px'
-          }}>
-            RIZZ POWER-UP<br/>SIMULATOR
-          </h1>
+          {/* Header space - title removed */}
+          <div style={{ height: '1rem' }}></div>
           
           {/* Horizontal line */}
           <div style={{
             width: '90%',
-            height: '3px',
+            height: '2px',
             background: 'linear-gradient(90deg, transparent 0%, #00F5D4 50%, transparent 100%)',
             boxShadow: '0 0 10px #00F5D4, 0 0 20px #00F5D4',
-            margin: '0.5rem 0'
+            margin: '0.25rem 0'
           }}></div>
           
           {/* Rizz Button */}
-          <button
-            onClick={handleRizzTap}
-            style={{
-              background: 'linear-gradient(90deg, #FF1B6B, #FFA07A)',
-              color: 'white',
-              fontWeight: 'bold',
-              fontSize: '1.5rem',
-              padding: '1rem 3rem',
-              border: 'none',
-              borderRadius: '50px',
-              cursor: 'pointer',
-              boxShadow: '0 0 15px #FF1B6B, 0 0 25px rgba(255, 27, 107, 0.5)',
-              textShadow: '0 0 5px #FFF',
-              transition: 'all 0.2s ease',
-              position: 'relative',
-              overflow: 'hidden'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
-            onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-          >
-            RIZZ UP
-          </button>
-          
-          {/* Quote Display */}
-          <div style={{
-            width: '90%',
-            padding: '1.5rem',
-            borderRadius: '20px',
-            background: 'rgba(46, 8, 84, 0.7)',
-            boxShadow: '0 0 10px #9B5DE5, inset 0 0 20px rgba(155, 93, 229, 0.3)',
-            textAlign: 'center',
-            position: 'relative'
-          }}>
-            <div style={{
-              position: 'absolute',
-              bottom: '-15px',
-              left: '30px',
-              width: '30px',
-              height: '30px',
-              background: 'rgba(46, 8, 84, 0.7)',
-              transform: 'rotate(45deg)',
-              zIndex: -1
-            }}></div>
-            <p style={{
-              fontSize: '1.2rem',
-              fontStyle: 'italic',
-              color: 'white'
-            }}>{quote}</p>
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
+            <RizzButton onClick={handleRizzTap} />
           </div>
+          
+          {/* Quote Display removed */}
           
           {/* Stats Panel */}
           <div style={{
             width: '90%',
-            padding: '1.5rem',
+            padding: isMobile ? '1rem' : '1.25rem',
             borderRadius: '20px',
             background: 'rgba(46, 8, 84, 0.7)',
-            boxShadow: '0 0 10px #00BBF9, inset 0 0 20px rgba(0, 187, 249, 0.3)',
+            boxShadow: '0 0 15px rgba(0, 187, 249, 0.5), inset 0 0 20px rgba(0, 187, 249, 0.3)',
             display: 'flex',
             flexDirection: 'column',
-            gap: '0.5rem'
+            gap: '0.4rem'
           }}>
             <h2 style={{
-              fontSize: '1.2rem',
+              fontSize: '1.1rem',
               color: '#00F5D4',
               textAlign: 'center',
-              marginBottom: '0.5rem',
+              marginBottom: '0.25rem',
               textShadow: '0 0 5px #00F5D4'
             }}>STATS PANEL</h2>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#00F5D4', fontSize: '1.1rem' }}>Vibe Level</span>
-              <span style={{ fontSize: '1.1rem' }}>🌊</span>
+              <span style={{ color: '#00F5D4', fontSize: '0.95rem', flex: 1, textAlign: 'left' }}>Vibe Level</span>
+              <span style={{
+                color: stats.vibeLevel >= 0 ? '#00F5D4' : '#F15BB5',
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                flex: 1,
+                textAlign: 'center'
+              }}>{stats.vibeLevel}</span>
+              <span style={{ fontSize: '1.2rem', flex: 1, textAlign: 'right' }}>{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#00F5D4', fontSize: '1.1rem' }}>Swagger</span>
-              <span style={{ fontSize: '1.1rem' }}>😎</span>
+              <span style={{ color: '#00F5D4', fontSize: '0.95rem', flex: 1, textAlign: 'left' }}>Swagger</span>
+              <span style={{
+                color: stats.swagger >= 0 ? '#00F5D4' : '#F15BB5',
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                flex: 1,
+                textAlign: 'center'
+              }}>{stats.swagger}</span>
+              <span style={{ fontSize: '1.2rem', flex: 1, textAlign: 'right' }}>{getEmojiForScore("Swagger", stats.swagger)}</span>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#00F5D4', fontSize: '1.1rem' }}>Cringe Avoidance</span>
-              <span style={{ fontSize: '1.1rem' }}>🧠</span>
-            </div>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#00F5D4', fontSize: '1.1rem' }}>Rizz Level</span>
-              <span style={{ color: '#00F5D4', fontSize: '1.5rem', fontWeight: 'bold' }}>{rizzLevel}</span>
+              <span style={{ color: '#00F5D4', fontSize: '0.95rem', flex: 1, textAlign: 'left' }}>Cringe Avoidance</span>
+              <span style={{
+                color: stats.cringeAvoidance >= 0 ? '#00F5D4' : '#F15BB5',
+                fontSize: '1.1rem',
+                fontWeight: 'bold',
+                flex: 1,
+                textAlign: 'center'
+              }}>{stats.cringeAvoidance}</span>
+              <span style={{ fontSize: '1.2rem', flex: 1, textAlign: 'right' }}>{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
             </div>
           </div>
+          
+          {/* Rizz Level Panel - Separated for emphasis */}
+          <div style={{
+            width: '90%',
+            padding: isMobile ? '0.75rem' : '1rem',
+            borderRadius: '20px',
+            background: 'rgba(46, 8, 84, 0.8)',
+            boxShadow: '0 0 20px rgba(241, 91, 181, 0.6), inset 0 0 25px rgba(241, 91, 181, 0.4)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            marginTop: '0.5rem'
+          }}>
+            <h2 style={{
+              fontSize: '1.2rem',
+              color: '#F15BB5',
+              textAlign: 'center',
+              marginBottom: '0.25rem',
+              textShadow: '0 0 8px #F15BB5'
+            }}>RIZZ LEVEL</h2>
+            
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '1rem'
+            }}>
+              <span style={{
+                color: rizzLevel >= 0 ? '#00F5D4' : '#F15BB5',
+                fontSize: '2rem',
+                fontWeight: 'bold',
+                textShadow: rizzLevel >= 0 ? '0 0 10px #00F5D4' : '0 0 10px #F15BB5'
+              }}>{rizzLevel}</span>
+              <span style={{
+                fontSize: '2rem'
+              }}>{getEmojiForScore("Rizz Level", rizzLevel)}</span>
+            </div>
+          </div>
+          
+          {/* Card Display */}
+          {showCard && currentCard && (
+            <div
+              className="card-display"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) scale(0.9)',
+                width: '80%',
+                maxWidth: '350px',
+                padding: '1rem',
+                borderRadius: '15px',
+                background: 'rgba(46, 8, 84, 0.9)',
+                boxShadow: '0 0 20px rgba(241, 91, 181, 0.7), 0 0 40px rgba(0, 187, 249, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.5)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.75rem',
+                zIndex: 100,
+                animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite',
+                border: '3px solid #00F5D4'
+              }}
+            >
+              <h3 style={{
+                color: '#FEE440',
+                fontSize: '1.2rem',
+                textAlign: 'center',
+                textShadow: '0 0 5px #FEE440',
+                margin: 0
+              }}>
+                {currentCard.name}
+              </h3>
+              
+              <div style={{
+                width: '100%',
+                height: '220px',
+                backgroundImage: `url(${currentCard.path})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'top center',
+                borderRadius: '10px',
+                boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+                marginTop: '-5px'
+              }} />
+              
+              <p style={{
+                color: 'white',
+                fontSize: '0.9rem',
+                textAlign: 'center',
+                margin: '0.5rem 0'
+              }}>
+                {currentCard.description}
+              </p>
+              
+              {currentAttributes && (
+                <div style={{
+                  width: '100%',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: '0.5rem',
+                  fontSize: '0.8rem',
+                  padding: '0.5rem',
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  borderRadius: '8px'
+                }}>
+                  <div style={{ color: currentAttributes.vibeLevel >= 0 ? '#00F5D4' : '#F15BB5' }}>
+                    Vibe Level: {currentAttributes.vibeLevel > 0 ? '+' : ''}{currentAttributes.vibeLevel}
+                  </div>
+                  <div style={{ color: currentAttributes.swagger >= 0 ? '#00F5D4' : '#F15BB5' }}>
+                    Swagger: {currentAttributes.swagger > 0 ? '+' : ''}{currentAttributes.swagger}
+                  </div>
+                  <div style={{ color: currentAttributes.cringeAvoidance >= 0 ? '#00F5D4' : '#F15BB5' }}>
+                    Cringe: {currentAttributes.cringeAvoidance > 0 ? '+' : ''}{currentAttributes.cringeAvoidance}
+                  </div>
+                  <div style={{
+                    color: calculateRizzLevel(currentAttributes) >= 0 ? '#00F5D4' : '#F15BB5',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    textShadow: calculateRizzLevel(currentAttributes) >= 0 ? '0 0 5px #00F5D4' : '0 0 5px #F15BB5',
+                    gridColumn: '1 / span 2',
+                    textAlign: 'center',
+                    marginTop: '0.25rem'
+                  }}>
+                    Rizz: {calculateRizzLevel(currentAttributes) > 0 ? '+' : ''}{calculateRizzLevel(currentAttributes)}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Bank or Deal Options */}
+          {showBankOptions && (
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90%',
+              maxWidth: '350px',
+              padding: '1.5rem',
+              borderRadius: '15px',
+              background: 'rgba(46, 8, 84, 0.9)',
+              boxShadow: '0 0 20px rgba(241, 91, 181, 0.7), 0 0 40px rgba(0, 187, 249, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.5)',
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem',
+              zIndex: 100,
+              animation: 'fadeIn 0.7s ease-out',
+              border: '3px solid #00F5D4'
+            }}>
+              <h3 style={{
+                color: '#FEE440',
+                fontSize: '1.3rem',
+                textAlign: 'center',
+                textShadow: '0 0 5px #FEE440',
+                margin: 0
+              }}>
+                What's your next move?
+              </h3>
+              
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '1rem',
+                marginBottom: '0.5rem'
+              }}>
+                <div style={{ color: '#00F5D4', fontSize: '1.1rem' }}>Current Rizz:</div>
+                <div style={{
+                  color: '#F15BB5',
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  textShadow: '0 0 10px #F15BB5'
+                }}>{rizzLevel}</div>
+              </div>
+              
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '1rem',
+                marginBottom: '1rem'
+              }}>
+                <div style={{ color: '#00F5D4', fontSize: '1.1rem' }}>High Score:</div>
+                <div style={{
+                  color: '#FEE440',
+                  fontSize: '1.5rem',
+                  fontWeight: 'bold',
+                  textShadow: '0 0 10px #FEE440'
+                }}>{highScore}</div>
+              </div>
+              
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <button
+                  onClick={handleDealAgain}
+                  style={{
+                    padding: '1rem',
+                    background: 'linear-gradient(90deg, #00BBF9, #00F5D4)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 0 15px rgba(0, 187, 249, 0.7)',
+                    transition: 'all 0.2s ease',
+                    transform: 'scale(1)',
+                    textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 187, 249, 0.9)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 187, 249, 0.7)';
+                  }}
+                >
+                  🎮 Deal Another Card
+                </button>
+                <button
+                  onClick={handleBankScore}
+                  style={{
+                    padding: '1rem',
+                    background: 'linear-gradient(90deg, #F15BB5, #9B5DE5)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontWeight: 'bold',
+                    fontSize: '1.2rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 0 15px rgba(241, 91, 181, 0.7)',
+                    transition: 'all 0.2s ease',
+                    transform: 'scale(1)',
+                    textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(241, 91, 181, 0.9)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(241, 91, 181, 0.7)';
+                  }}
+                >
+                  💰 Bank Your Score
+                </button>
+              </div>
+            </div>
+          )}
           
           {/* Special Event */}
           {showSpecialEvent && (
             <div style={{
               width: '90%',
-              padding: '1rem',
+              padding: '0.75rem',
               borderRadius: '20px',
               background: 'rgba(155, 93, 229, 0.7)',
-              boxShadow: '0 0 15px #9B5DE5',
+              boxShadow: '0 0 15px rgba(155, 93, 229, 0.7)',
               textAlign: 'center',
               animation: 'glitch 0.5s infinite',
               color: '#FEE440',
               fontWeight: 'bold',
-              fontSize: '1.1rem',
+              fontSize: '1rem',
               textShadow: '0 0 5px #FEE440'
             }}>
               ✨ Sigma Surge Activated! ✨
