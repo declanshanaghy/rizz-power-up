@@ -42,15 +42,21 @@ Use time difference between now and the last commit timestamp for the developmen
   - Use ./design/mockups/ui.html as a reference, it's an implementation-ready HTML+Tailwind component
 - [x] Add a buy me a coffee button to the app and README.md https://buymeacoffee.com/firemandecko
    - <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="firemandecko" data-color="#FFDD00" data-emoji="☕"  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
-- [] Integrate enw Rizz button based on images in apps/frontend/public/buttons/rizz.png
+- [] Integrate new Rizz button based on images in apps/frontend/public/buttons/rizz.png
    - The button image may need to be pre-processed to split it up into its 3 states: disabled, enabled no hover, enabled hovering
+- [] Ensure the game always scales to fit within the window
 - [] Design and implement the main game screen with Rizz button
   - Clicking the rizz button should deal a random card from memeImages.ts
   - The card should be animated in to display in the center of the screen
   - The card should have a fabulous border and shadow
   - The card should display the descrption and effects on the player's stats
+  - The card should disappear after a few seconds and the players score adjusted according to the attributes of the card
+  - Modify the attrbiute panel at the bottom to show the score (integer) in the center the and emoji of the score on the right side
   - Apply the cards effects on the player's stats
   - Ask the player if they want to deal another card or bank their high score
+- [] Attribute scoring
+   - Convert the string keys in Integrate apps/frontend/src/rizz_attributes_emojis.json  to integars.
+   - Integrate apps/frontend/src/rizz_attributes_emojis.json into the app to determine what emoji should be shown according to the attribute score
 - [] Create a database of predefined Rizz quotes (at least 100 unique quotes)
 - [] Implement local storage for saving user progress
 - [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
