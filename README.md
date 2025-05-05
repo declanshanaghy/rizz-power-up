@@ -130,8 +130,12 @@ The application is deployed automatically using GitHub Actions workflows:
 
 ## 👤 Cr3d1ts
 
-> Built by F1r3m4n D3ck0 🔥🧘‍♂️💻  
+> Built by F1r3m4n D3ck0 🔥🧘‍♂️💻
 > "Hustling through the 5th dimension of meme logic and frontend fire."
+
+<a href="https://www.buymeacoffee.com/firemandecko" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" >
+</a>
 
 ## 📜 L1c3ns3
 

@@ -211,7 +211,6 @@ Once a task has been broken down into subtasks using `expand_task` or similar me
      * When creating or updating a Pull Request (PR) on GitHub
         * Title should be a one summary of all the chages on the branch vs the PR target branch. 
         * The description should have a summary of all changes on the PR branch vs the PR target branch using the l33tc0dzer markup style. 
-        * Always include the sum of all development cost metrics found in git commit message history on the branch the PR is being created for.
         * Don't include lists of changed files in the PR
      *   **Always disable the pager** 
         * Disable the pager on all git commands that may have long output, such as `tag`, `show`, `diff`, `log`, or `branch` when composing a commit message        

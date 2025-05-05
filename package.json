@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "pnpm --filter ./apps/frontend dev",
     "build": "pnpm --filter ./apps/frontend build",
-    "preview": "pnpm --filter ./apps/frontend preview"
+    "preview": "pnpm --filter ./apps/frontend preview",
+    "meme:build": "pnpm --filter ./apps/meme-converter build",
+    "meme:convert": "pnpm --filter ./apps/meme-converter start"
   },
   "keywords": [
     "rizz",

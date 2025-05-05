@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ Rizz Power-Up Simulator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset some basic elements */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Source Sans Pro', sans-serif;
+      background-color: #1A1A1A;
+      color: #FFFFFF;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+    }
+    
+    .container {
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .title {
+      font-size: 1.875rem;
+      text-align: center;
+      color: #F15BB5;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 5px #FFF;
+    }
+    
+    .quote-box {
+      font-style: italic;
+      padding: 1rem;
+      border-left: 4px solid #00BBF9;
+      background-color: rgba(255, 255, 255, 0.05);
+      margin-bottom: 1.5rem;
+      color: #00F5D4;
+    }
+    
+    .button-container {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+    
+    .neon-button {
+      background: linear-gradient(90deg, #F15BB5, #00BBF9);
+      color: white;
+      font-weight: bold;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 9999px;
+      text-shadow: 0 0 5px #FFF;
+      box-shadow: 0 0 15px #F15BB5;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+    
+    .neon-button:active {
+      transform: scale(0.95);
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      background-color: #2D2D2D;
+      padding: 1rem;
+      border-radius: 0.5rem;
+    }
+    
+    .rizz-value { color: #FEE440; }
+    .vibe-value { color: #00F5D4; }
+    .swagger-value { color: #00BBF9; }
+    .cringe-value { color: #9B5DE5; }
+    
+    .special-event {
+      margin-top: 1rem;
+      background-color: rgba(155, 93, 229, 0.7);
+      text-align: center;
+      color: #FEE440;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      animation: glitch 0.5s infinite;
+      display: none;
+    }
+    
+    .footer {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+    
+    .menu-button {
+      font-size: 0.875rem;
+      color: #7E7E7E;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    
+    /* Vaporwave-inspired animations */
+    @keyframes neon-pulse {
+      0%, 100% {
+        box-shadow: 0 0 15px #F15BB5;
+      }
+      50% {
+        box-shadow: 0 0 25px #F15BB5, 0 0 35px #F15BB5;
+      }
+    }
+    
+    .animate-neon-pulse {
+      animation: neon-pulse 2s infinite;
+    }
+    
+    @keyframes glitch {
+      0% {
+        transform: translate(0);
+      }
+      20% {
+        transform: translate(-2px, 2px);
+      }
+      40% {
+        transform: translate(-2px, -2px);
+      }
+      60% {
+        transform: translate(2px, 2px);
+      }
+      80% {
+        transform: translate(2px, -2px);
+      }
+      100% {
+        transform: translate(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <h1 class="title">
+      ⚡ RIZZ POWER-UP SIMULATOR
+    </h1>
+    
+    <!-- Quote Display -->
+    <div class="quote-box">
+      <p id="quote">Tap the button to increase your Rizz!</p>
+    </div>
+    
+    <!-- Rizz Button -->
+    <div class="button-container">
+      <button class="neon-button animate-neon-pulse" id="rizz-button">
+        🔥 TAP TO RIZZ UP 🔥
+      </button>
+    </div>
+    
+    <!-- Stats Panel -->
+    <div class="stats-grid">
+      <div>🚀 <strong>Rizz Level:</strong> <span class="rizz-value" id="rizz-level">0</span></div>
+      <div>🌊 <strong>Vibe Level:</strong> <span class="vibe-value" id="vibe-level">0</span></div>
+      <div>😎 <strong>Swagger:</strong> <span class="swagger-value" id="swagger">0</span></div>
+      <div>🧠 <strong>Cringe Avoidance:</strong> <span class="cringe-value" id="cringe">0</span></div>
+    </div>
+    
+    <!-- Special Event -->
+    <div class="special-event" id="special-event">
+      ✨ Sigma Surge Activated! ✨
+    </div>
+    
+    <!-- Footer -->
+    <div class="footer">
+      <button class="menu-button">☰ Open Menu</button>
+    </div>
+  </div>
+
+  <script>
+    // DOM elements
+    const rizzButton = document.getElementById('rizz-button');
+    const quoteElement = document.getElementById('quote');
+    const rizzLevelElement = document.getElementById('rizz-level');
+    const vibeLevelElement = document.getElementById('vibe-level');
+    const swaggerElement = document.getElementById('swagger');
+    const cringeElement = document.getElementById('cringe');
+    const specialEventElement = document.getElementById('special-event');
+    
+    // Game state
+    let rizzLevel = 0;
+    let vibeLevel = 0;
+    let swagger = 0;
+    let cringeAvoidance = 0;
+    
+    // Sample quotes
+    const quotes = [
+      "Your vibe just went up by 10 points!",
+      "That's some serious swagger right there!",
+      "Cringe levels decreasing... Rizz increasing!",
+      "You're radiating pure charisma now!",
+      "Your Rizz power is growing stronger!",
+      "Your aura just disrupted the algorithm."
+    ];
+    
+    // Handle button tap
+    rizzButton.addEventListener('click', () => {
+      // Increase Rizz level
+      rizzLevel++;
+      rizzLevelElement.textContent = rizzLevel;
+      
+      // Update stats
+      vibeLevel += Math.floor(Math.random() * 3) + 1;
+      swagger += Math.floor(Math.random() * 3) + 1;
+      cringeAvoidance += Math.floor(Math.random() * 3) + 1;
+      
+      vibeLevelElement.textContent = vibeLevel;
+      swaggerElement.textContent = swagger;
+      cringeElement.textContent = cringeAvoidance;
+      
+      // Get a random quote
+      const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+      quoteElement.textContent = randomQuote;
+      
+      // Check for special event (every 10 taps)
+      if (rizzLevel % 10 === 0) {
+        specialEventElement.style.display = 'block';
+        setTimeout(() => {
+          specialEventElement.style.display = 'none';
+        }, 3000);
+      }
+    });
+  </script>
+</body>
+</html>
