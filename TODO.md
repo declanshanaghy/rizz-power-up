@@ -4,7 +4,6 @@
 Prior to completing a task, ensure that all changes are committed to git and pushed to the origin
 Create a git commit which includes all changes since last commit on this branch 
 Generate a a summary of changes from the diff of all changed files and your context for the commit message
-Ensure to include Development Cost Metrics. Don't use $ in API Cost, replace it with USD xx.yy
 Disable the pager for all git commands while figuring out the diff
 Use the latest API cost of this task for the API Cost metric.
 Use time difference between now and the last commit timestamp for the development time metric
@@ -44,7 +43,12 @@ Use time difference between now and the last commit timestamp for the developmen
    - <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="firemandecko" data-color="#FFDD00" data-emoji="☕"  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
 - [x] Integrate new Rizz button based on images in apps/frontend/public/buttons/rizz.png
    - The button image may need to be pre-processed to split it up into its 3 states: disabled, enabled no hover, enabled hovering
-- [] Ensure the game always scales to fit within the window
+- [x] Ensure the game always scales to fit within the window
+- [x] Update rizz_image_prompts_no_text_overlay.md so that it has 2 fields per prompt
+   - the prompt itself which is already in the doc
+   - a description field which can be used to describe the card in the game, keep it vague but descriptive of the prompt
+   - Update the meme-converter to generate the new memeImages.ts file with the description field instead of the prompt
+- [] Fix build error in https://github.com/declanshanaghy/rizz-power-up/actions/runs/14831001364/job/41632002398
 - [] Design and implement the main game screen with Rizz button
   - Clicking the rizz button should deal a random card from memeImages.ts
   - The card should be animated in to display in the center of the screen

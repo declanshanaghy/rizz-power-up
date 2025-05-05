@@ -1,3 +1,8 @@
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Reset some basic elements */
 * {
   box-sizing: border-box;
@@ -133,4 +138,95 @@ body {
   }
 }
 
+/* Card animations */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8) rotateY(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+}
+
+@keyframes cardGlow {
+  0% {
+    box-shadow: 0 0 10px #F15BB5, 0 0 20px #00BBF9;
+  }
+  50% {
+    box-shadow: 0 0 20px #00F5D4, 0 0 40px #9B5DE5;
+  }
+  100% {
+    box-shadow: 0 0 10px #F15BB5, 0 0 20px #00BBF9;
+  }
+}
+
 /* Add any additional custom styles here */
+
+/* Rizz Button Styles */
+.rizz-button {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.1s ease;
+  /* Fallback styles in case the image doesn't load */
+  min-width: 200px;
+  min-height: 80px;
+  border-radius: 50px;
+  background-color: #2E0854;
+  /* Remove the pink box-shadow */
+}
+
+/* Ensure the button image is properly loaded */
+.rizz-button-img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Preload the button image to avoid flickering on state changes */
+body::after {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  z-index: -1;
+  content: url('/buttons/rizz.png');
+}
+
+/* Alternative button states for different image formats */
+.rizz-button.disabled {
+  opacity: 0.6;
+  filter: grayscale(70%);
+  cursor: not-allowed;
+}
+
+.rizz-button:hover:not(.disabled) {
+  transform: scale(1.05);
+  /* Remove the pink box-shadow */
+}
+
+.rizz-button:active:not(.disabled) {
+  transform: scale(0.95);
+}
+
+/* Card display classes */
+.card-display {
+  transition: all 0.5s ease;
+}
+
+.card-display.fadeOut {
+  animation: fadeOut 0.5s forwards !important;
+  pointer-events: none;
+}

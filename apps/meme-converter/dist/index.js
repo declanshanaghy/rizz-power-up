@@ -55,7 +55,9 @@ async function parsePrompts() {
     const prompts = [];
     let currentType = 'good';
     let currentPrompt = null;
+    let collectingPrompt = false;
     let collectingDescription = false;
+    let promptLines = [];
     let descriptionLines = [];
     for (const line of lines) {
         // Detect section type
@@ -76,11 +78,18 @@ async function parsePrompts() {
         if (promptMatch) {
             // Save previous prompt if exists
             if (currentPrompt) {
+                // Join all prompt lines and clean up
+                if (promptLines.length > 0) {
+                    currentPrompt.prompt = promptLines
+                        .join(' ')
+                        .replace(/\*\*[^*]+\*\*/g, '') // Remove bold text markers
+                        .trim();
+                }
                 // Join all description lines and clean up
                 if (descriptionLines.length > 0) {
                     currentPrompt.description = descriptionLines
                         .join(' ')
-                        .replace(/\*\*[^*]+\*\*/g, '') // Remove bold text markers
+                        .replace(/\*\*Description:\*\* /, '') // Remove description marker
                         .trim();
                 }
                 prompts.push(currentPrompt);
@@ -89,32 +98,55 @@ async function parsePrompts() {
             currentPrompt = {
                 id: parseInt(promptMatch[1]),
                 title: promptMatch[2],
+                prompt: '',
                 description: '',
                 type: currentType
             };
-            // Reset description collection
-            collectingDescription = true;
+            // Reset collection
+            collectingPrompt = true;
+            collectingDescription = false;
+            promptLines = [];
             descriptionLines = [];
             continue;
         }
-        // Add description text
-        if (currentPrompt && collectingDescription && line.trim() && !line.startsWith('#')) {
+        // Check for description marker
+        if (line.includes('**Description:**')) {
+            collectingPrompt = false;
+            collectingDescription = true;
+            descriptionLines.push(line.trim());
+            continue;
+        }
+        // Add prompt text
+        if (currentPrompt && collectingPrompt && line.trim() && !line.startsWith('#')) {
             // Skip lines that are just formatting instructions
             if (!line.trim().startsWith('**') || !line.trim().endsWith('**')) {
-                descriptionLines.push(line.trim());
+                promptLines.push(line.trim());
             }
         }
+        // Add description text
+        if (currentPrompt && collectingDescription && line.trim() && !line.startsWith('#')) {
+            descriptionLines.push(line.trim());
+        }
         // End of prompt is a blank line
-        if (collectingDescription && line.trim() === '') {
+        if ((collectingPrompt || collectingDescription) && line.trim() === '') {
+            collectingPrompt = false;
             collectingDescription = false;
         }
     }
     // Add the last prompt
     if (currentPrompt) {
+        // Join all prompt lines and clean up
+        if (promptLines.length > 0) {
+            currentPrompt.prompt = promptLines
+                .join(' ')
+                .replace(/\*\*[^*]+\*\*/g, '') // Remove bold text markers
+                .trim();
+        }
+        // Join all description lines and clean up
         if (descriptionLines.length > 0) {
             currentPrompt.description = descriptionLines
                 .join(' ')
-                .replace(/\*\*[^*]+\*\*/g, '') // Remove bold text markers
+                .replace(/\*\*Description:\*\* /, '') // Remove description marker
                 .trim();
         }
         prompts.push(currentPrompt);
@@ -190,25 +222,32 @@ function matchImagesToPrompts(imageGroups, prompts) {
     const imageToPromptIdMapping = {
         'hallway-heroics': 1, // "Main character energy."
         'maximal-clout-strut': 2, // "Exuding max clout per nanosecond."
-        'boho-vibe-overload': 21, // "Spotted: Valley Girl rizz overload in a Benicia sunbeam."
+        'boho-vibe-overload': 9, // "Rizz Zen achieved."
         'meditative-cat-serenity': 20, // "Rizztao the catto energy observed."
         'primal-power-unleashed': 10, // "Unleashed primal rizz beast mode."
         'rained-romance-ruin': 11, // "Your rizz has been obliterated."
         'cringe-meets-style': 12, // "Main cringe energy detected."
         'lonely-raw-hot-dog': 13, // "Rizzless, like an uncooked glizzy."
         'chaotic-desktop-dilemma': 19, // "Overflow Rizzion – Exception Raised."
-        'empty-rizz-neon-car': 18 // "Rizz tank empty."
+        'empty-rizz-neon-car': 18, // "Rizz tank empty."
+        'rizz-core-crisis': 14 // "Quantum rizzwave collapse."
     };
     // Force specific mappings for problematic cases
     const forceSpecificPrompts = (baseName, files, prompts) => {
         // Handle specific cases that need manual mapping
         if (baseName === 'meditative-cat-serenity' && files[0].includes('/good/')) {
-            // This is in the good directory but should match prompt ID 20 (which is in the bad section)
-            return prompts.find(p => p.id === 20); // "Rizztao the catto energy observed"
+            // Create a custom prompt for meditative-cat-serenity in the good directory
+            return {
+                id: 100, // Use a high ID to avoid conflicts
+                title: "Rizztao the catto energy observed",
+                prompt: "A meditative cat sits cross-legged on a mountain edge, surrounded by glowing paw prints, incense smoke, and floating fish emojis.",
+                description: "You've achieved a zen-like state of feline indifference that paradoxically makes everyone want your attention and approval.",
+                type: "good"
+            };
         }
         if (baseName === 'boho-vibe-overload') {
-            // This should match the Valley Girl prompt
-            return prompts.find(p => p.id === 21); // "Spotted: Valley Girl rizz overload"
+            // This should match the Rizz Zen prompt
+            return prompts.find(p => p.id === 9); // "Rizz Zen achieved"
         }
         return undefined;
     };
@@ -216,10 +255,14 @@ function matchImagesToPrompts(imageGroups, prompts) {
     for (const [baseName, files] of imageGroups.entries()) {
         // Try to find a matching prompt
         let matchedPrompt;
-        // First try direct ID mapping (most precise)
-        const promptId = imageToPromptIdMapping[baseName];
-        if (promptId) {
-            matchedPrompt = prompts.find(p => p.id === promptId);
+        // First try forced specific prompts for special cases
+        matchedPrompt = forceSpecificPrompts(baseName, files, prompts);
+        // If no forced prompt, try direct ID mapping
+        if (!matchedPrompt) {
+            const promptId = imageToPromptIdMapping[baseName];
+            if (promptId) {
+                matchedPrompt = prompts.find(p => p.id === promptId);
+            }
         }
         // If no direct ID mapping, try matching by title keywords
         if (!matchedPrompt) {
@@ -255,7 +298,8 @@ function matchImagesToPrompts(imageGroups, prompts) {
             const defaultPrompt = {
                 id: 0,
                 title: baseName.replace(/-/g, ' '),
-                description: `A ${isGood ? 'positive' : 'negative'} rizz image showing ${baseName.replace(/-/g, ' ')}.`,
+                prompt: `A ${isGood ? 'positive' : 'negative'} rizz image showing ${baseName.replace(/-/g, ' ')}.`,
+                description: `A ${isGood ? 'charming' : 'awkward'} moment that ${isGood ? 'enhances' : 'diminishes'} your social appeal.`,
                 type: isGood ? 'good' : 'bad'
             };
             matchedPrompt = defaultPrompt;
@@ -275,7 +319,6 @@ function generateRandomStats(isGood) {
     const min = isGood ? 1 : -10;
     const max = isGood ? 10 : -1;
     return {
-        rizzLevel: Math.floor(Math.random() * (max - min + 1)) + min,
         vibeLevel: Math.floor(Math.random() * (max - min + 1)) + min,
         swagger: Math.floor(Math.random() * (max - min + 1)) + min,
         cringeAvoidance: Math.floor(Math.random() * (max - min + 1)) + min
@@ -297,11 +340,10 @@ async function generateTypeScriptFile(goodMatches, badMatches) {
                 id: `${baseName}-${index + 1}`,
                 name: baseName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
                 path: `/memes/good/${file}`,
-                description: prompt.description,
+                description: prompt.description, // Use the description field instead of the prompt
                 promptTitle: prompt.title,
                 promptId: prompt.id,
                 // Add stats
-                rizzLevel: stats.rizzLevel,
                 vibeLevel: stats.vibeLevel,
                 swagger: stats.swagger,
                 cringeAvoidance: stats.cringeAvoidance
@@ -317,11 +359,10 @@ async function generateTypeScriptFile(goodMatches, badMatches) {
                 id: `${baseName}-${index + 1}`,
                 name: baseName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
                 path: `/memes/bad/${file}`,
-                description: prompt.description,
+                description: prompt.description, // Use the description field instead of the prompt
                 promptTitle: prompt.title,
                 promptId: prompt.id,
                 // Add stats
-                rizzLevel: stats.rizzLevel,
                 vibeLevel: stats.vibeLevel,
                 swagger: stats.swagger,
                 cringeAvoidance: stats.cringeAvoidance
@@ -355,14 +396,20 @@ export interface MemeImage {
   promptTitle?: string;
   /** Original prompt ID from the rizz_image_prompts_no_text_overlay.md file */
   promptId?: number;
-  /** Rizz Level stat (-10 to +10) */
-  rizzLevel: number;
   /** Vibe Level stat (-10 to +10) */
   vibeLevel: number;
   /** Swagger stat (-10 to +10) */
   swagger: number;
   /** Cringe Avoidance stat (-10 to +10) */
   cringeAvoidance: number;
+  
+  /**
+   * Calculate Rizz Level as the sum of all other attributes
+   * @returns The calculated Rizz Level
+   */
+  get rizzLevel(): number {
+    return this.vibeLevel + this.swagger + this.cringeAvoidance;
+  }
 }
 
 /**

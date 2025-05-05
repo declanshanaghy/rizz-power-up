@@ -72,7 +72,7 @@ const toggleFullScreen = () => {
 
 function App() {
   const [rizzLevel, setRizzLevel] = useState(0)
-  const [quote, setQuote] = useState('Tap the button to increase your Rizz!')
+  // Removed unused quote state
   const [showSpecialEvent, setShowSpecialEvent] = useState(false)
   const [containerDimensions, setContainerDimensions] = useState({ width: '95vw', height: 'auto' })
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -289,9 +289,6 @@ function App() {
     setCurrentCard(card);
     setShowCard(true);
     
-    // Set the quote to the card description
-    setQuote(card.description);
-    
     // Update stats based on generated attributes
     const newStats = {
       vibeLevel: stats.vibeLevel + attributes.vibeLevel,
@@ -342,7 +339,6 @@ function App() {
       cringeAvoidance: 0
     });
     setShowBankOptions(false);
-    setQuote('Tap the button to increase your Rizz!');
   };
   
   // Handle dealing another card
@@ -365,9 +361,6 @@ function App() {
       
       setCurrentCard(card);
       setShowCard(true);
-      
-      // Set the quote to the card description
-      setQuote(card.description);
       
       // Update stats based on generated attributes
       const newStats = {
