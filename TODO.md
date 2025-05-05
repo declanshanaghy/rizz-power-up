@@ -32,8 +32,8 @@ Use time difference between now and the last commit timestamp for the developmen
 
 
 ## Frontend Tasks
-- [] Refine image filenames
-   - Read the prompts in apps/frontend/public/memes/rizz_image_prompts_no_text_overlay.md 
+- [x] Refine image filenames
+   - Read the prompts in apps/frontend/public/memes/rizz_image_prompts_no_text_overlay.md
    - Rename the files in the bood and bad subdirectories to be URL compatible
       - Only use chars from regex /[0-9a-zA-Z-.]+/ and .png extension
       - Generate a typescript file for the frontend app that can be used to reference both the good and bad images images for displays
@@ -43,7 +43,7 @@ Use time difference between now and the last commit timestamp for the developmen
 - [] Design and implement the main game screen with Rizz button
 - [] Create a database of predefined Rizz quotes (at least 100 unique quotes)
 - [] Implement local storage for saving user progress
-- [] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
+- [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
 - [] Create special events system that triggers every 10 taps
 - [] Implement hybrid visual style (clean base with glitchy effects during special events)
 - [] Set up Google Analytics for basic user engagement tracking
