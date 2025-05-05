@@ -42,7 +42,7 @@ Use time difference between now and the last commit timestamp for the developmen
   - Use ./design/mockups/ui.html as a reference, it's an implementation-ready HTML+Tailwind component
 - [x] Add a buy me a coffee button to the app and README.md https://buymeacoffee.com/firemandecko
    - <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="firemandecko" data-color="#FFDD00" data-emoji="☕"  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
-- [] Integrate new Rizz button based on images in apps/frontend/public/buttons/rizz.png
+- [x] Integrate new Rizz button based on images in apps/frontend/public/buttons/rizz.png
    - The button image may need to be pre-processed to split it up into its 3 states: disabled, enabled no hover, enabled hovering
 - [] Ensure the game always scales to fit within the window
 - [] Design and implement the main game screen with Rizz button
