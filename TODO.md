@@ -48,8 +48,8 @@ Use time difference between now and the last commit timestamp for the developmen
    - the prompt itself which is already in the doc
    - a description field which can be used to describe the card in the game, keep it vague but descriptive of the prompt
    - Update the meme-converter to generate the new memeImages.ts file with the description field instead of the prompt
-- [] Fix build error in https://github.com/declanshanaghy/rizz-power-up/actions/runs/14831001364/job/41632002398
-- [] Design and implement the main game screen with Rizz button
+- [x] Fix build error in https://github.com/declanshanaghy/rizz-power-up/actions/runs/14831001364/job/41632002398
+- [x] Design and implement the main game screen with Rizz button
   - Clicking the rizz button should deal a random card from memeImages.ts
   - The card should be animated in to display in the center of the screen
   - The card should have a fabulous border and shadow
@@ -58,13 +58,12 @@ Use time difference between now and the last commit timestamp for the developmen
   - Modify the attrbiute panel at the bottom to show the score (integer) in the center the and emoji of the score on the right side
   - Apply the cards effects on the player's stats
   - Ask the player if they want to deal another card or bank their high score
-- [] Attribute scoring
+- [x] Attribute scoring
    - Convert the string keys in Integrate apps/frontend/src/rizz_attributes_emojis.json  to integars.
    - Integrate apps/frontend/src/rizz_attributes_emojis.json into the app to determine what emoji should be shown according to the attribute score
-- [] Create a database of predefined Rizz quotes (at least 100 unique quotes)
 - [] Implement local storage for saving user progress
 - [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
-- [] Create special events system that triggers every 10 taps
+- [] Create special events system that trigger randomly ~ every 10 taps
 - [] Implement hybrid visual style (clean base with glitchy effects during special events)
 - [] Set up Google Analytics for basic user engagement tracking
 
