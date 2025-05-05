@@ -1,0 +1,20 @@
+{
+  "name": "rizz-power-up",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rizz Power-Up Simulator - A vaporwave-style mobile web app",
+  "scripts": {
+    "dev": "pnpm --filter ./apps/frontend dev",
+    "build": "pnpm --filter ./apps/frontend build",
+    "preview": "pnpm --filter ./apps/frontend preview"
+  },
+  "keywords": [
+    "rizz",
+    "vaporwave",
+    "mobile",
+    "web-app",
+    "game"
+  ],
+  "author": "",
+  "license": "MIT"
+}

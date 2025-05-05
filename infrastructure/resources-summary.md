@@ -1,10 +1,10 @@
-# Dollar Game Infrastructure Resources
+# Rizz Power Up Infrastructure Resources
 
 ## S3 Bucket
-- **Name**: dollar-game-firemandecko
+- **Name**: rizz-power-up-firemandecko
 - **Region**: us-east-1 (default region)
-- **ARN**: arn:aws:s3:::dollar-game-firemandecko
-- **Website URL**: http://dollar-game-firemandecko.s3-website-us-east-1.amazonaws.com
+- **ARN**: arn:aws:s3:::rizz-power-up-firemandecko
+- **Website URL**: http://rizz-power-up-firemandecko.s3-website-us-east-1.amazonaws.com
 
 ## Website Configuration
 ```json
@@ -30,7 +30,7 @@
                 "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity [OAI_ID]"
             },
             "Action": "s3:GetObject",
-            "Resource": "arn:aws:s3:::dollar-game-firemandecko/*"
+            "Resource": "arn:aws:s3:::rizz-power-up-firemandecko/*"
         }
     ]
 }
@@ -47,24 +47,24 @@
 ```
 
 ## CloudFront Distribution
-- **Domain**: dollar-game.firemandecko.com
-- **Aliases**: dollar-game.firemandecko.com, www.dollar-game.firemandecko.com
-- **Origin**: S3 bucket (dollar-game-firemandecko)
+- **Domain**: rizz-power-up.firemandecko.com
+- **Aliases**: rizz-power-up.firemandecko.com, www.rizz-power-up.firemandecko.com
+- **Origin**: S3 bucket (rizz-power-up-firemandecko)
 - **Origin Access Identity**: Used to secure S3 bucket access
 - **Default Root Object**: index.html
 - **Price Class**: PriceClass_100 (North America and Europe edge locations)
-- **SSL Certificate**: ACM Certificate for dollar-game.firemandecko.com
+- **SSL Certificate**: ACM Certificate for rizz-power-up.firemandecko.com
 - **Custom Error Response**: 404 errors return index.html with 200 status code (for SPA routing)
 
 ## Route 53 and DNS
 - **Hosted Zone**: firemandecko.com
 - **DNS Records**:
-  - dollar-game.firemandecko.com -> CloudFront distribution
-  - www.dollar-game.firemandecko.com -> CloudFront distribution
+  - rizz-power-up.firemandecko.com -> CloudFront distribution
+  - www.rizz-power-up.firemandecko.com -> CloudFront distribution
 
 ## SSL/TLS Certificate
-- **Domain**: dollar-game.firemandecko.com
-- **Alternative Names**: www.dollar-game.firemandecko.com
+- **Domain**: rizz-power-up.firemandecko.com
+- **Alternative Names**: www.rizz-power-up.firemandecko.com
 - **Validation Method**: DNS
 - **Region**: us-east-1 (required for CloudFront)
 
@@ -106,10 +106,10 @@ To manually invalidate the CloudFront cache:
 
 ```bash
 # Get the CloudFront distribution ID
-DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?contains(@, 'dollar-game.firemandecko.com')]].Id" --output text --profile dollar-game)
+DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?contains(@, 'rizz-power-up.firemandecko.com')]].Id" --output text --profile rizz-power-up)
 
 # Create invalidation for all files
-aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" --profile dollar-game
+aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" --profile rizz-power-up
 ```
 
 ## Troubleshooting

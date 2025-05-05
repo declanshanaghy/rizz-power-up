@@ -1,31 +1,31 @@
 # Terraform/OpenTofu Backend Configuration
 terraform {
   backend "s3" {
-    bucket         = "dollar-game-terraform-state"
-    key            = "dollar-game/terraform.tfstate"
+    bucket         = "rizz-power-up-terraform-state"
+    key            = "rizz-power-up/terraform.tfstate"
     region         = "us-east-1"
-    dynamodb_table = "dollar-game-terraform-locks"
+    dynamodb_table = "rizz-power-up-terraform-locks"
     encrypt        = true
-    profile        = "dollar-game"
+    profile        = "rizz-power-up"
   }
 }
 
 # AWS Provider Configuration
 provider "aws" {
-  profile = "dollar-game"
-  region  = "us-east-1"  # Change to your preferred region
+  profile = "rizz-power-up"
+  region  = "us-east-1" # Change to your preferred region
 }
 
 # AWS Provider for us-east-1 region (required for CloudFront certificates)
 provider "aws" {
   alias   = "us_east_1"
-  profile = "dollar-game"
+  profile = "rizz-power-up"
   region  = "us-east-1"
 }
 
 # S3 Bucket for Website Hosting
 resource "aws_s3_bucket" "website_bucket" {
-  bucket = "dollar-game-firemandecko"
+  bucket = "rizz-power-up-firemandecko"
 }
 
 # S3 Bucket Website Configuration
@@ -58,13 +58,13 @@ resource "aws_s3_bucket_policy" "website_bucket_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid       = "CloudFrontReadGetObject"
-        Effect    = "Allow"
+        Sid    = "CloudFrontReadGetObject"
+        Effect = "Allow"
         Principal = {
           AWS = "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.oai.id}"
         }
-        Action    = "s3:GetObject"
-        Resource  = "${aws_s3_bucket.website_bucket.arn}/*"
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.website_bucket.arn}/*"
       }
     ]
   })
@@ -75,7 +75,7 @@ resource "aws_s3_bucket_policy" "website_bucket_policy" {
 
 # Output the S3 website URL
 output "s3_website_url" {
-  value = "http://${aws_s3_bucket.website_bucket.bucket}.s3-website-${data.aws_region.current.name}.amazonaws.com"
+  value       = "http://${aws_s3_bucket.website_bucket.bucket}.s3-website-${data.aws_region.current.name}.amazonaws.com"
   description = "S3 website URL"
 }
 

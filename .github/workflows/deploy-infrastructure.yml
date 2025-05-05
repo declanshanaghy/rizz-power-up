@@ -3,11 +3,11 @@
 
 name: Deploy Infrastructure
 
-# Trigger on pushes to the master branch when files in the infrastructure/ directory change
+# Trigger on pushes to the main branch when files in the infrastructure/ directory change
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'infrastructure/**'
 
@@ -45,10 +45,10 @@ jobs:
       - name: Set up AWS profile
         run: |
           mkdir -p ~/.aws
-          echo "[dollar-game]" > ~/.aws/credentials
+          echo "[rizz-power-up]" > ~/.aws/credentials
           echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
           echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
-          echo "[dollar-game]" > ~/.aws/config
+          echo "[rizz-power-up]" > ~/.aws/config
           echo "region=us-east-1" >> ~/.aws/config
       
       # Step 4: Initialize OpenTofu
@@ -118,7 +118,7 @@ jobs:
         run: |
           echo "Checking DNS propagation..."
           # Get the domain name
-          DOMAIN=$(tofu output -raw domain_name 2>/dev/null || echo "firemandecko.com")
+          DOMAIN=$(tofu output -raw domain_name 2>/dev/null || echo "rizz-power-up.firemandecko.com")
           
           # Wait for DNS propagation (timeout after 30 minutes)
           TIMEOUT=${{ env.DNS_PROPAGATION_CHECK_TIMEOUT }}

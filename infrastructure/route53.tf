@@ -1,25 +1,20 @@
-# Route53 Hosted Zone for firemandecko.com
-resource "aws_route53_zone" "primary" {
-  name = "firemandecko.com"
-  
-  tags = {
-    Name        = "firemandecko-com-zone"
-    Environment = "production"
-  }
+# Use existing Route53 Hosted Zone for firemandecko.com
+data "aws_route53_zone" "primary" {
+  zone_id = "Z08364008E5M1Z1J3TDD"
 }
 
-# Output the nameservers assigned by AWS
+# Output the nameservers from the existing zone
 output "nameservers" {
-  value       = aws_route53_zone.primary.name_servers
-  description = "The nameservers assigned to the Route53 hosted zone"
+  value       = data.aws_route53_zone.primary.name_servers
+  description = "The nameservers of the Route53 hosted zone"
 }
 
 # A record for apex domain pointing to CloudFront
 resource "aws_route53_record" "apex" {
-  zone_id = aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = "firemandecko.com"
   type    = "A"
-  
+
   alias {
     name                   = aws_cloudfront_distribution.website_distribution.domain_name
     zone_id                = aws_cloudfront_distribution.website_distribution.hosted_zone_id
@@ -28,12 +23,12 @@ resource "aws_route53_record" "apex" {
 }
 
 
-# A record for dollar-game subdomain
-resource "aws_route53_record" "dollar_game" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "dollar-game.firemandecko.com"
+# A record for rizz-power-up subdomain
+resource "aws_route53_record" "rizz_power_up" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "rizz-power-up.firemandecko.com"
   type    = "A"
-  
+
   alias {
     name                   = aws_cloudfront_distribution.website_distribution.domain_name
     zone_id                = aws_cloudfront_distribution.website_distribution.hosted_zone_id
@@ -41,10 +36,10 @@ resource "aws_route53_record" "dollar_game" {
   }
 }
 
-# CNAME record for www.dollar-game subdomain
-resource "aws_route53_record" "www_dollar_game" {
-  zone_id = aws_route53_zone.primary.zone_id
-  name    = "www.dollar-game.firemandecko.com"
+# CNAME record for www.rizz-power-up subdomain
+resource "aws_route53_record" "www_rizz_power_up" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = "www.rizz-power-up.firemandecko.com"
   type    = "CNAME"
   ttl     = 300
   records = [aws_cloudfront_distribution.website_distribution.domain_name]
@@ -52,7 +47,7 @@ resource "aws_route53_record" "www_dollar_game" {
 
 # MX records for email
 resource "aws_route53_record" "mx" {
-  zone_id = aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = "firemandecko.com"
   type    = "MX"
   ttl     = 3600
@@ -64,7 +59,7 @@ resource "aws_route53_record" "mx" {
 
 # TXT record for SPF
 resource "aws_route53_record" "spf" {
-  zone_id = aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = "firemandecko.com"
   type    = "TXT"
   ttl     = 3600
@@ -81,7 +76,7 @@ resource "aws_route53_record" "cert_validation" {
     }
   }
 
-  zone_id = aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = each.value.name
   type    = each.value.type
   ttl     = 60

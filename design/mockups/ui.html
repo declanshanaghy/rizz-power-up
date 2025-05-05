@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ Rizz Power-Up Simulator</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+Pro&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Source Sans Pro', sans-serif;
+      background-color: #1A1A1A;
+      color: #FFFFFF;
+    }
+    h1, h2, h3 {
+      font-family: 'Playfair Display', serif;
+    }
+    .neon-button {
+      background: linear-gradient(90deg, #F15BB5, #00BBF9);
+      color: white;
+      font-weight: bold;
+      padding: 1rem 2rem;
+      border-radius: 9999px;
+      text-shadow: 0 0 5px #FFF;
+      box-shadow: 0 0 15px #F15BB5;
+      transition: transform 0.2s;
+    }
+    .neon-button:active {
+      transform: scale(0.95);
+    }
+    .quote-box {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-left: 4px solid #00BBF9;
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen px-4 py-8">
+
+  <div class="max-w-md w-full">
+    <h1 class="text-3xl text-center text-pink-400 mb-2">⚡ RIZZ POWER-UP SIMULATOR</h1>
+    <p class="quote-box italic text-blue-300">“Your aura just disrupted the algorithm.”</p>
+
+    <div class="flex justify-center my-6">
+      <button class="neon-button">🔥 TAP TO RIZZ UP 🔥</button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 text-sm bg-gray-800 p-4 rounded-lg">
+      <div>🚀 <strong>Rizz Level:</strong> <span id="rizz-level">1234</span></div>
+      <div>🌊 <strong>Vibe Level:</strong> <span id="vibe-level">71</span></div>
+      <div>😎 <strong>Swagger:</strong> <span id="swagger">88</span></div>
+      <div>🧠 <strong>Cringe Avoidance:</strong> <span id="cringe">42</span></div>
+    </div>
+
+    <div class="mt-4 bg-purple-900 text-center text-yellow-300 p-3 rounded-lg hidden" id="special-event">
+      ✨ Sigma Surge Activated! ✨
+    </div>
+
+    <div class="mt-6 text-center">
+      <button class="text-sm text-gray-400 hover:text-pink-400">☰ Open Menu</button>
+    </div>
+  </div>
+
+</body>
+</html>

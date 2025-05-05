@@ -3,11 +3,11 @@
 
 name: Deploy Application
 
-# Trigger on pushes to the master branch when files outside the infrastructure/ directory change
+# Trigger on pushes to the main branch when files outside the infrastructure/ directory change
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - 'infrastructure/**'
       - '.github/workflows/deploy-infrastructure.yml'
@@ -16,7 +16,7 @@ on:
 # Environment variables used throughout the workflow
 env:
   NODE_VERSION: '20'  # Specify the Node.js version to use
-  S3_BUCKET: 'dollar-game-firemandecko'  # Target S3 bucket for deployment
+  S3_BUCKET: 'rizz-power-up-firemandecko'  # Target S3 bucket for deployment
   AWS_PAGER: ""  # Disable AWS CLI pagination
 
 jobs:
@@ -63,10 +63,10 @@ jobs:
       - name: Set up AWS profile
         run: |
           mkdir -p ~/.aws
-          echo "[dollar-game]" > ~/.aws/credentials
+          echo "[rizz-power-up]" > ~/.aws/credentials
           echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
           echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
-          echo "[dollar-game]" > ~/.aws/config
+          echo "[rizz-power-up]" > ~/.aws/config
           echo "region=us-east-1" >> ~/.aws/config
       
       # Step 7: Deploy to S3
@@ -92,7 +92,7 @@ jobs:
       - name: Invalidate CloudFront cache
         run: |
           # Get the CloudFront distribution ID
-          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?contains(@, 'dollar-game.firemandecko.com')]].Id" --output text)
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Aliases.Items[?contains(@, 'rizz-power-up.firemandecko.com')]].Id" --output text)
           
           if [ -n "$DISTRIBUTION_ID" ]; then
             echo "Invalidating CloudFront distribution: $DISTRIBUTION_ID"
@@ -118,13 +118,13 @@ jobs:
               echo "CloudFront URL:"
               tofu output cloudfront_url || echo "CloudFront URL not available yet"
               echo "Custom Domain (once DNS is configured):"
-              tofu output custom_domain || echo "https://dollar-game.firemandecko.com"
+              tofu output custom_domain || echo "https://rizz-power-up.firemandecko.com"
             else
               echo "OpenTofu not available. Using default URLs:"
               echo "S3 Website URL (internal only): http://${{ env.S3_BUCKET }}.s3-website-us-east-1.amazonaws.com"
-              echo "Custom Domain: https://dollar-game.firemandecko.com"
+              echo "Custom Domain: https://rizz-power-up.firemandecko.com"
             fi
           else
             echo "S3 Website URL (internal only): http://${{ env.S3_BUCKET }}.s3-website-us-east-1.amazonaws.com"
-            echo "Custom Domain: https://dollar-game.firemandecko.com"
+            echo "Custom Domain: https://rizz-power-up.firemandecko.com"
           fi

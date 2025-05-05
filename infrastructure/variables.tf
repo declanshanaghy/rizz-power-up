@@ -1,4 +1,4 @@
-# Variables for the Dollar Game infrastructure
+# Variables for the Rizz Power Up infrastructure
 
 # Variable for the root domain name
 variable "root_domain_name" {
@@ -11,5 +11,5 @@ variable "root_domain_name" {
 variable "domain_name" {
   description = "The full domain name for the website"
   type        = string
-  default     = "dollar-game.firemandecko.com"
+  default     = "rizz-power-up.firemandecko.com"
 }

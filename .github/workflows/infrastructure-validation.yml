@@ -1,0 +1,38 @@
+name: Infrastructure Validation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/infrastructure-validation.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'infrastructure/**'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: 1.6.0
+          
+      - name: Initialize OpenTofu
+        working-directory: ./infrastructure
+        run: tofu init -backend=false
+        
+      - name: Validate OpenTofu configuration
+        working-directory: ./infrastructure
+        run: tofu validate
+        
+      - name: Format check
+        working-directory: ./infrastructure
+        run: tofu fmt -check

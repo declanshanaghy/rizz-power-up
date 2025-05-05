@@ -9,10 +9,42 @@ Disable the pager for all git commands while figuring out the diff
 Use the latest API cost of this task for the API Cost metric.
 Use time difference between now and the last commit timestamp for the development time metric
 
-- [] Setup a new git repo for rizz-power-up, then push it up to GitHub in a public repo
-- [] Read the PRD.md file and create a plan for the project. Ask for feedback using yes or no questions on how the app should operate
-   - [] As new tasks are discovered write them back into the TODO.md file for future work
-- [] Initialize a new typescript react project in apps/frontend
-- [] Configure an aws profile for "rizz-power-up"
-- [] Rewrite the copied opentofu modules inside ./infrastructure to handle the rizz-power-up app, instead of dollar-game
-- [] Rewrite the copied GitHub actions inside .github to handle the rizz-power-up app, instead of dollar-game
+- [x] Setup a new git repo for rizz-power-up, then push it up to GitHub in a public repo
+- [x] Read the PRD.md file and create a plan for the project. Ask for feedback using yes or no questions on how the app should operate
+   - [x] As new tasks are discovered write them back into the TODO.md file for future work
+- [x] Generate a README.md for the project, refer to style-guide.md for the style guide for all documentation
+- [x] Initialize a new typescript react project in apps/frontend
+- [x] Configure an aws profile for "rizz-power-up" using ~/Downloads/rizz-power-up_accessKeys.csv
+- [x] Rewrite the copied opentofu modules inside ./infrastructure to handle the rizz-power-up app, instead of dollar-game
+- [x] Run the state.tf Tofu module first to get the state resrouces created
+   - Run all the rest of the required infrastructure resources with OpenTofu and ensure they create successfully
+- [x] Rewrite the copied GitHub actions inside .github to handle the rizz-power-up app, instead of dollar-game
+- [x] Run the github actions locally using act to ensure that they deploy properly
+- [] Commit all changes to git, push to origin, and validate that the actions are succeeding
+- [] Change the License to Apache 2.0 and remove the requests for contributors in README.md
+   - Add a LICENSE.md file to the root of the project with the Apache 2.0 license text in it.
+
+## Frontend Tasks
+- [] Create a vaporwave-inspired TailwindCSS theme
+  - Generate a theme for the app based on ./design/mockups/mock1.png and mock2.png
+  - Use ./design/mockups/ui.html as a reference, it's an implementation-ready HTML+Tailwind component
+- [] Design and implement the main game screen with Rizz button
+- [] Create a database of predefined Rizz quotes (at least 100 unique quotes)
+- [] Implement local storage for saving user progress
+- [] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
+- [] Create special events system that triggers every 10 taps
+- [] Implement hybrid visual style (clean base with glitchy effects during special events)
+- [] Set up Google Analytics for basic user engagement tracking
+
+## Infrastructure Tasks
+- [] Update S3 bucket configuration for rizz-power-up
+- [] Configure CloudFront distribution for the new app
+- [] Set up Route53 DNS records
+- [] Configure SSL certificate
+- [] Test the infrastructure deployment
+
+## Testing Tasks
+- [] Test the app on various mobile devices and screen sizes
+- [] Verify that local storage works correctly for saving progress
+- [] Test special events system
+- [] Verify analytics tracking is working properly
