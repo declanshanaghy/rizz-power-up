@@ -156,7 +156,7 @@ Use time difference between now and the last commit timestamp for the developmen
 - [x] Make good cards give 1.25% bigger scores
    - Apply a 1.25x multiplier to attribute values for good cards
    - Add logging to show the original and multiplied values
-- [] Enhance the user experience with animations
+- [x] Enhance the user experience with animations
    - Animate the stats, label, emoji and score individually.
    - Make them bounce up and down and left and right
    - Make them bounce more when the score is higher and less when the score is lower
@@ -167,9 +167,17 @@ Use time difference between now and the last commit timestamp for the developmen
    - Animate the give up modal as it's opened and closed
    - Animate the Rizz level as it's increased
    - Animate the special events as they're triggered
-- [] Implement hybrid visual style (clean base with glitchy effects during special events)
-- [] Set up Google Analytics for basic user engagement tracking
-   - prompt the user for a new streaming project id
+- [] Optimize the app sounds, videos and images
+   - Allow the main screen to display and the game to start before all the resources are loaded
+   - Optimize the build so that all audio, video and image files are compressed as much as possible,
+   - convert formats if necessary
+   - Ensure that all the images, videos and sounds are optimized for the web
+   - Ensure that all the images, videos and sounds are cached properly
+   - Ensure that all the images, videos and sounds are lazy loaded properly
+   - Ensure that all the images, videos and sounds are preloaded properly
+   - Ensure that all the images, videos and sounds are preloaded properly
+   - Ensure that all the images, videos and sounds are preloaded properly
+   - 
 
 ## Infrastructure Tasks
 - [x] Update S3 bucket configuration for rizz-power-up

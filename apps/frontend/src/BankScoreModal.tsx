@@ -20,6 +20,7 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
   const [videoPath, setVideoPath] = useState<string>('');
   const [audioPath, setAudioPath] = useState<string>('');
   const [isClosing, setIsClosing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Add animations to the document
   useEffect(() => {
@@ -36,6 +37,7 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       setIsClosing(false);
+      setIsLoading(true);
       
       // Generate random paths
       const newVideoPath = getRandomVideoPath('bank');
@@ -45,7 +47,16 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
       setVideoPath(newVideoPath);
       setAudioPath(newAudioPath);
       
-      console.log('Bank modal opened with:', { video: newVideoPath, audio: newAudioPath });
+      console.log('Bank modal opened with media:', { 
+        video: newVideoPath, 
+        audio: newAudioPath 
+      });
+      
+      // Automatically hide loading spinner after a short delay
+      // This ensures the UI doesn't get stuck in loading state
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
     }
   }, [isOpen]);
   
@@ -65,8 +76,14 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
       // Start video and audio
       if (videoElement) {
         videoElement.play()
-          .then(() => console.log('Bank video started playing successfully'))
-          .catch((err: Error) => console.error('Error playing bank video:', err));
+          .then(() => {
+            console.log('Bank video started playing successfully');
+            setIsLoading(false);
+          })
+          .catch((err: Error) => {
+            console.error('Error playing bank video:', err);
+            setIsLoading(false);
+          });
       }
       
       if (audioElement) {
@@ -74,7 +91,7 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
           .then(() => console.log('Bank audio started playing successfully'))
           .catch((err: Error) => console.error('Error playing bank audio:', err));
       }
-    }, 100);
+    }, 300);
     
     return () => {
       clearTimeout(playTimer);
@@ -170,12 +187,33 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
       boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
       display: 'flex',
       alignItems: 'center',
+      position: 'relative' as const,
     },
     video: {
       width: '100%',
       height: 'auto',
       display: 'block',
       maxHeight: '100%',
+    },
+    loadingOverlay: {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1,
+    },
+    loadingSpinner: {
+      width: '50px',
+      height: '50px',
+      border: '5px solid rgba(255, 255, 255, 0.3)',
+      borderRadius: '50%',
+      borderTop: '5px solid var(--color-accent-3, #00F5D4)',
+      animation: 'spin 1s linear infinite',
     },
     button: {
       background: 'linear-gradient(90deg, var(--color-accent-1, #F15BB5), var(--color-accent-4, #9B5DE5))',
@@ -199,12 +237,18 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
     <div style={modalStyles.overlay}>
       <div ref={modalRef} style={modalStyles.modal}>
         <div style={modalStyles.videoContainer}>
+          {isLoading && (
+            <div style={modalStyles.loadingOverlay}>
+              <div style={modalStyles.loadingSpinner}></div>
+            </div>
+          )}
           <video
             ref={videoRef}
             style={modalStyles.video}
             src={videoPath}
             loop
             muted={false}
+            preload="auto"
           />
         </div>
         
@@ -213,6 +257,7 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
           ref={audioRef}
           src={audioPath}
           loop
+          preload="auto"
         />
         
         <button
@@ -230,6 +275,14 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
           CONTINUE
         </button>
       </div>
+      <style>
+        {`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}
+      </style>
     </div>
   );
 };

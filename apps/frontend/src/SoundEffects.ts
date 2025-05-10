@@ -1,5 +1,12 @@
 // Sound effects manager for Rizz Power-Up
-// This module handles loading and playing sound effects for various game events
+// This module handles loading and playing sound effects with optimized formats and lazy loading
+
+import { 
+  getOptimalAudioFormat, 
+  getOptimizedAudioUrl, 
+  AudioFormat,
+  createLazyAudio
+} from './MediaOptimizer';
 
 // Define the types of sound effects
 export enum SoundEffectType {
@@ -20,7 +27,7 @@ export enum SoundEffectType {
 type SoundPath = string | string[];
 
 const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
-  [SoundEffectType.BUTTON_CLICK]: '/sounds/button_click.wav', // Use .wav extension instead of .mp3
+  [SoundEffectType.BUTTON_CLICK]: '/sounds/button_click.wav',
   [SoundEffectType.DEAL_CARD]: [
     '/sounds/card_good_00.wav',
     '/sounds/card_good_01.wav',
@@ -40,26 +47,26 @@ const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
     '/sounds/bank_01.wav',
   ],
   [SoundEffectType.RIZZ_LEVEL]: '/sounds/rizz_level_up.mp3',
-  [SoundEffectType.SPECIAL_EVENT]: '/sounds/card_good_00.wav', // Use an existing sound file
+  [SoundEffectType.SPECIAL_EVENT]: '/sounds/card_good_00.wav',
   [SoundEffectType.SPECIAL_EVENT_GOOD]: [
     '/sounds/card_good_00.wav',
     '/sounds/card_good_01.wav',
     '/sounds/card_good_02.wav',
     '/sounds/card_good_03.wav',
     '/sounds/card_good_04.wav',
-  ], // Reuse the good card sounds for good events
+  ],
   [SoundEffectType.SPECIAL_EVENT_BAD]: [
     '/sounds/card_bad_00.wav',
     '/sounds/card_bad_01.wav',
     '/sounds/card_bad_02.wav',
     '/sounds/card_bad_03.wav',
     '/sounds/card_bad_04.wav',
-  ], // Reuse the bad card sounds for bad events
-  [SoundEffectType.TOAST_NOTIFICATION]: '/sounds/button_click.wav', // Use .wav extension instead of .mp3
+  ],
+  [SoundEffectType.TOAST_NOTIFICATION]: '/sounds/button_click.wav',
   [SoundEffectType.GIVE_UP]: [
     '/sounds/giveup_00.wav',
     '/sounds/giveup_01.wav',
-  ], // Sounds for give up modal
+  ],
 };
 
 // Cache for preloaded audio elements
@@ -71,41 +78,104 @@ const audioCache: AudioCache = {} as AudioCache;
 let soundEffectsVolume = 0.7; // Default volume (0.0 to 1.0)
 let isMuted = false;
 
+// Track which sound types have been preloaded
+const preloadedTypes = new Set<SoundEffectType>();
+
+// Get the optimal audio format based on browser support
+const optimalAudioFormat = getOptimalAudioFormat();
+
 /**
- * Preload all sound effects to avoid delays when playing
+ * Preload critical sound effects to avoid delays when playing
+ * This only preloads the most important sounds, others are loaded on demand
  */
-export function preloadSoundEffects(): void {
-  Object.entries(SOUND_PATHS).forEach(([type, path]) => {
-    if (Array.isArray(path)) {
-      // Handle array of sound paths
-      const audioArray: HTMLAudioElement[] = [];
-      path.forEach(soundPath => {
-        const audio = new Audio(soundPath);
-        audio.preload = 'auto';
-        audioArray.push(audio);
-        
-        // Load the audio file
-        audio.load();
-      });
-      audioCache[type as SoundEffectType] = audioArray;
-    } else {
-      // Handle single sound path
-      const audio = new Audio(path);
-      audio.preload = 'auto';
-      audioCache[type as SoundEffectType] = audio;
-      
-      // Load the audio file
-      audio.load();
-    }
+export function preloadCriticalSoundEffects(): void {
+  // Only preload critical sound effects
+  const criticalSoundTypes = [
+    SoundEffectType.BUTTON_CLICK,
+    SoundEffectType.DEAL_CARD,
+    SoundEffectType.DEAL_CARD_BAD
+  ];
+  
+  criticalSoundTypes.forEach(type => {
+    preloadSoundType(type);
   });
   
-  // Removed console log to declutter
+  console.log(`Preloaded ${criticalSoundTypes.length} critical sound effects`);
 }
 
 /**
- * Play a sound effect
- * @param type The type of sound effect to play
+ * Preload all sound effects in the background
+ * This can be called after the app is interactive
  */
+export function preloadAllSoundEffects(): void {
+  Object.keys(SOUND_PATHS).forEach(type => {
+    preloadSoundType(type as SoundEffectType);
+  });
+  
+  console.log('All sound effects queued for preloading');
+}
+
+/**
+ * Preload a specific sound effect type
+ * @param type The type of sound effect to preload
+ */
+function preloadSoundType(type: SoundEffectType): void {
+  // Skip if already preloaded
+  if (preloadedTypes.has(type)) {
+    return;
+  }
+  
+  const soundPath = SOUND_PATHS[type];
+  
+  if (Array.isArray(soundPath)) {
+    // Handle array of sound paths
+    const audioArray: HTMLAudioElement[] = [];
+    
+    soundPath.forEach(path => {
+      // Use optimized audio URL based on browser support
+      const optimizedPath = getOptimizedAudioUrl(path, optimalAudioFormat);
+      
+      // Create audio element with lazy loading
+      const audio = createLazyAudio(optimizedPath, 'metadata');
+      
+      // Set volume
+      audio.volume = soundEffectsVolume;
+      
+      audioArray.push(audio);
+      
+      // Notify service worker to cache this resource
+      if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({
+          type: 'CACHE_RESOURCE',
+          url: optimizedPath
+        });
+      }
+    });
+    
+    audioCache[type] = audioArray;
+  } else {
+    // Handle single sound path
+    const optimizedPath = getOptimizedAudioUrl(soundPath, optimalAudioFormat);
+    const audio = createLazyAudio(optimizedPath, 'metadata');
+    
+    // Set volume
+    audio.volume = soundEffectsVolume;
+    
+    audioCache[type] = audio;
+    
+    // Notify service worker to cache this resource
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'CACHE_RESOURCE',
+        url: optimizedPath
+      });
+    }
+  }
+  
+  // Mark as preloaded
+  preloadedTypes.add(type);
+}
+
 /**
  * Get a random sound from an array of sounds
  * @param sounds Array of sound paths or audio elements
@@ -113,7 +183,6 @@ export function preloadSoundEffects(): void {
  */
 function getRandomSound<T>(sounds: T[]): T {
   const randomIndex = Math.floor(Math.random() * sounds.length);
-  // Removed console log to declutter
   return sounds[randomIndex];
 }
 
@@ -124,26 +193,17 @@ function getRandomSound<T>(sounds: T[]): T {
 export function playSoundEffect(type: SoundEffectType): void {
   if (isMuted) return;
   
-  const soundPath = SOUND_PATHS[type];
+  // Ensure the sound type is preloaded
+  if (!preloadedTypes.has(type)) {
+    preloadSoundType(type);
+  }
+  
   const cachedAudio = audioCache[type];
   
   // Handle array of sound paths
-  if (Array.isArray(soundPath)) {
-    let audio: HTMLAudioElement;
-    
-    // Get a random audio element from cache or create a new one
-    if (Array.isArray(cachedAudio)) {
-      audio = getRandomSound(cachedAudio);
-      // Removed console log to declutter
-    } else {
-      // If not cached yet, create a new audio element with a random sound path
-      const randomPath = getRandomSound(soundPath);
-      // Removed console log to declutter
-      audio = new Audio(randomPath);
-      
-      // We don't update the cache here since we're expecting an array
-      // This should not happen if preloadSoundEffects was called
-    }
+  if (Array.isArray(cachedAudio)) {
+    // Get a random audio element from cache
+    const audio = getRandomSound(cachedAudio);
     
     // Reset the audio to the beginning if it's already playing
     audio.currentTime = 0;
@@ -157,14 +217,7 @@ export function playSoundEffect(type: SoundEffectType): void {
     });
   } else {
     // Handle single sound path
-    let audio = cachedAudio as HTMLAudioElement;
-    if (!audio) {
-      // Removed console log to declutter
-      audio = new Audio(soundPath);
-      audioCache[type] = audio;
-    } else {
-      // Removed console log to declutter
-    }
+    const audio = cachedAudio;
     
     // Reset the audio to the beginning if it's already playing
     audio.currentTime = 0;
@@ -185,6 +238,17 @@ export function playSoundEffect(type: SoundEffectType): void {
  */
 export function setSoundEffectsVolume(volume: number): void {
   soundEffectsVolume = Math.max(0, Math.min(1, volume));
+  
+  // Update volume for all cached audio elements
+  Object.values(audioCache).forEach(cached => {
+    if (Array.isArray(cached)) {
+      cached.forEach(audio => {
+        audio.volume = soundEffectsVolume;
+      });
+    } else {
+      cached.volume = soundEffectsVolume;
+    }
+  });
 }
 
 /**
@@ -273,3 +337,6 @@ export function playToastSound(): void {
 export function playGiveUpSound(): void {
   playSoundEffect(SoundEffectType.GIVE_UP);
 }
+
+// For backward compatibility
+export const preloadSoundEffects = preloadAllSoundEffects;

@@ -5,20 +5,22 @@ import RizzLevelPanel from './RizzLevelPanel'
 import SpecialEvent from './SpecialEvent'
 import BankScoreModal from './BankScoreModal'
 import GiveUpModal from './GiveUpModal'
-import ResourcePreloader from './ResourcePreloader'
+import OptimizedResourceLoader, { ResourceType } from './OptimizedResourceLoader'
 import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
 import attributeEmojis from './rizz_attributes_emojis'
 import { generateSpecialEvent, shouldTriggerSpecialEvent, applySpecialEventToStats, SpecialEventData } from './SpecialEventUtils'
 import { allAnimations } from './Animations'
 import {
-  preloadSoundEffects,
+  preloadCriticalSoundEffects,
+  preloadAllSoundEffects,
   playButtonClickSound,
   playDealCardSound,
   playRizzLevelSound,
   playSpecialEventSound,
   playGiveUpSound
 } from './SoundEffects'
+import { setupMediaCaching, getOptimizedImageUrl, ImageSize } from './MediaOptimizer'
 
 function VaporwaveApp() {
   // Game state
@@ -29,7 +31,8 @@ function VaporwaveApp() {
   const [currentCard, setCurrentCard] = useState<MemeImage | null>(null)
   const [showBankModal, setShowBankModal] = useState(false)
   const [showGiveUpModal, setShowGiveUpModal] = useState(false)
-  const [resourcesLoaded, setResourcesLoaded] = useState(false)
+  const [criticalResourcesLoaded, setCriticalResourcesLoaded] = useState(false)
+  const [allResourcesLoaded, setAllResourcesLoaded] = useState(false)
   const [currentAttributes, setCurrentAttributes] = useState<{
     vibeLevel: number;
     swagger: number;
@@ -40,17 +43,6 @@ function VaporwaveApp() {
   
   // Game timing
   const [cardDisplayTime, setCardDisplayTime] = useState(2000) // Default card display time in ms
-  
-  
-  // Sample quotes - currently not used but kept for future implementation
-  // const quotes = [
-  //   "Your vibe just went up by 10 points!",
-  //   "That's some serious swagger right there!",
-  //   "Cringe levels decreasing... Rizz increasing!",
-  //   "You're radiating pure charisma now!",
-  //   "Your Rizz power is growing stronger!",
-  //   "Your aura just disrupted the algorithm."
-  // ]
   
   // Stats that increase with each tap
   const [stats, setStats] = useState({
@@ -81,8 +73,11 @@ function VaporwaveApp() {
       setHighScore(savedState.highScore)
     }
     
-    // Preload sound effects
-    preloadSoundEffects();
+    // Set up media caching with service worker
+    setupMediaCaching();
+    
+    // Preload critical sound effects immediately
+    preloadCriticalSoundEffects();
   }, [])
   
   // Save high score to localStorage whenever it changes
@@ -95,7 +90,6 @@ function VaporwaveApp() {
         highScore: highScore
       };
       saveGameState(gameState);
-      // Removed console log for high score to declutter
     }
   }, [highScore, rizzLevel, stats])
   
@@ -128,17 +122,17 @@ function VaporwaveApp() {
     playDealCardSound(isBadCard);
     
     // Update stats based on the card's attributes
-    // Apply a 1.05x multiplier to good cards
+    // Apply a 1.25x multiplier to good cards (increased from 1.05x)
     let newStats;
     if (!isBadCard) {
-      // For good cards, apply a 1.05x multiplier to the attribute values
-      const multiplier = 1.05;
+      // For good cards, apply a 1.25x multiplier to the attribute values
+      const multiplier = 1.25;
       newStats = {
         vibeLevel: stats.vibeLevel + Math.round(attributes.vibeLevel * multiplier),
         swagger: stats.swagger + Math.round(attributes.swagger * multiplier),
         cringeAvoidance: stats.cringeAvoidance + Math.round(attributes.cringeAvoidance * multiplier)
       };
-      console.log(`Applied 1.05x multiplier to good card attributes:`, {
+      console.log(`Applied 1.25x multiplier to good card attributes:`, {
         original: attributes,
         multiplied: {
           vibeLevel: Math.round(attributes.vibeLevel * multiplier),
@@ -193,9 +187,6 @@ function VaporwaveApp() {
     // Update the stats and Rizz level
     setStats(newStats);
     setRizzLevel(newRizzLevel);
-    
-    // Get a random quote (not used currently)
-    // const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
     
     // Set the current card and attributes for display
     setCurrentCard(card);
@@ -422,309 +413,263 @@ function VaporwaveApp() {
     }
   }
 
-  // Handle resource preloading completion
-  const handleResourcesLoaded = useCallback(() => {
-    setResourcesLoaded(true);
-    console.log('All resources preloaded successfully!');
+  // Handle critical resources loaded
+  const handleCriticalResourcesLoaded = useCallback(() => {
+    setCriticalResourcesLoaded(true);
+    console.log('Critical resources loaded, app is now interactive!');
+    
+    // Start loading non-critical resources in the background
+    preloadAllSoundEffects();
   }, []);
 
-  // Only preload resources once when the component mounts
-  useEffect(() => {
-    console.log('Initializing resource preloading...');
-    // The ResourcePreloader component will be rendered only once
+  // Handle all resources loaded
+  const handleAllResourcesLoaded = useCallback(() => {
+    setAllResourcesLoaded(true);
+    console.log('All resources loaded successfully!');
   }, []);
 
   return (
-    <div style={styles.container}>
-      {/* Resource Preloader - only render once when the app loads */}
-      {!resourcesLoaded && <ResourcePreloader onComplete={handleResourcesLoaded} />}
-      
-      {/* Loading indicator */}
-      {!resourcesLoaded && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.8)',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999,
-        }}>
-          <div style={{
-            color: 'var(--color-accent-3, #00F5D4)',
-            fontSize: 'clamp(1.5rem, 5vmin, 2rem)',
-            textAlign: 'center',
-            marginBottom: 'clamp(1rem, 4vmin, 1.5rem)',
-            textShadow: '0 0 10px var(--color-accent-3, #00F5D4)',
-          }}>
-            Loading Rizz Power-Up...
-          </div>
-          <div style={{
-            width: 'min(80%, 300px)',
-            height: '10px',
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderRadius: '5px',
-            overflow: 'hidden',
-          }}>
-            <div style={{
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'var(--color-accent-1, #F15BB5)',
-              backgroundImage: 'linear-gradient(90deg, var(--color-accent-1, #F15BB5), var(--color-accent-2, #00BBF9), var(--color-accent-3, #00F5D4), var(--color-accent-4, #9B5DE5), var(--color-accent-5, #FEE440))',
-              backgroundSize: '200% 100%',
-              animation: 'gradient 2s linear infinite',
-            }} />
-          </div>
-          <style>
-            {`
-              @keyframes gradient {
-                0% { background-position: 0% 50%; }
-                100% { background-position: 200% 50%; }
-              }
-            `}
-          </style>
-        </div>
-      )}
-      <div style={styles.content}>
-        {/* Button Panel - with swapped button order */}
-        <ButtonPanel
-          rizzLevel={rizzLevel}
-          highScore={highScore}
-          clickCount={clickCount}
-          showCard={showCard}
-          onRizzTap={handleRizzTap}
-          onBankScore={handleBankScore}
-          onGiveUp={handleGiveUp}
-        />
-        
-        {/* Stats Panel - with Vibe Level, Swagger, and Cringe Avoidance */}
-        <StatsPanel stats={stats} getEmojiForScore={getEmojiForScore} />
-        
-        {/* Rizz Level Panel - separate component */}
-        <RizzLevelPanel rizzLevel={rizzLevel} getEmojiForScore={getEmojiForScore} />
-        
-        {/* High Score Display moved to footer */}
-        
-        {/* Card Display */}
-        {showCard && currentCard && (
-          <div
-            className="card-display"
-            style={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: 'min(90%, 400px)', // Wider container for better layout
-              height: 'auto',
-              maxHeight: '85vh', // Slightly more vertical space
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
-              borderRadius: 'var(--border-radius-lg, 1rem)',
-              background: 'rgba(46, 8, 84, 0.95)',
-              boxShadow: `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
-                         0 0 clamp(40px, 10vmin, 60px) rgba(0, 187, 249, 0.8),
-                         inset 0 0 clamp(15px, 4vmin, 20px) rgba(255, 255, 255, 0.6)`,
-              alignItems: 'center',
-              gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-              zIndex: 9999,
-              animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite, cardHover 4s ease-in-out infinite 0.7s',
-              border: `4px solid var(--color-accent-3, #00F5D4)`,
-              overflowY: 'auto',
-              cursor: 'pointer', // Add pointer cursor to indicate clickability
-              transition: 'transform 0.3s ease-out'
-            }}
-            onClick={handleCardClick} // Add click handler to dismiss card
-            onMouseOver={(e) => {
-              e.currentTarget.style.animation = 'none';
-              e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.05)';
-              e.currentTarget.style.boxShadow = `0 0 clamp(25px, 6vmin, 35px) rgba(241, 91, 181, 0.9),
-                                               0 0 clamp(50px, 12vmin, 70px) rgba(0, 187, 249, 0.9),
-                                               0 0 clamp(70px, 15vmin, 90px) rgba(255, 255, 255, 0.3),
-                                               inset 0 0 clamp(20px, 5vmin, 25px) rgba(255, 255, 255, 0.7)`;
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.animation = 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite, cardHover 4s ease-in-out infinite';
-              e.currentTarget.style.transform = 'translate(-50%, -50%)';
-              e.currentTarget.style.boxShadow = `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
-                                               0 0 clamp(40px, 10vmin, 60px) rgba(0, 187, 249, 0.8),
-                                               inset 0 0 clamp(15px, 4vmin, 20px) rgba(255, 255, 255, 0.6)`;
-            }}
-          >
-            <h3 style={{
-              color: 'var(--color-accent-5, #FEE440)',
-              fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-              textAlign: 'center',
-              textShadow: `0 0 5px var(--color-accent-5, #FEE440)`,
-              margin: 0,
-              animation: 'cardTextGlow 2s infinite'
-            }}>
-              {currentCard.name}
-            </h3>
-            
-            <div style={{
-              width: '66%', // Scale down to 2/3 of container width
-              aspectRatio: '2/3', // Match the 1024 × 1536 aspect ratio
-              backgroundImage: `url(${currentCard.path})`,
-              backgroundSize: 'contain', // Maintain aspect ratio without cropping
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              borderRadius: 'var(--border-radius-md, 0.75rem)',
-              boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-              marginTop: 'clamp(-5px, -1vmin, -2px)',
-              alignSelf: 'center', // Center horizontally within parent
-              animation: 'cardImagePulse 3s infinite'
-            }} />
-            
-            <p style={{
-              color: 'white',
-              fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)',
-              textAlign: 'center',
-              margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) 0',
-              animation: 'cardTextGlow 2.5s infinite 0.5s'
-            }}>
-              {currentCard.description}
-            </p>
-            
-            {currentAttributes && (
-              <div style={{
-                width: '100%',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-                fontSize: 'clamp(0.7rem, 2.2vmin, 0.8rem)',
-                padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-                background: 'rgba(0, 0, 0, 0.3)',
-                borderRadius: 'var(--border-radius-sm, 0.5rem)',
-                animation: 'cardStatsPulse 3s infinite 1s'
-              }}>
-                <div style={{
-                  color: currentAttributes.vibeLevel >= 0 ?
-                    'var(--color-accent-3, #00F5D4)' :
-                    'var(--color-accent-1, #F15BB5)'
-                }}>
-                  Vibe Level: {currentAttributes.vibeLevel > 0 ? '+' : ''}{currentAttributes.vibeLevel}
-                </div>
-                <div style={{
-                  color: currentAttributes.swagger >= 0 ?
-                    'var(--color-accent-3, #00F5D4)' :
-                    'var(--color-accent-1, #F15BB5)'
-                }}>
-                  Swagger: {currentAttributes.swagger > 0 ? '+' : ''}{currentAttributes.swagger}
-                </div>
-                <div style={{
-                  color: currentAttributes.cringeAvoidance >= 0 ?
-                    'var(--color-accent-3, #00F5D4)' :
-                    'var(--color-accent-1, #F15BB5)'
-                }}>
-                  Cringe: {currentAttributes.cringeAvoidance > 0 ? '+' : ''}{currentAttributes.cringeAvoidance}
-                </div>
-                <div style={{
-                  color: calculateRizzLevel(currentAttributes) >= 0 ?
-                    'var(--color-accent-3, #00F5D4)' :
-                    'var(--color-accent-1, #F15BB5)',
-                  fontSize: 'clamp(0.9rem, 2.8vmin, 1rem)',
-                  fontWeight: 'bold',
-                  textShadow: calculateRizzLevel(currentAttributes) >= 0 ?
-                    '0 0 5px var(--color-accent-3, #00F5D4)' :
-                    '0 0 5px var(--color-accent-1, #F15BB5)',
-                  gridColumn: '1 / -1',
-                  textAlign: 'center',
-                  marginTop: 'clamp(0.15rem, 0.75vmin, 0.25rem)'
-                }}>
-                  Rizz: {calculateRizzLevel(currentAttributes) > 0 ? '+' : ''}{calculateRizzLevel(currentAttributes)}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Special Event */}
-        {showSpecialEvent && currentSpecialEvent && (
-          <SpecialEvent
-            isVisible={showSpecialEvent}
-            eventType={currentSpecialEvent.eventType}
-            statChange={currentSpecialEvent.statChange}
-            statType={currentSpecialEvent.statType}
+    <OptimizedResourceLoader
+      onCriticalComplete={handleCriticalResourcesLoaded}
+      onAllComplete={handleAllResourcesLoaded}
+    >
+      <div style={styles.container}>
+        <div style={styles.content}>
+          {/* Button Panel - with swapped button order */}
+          <ButtonPanel
+            rizzLevel={rizzLevel}
+            highScore={highScore}
+            clickCount={clickCount}
+            showCard={showCard}
+            onRizzTap={handleRizzTap}
+            onBankScore={handleBankScore}
+            onGiveUp={handleGiveUp}
           />
-        )}
-        
-        {/* Bank Score Modal */}
-        <BankScoreModal
-          isOpen={showBankModal}
-          onClose={handleCloseBankModal}
-        />
-        
-        {/* Give Up Modal */}
-        <GiveUpModal
-          isOpen={showGiveUpModal}
-          onClose={handleCloseGiveUpModal}
-        />
-        
-        {/* Footer */}
-        <div style={{
-          ...styles.footer,
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          {/* Buy Me A Coffee button */}
-          <div style={styles.bmcContainer}>
-            <a
-              href="https://www.buymeacoffee.com/firemandecko"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-block',
-                marginTop: '10px',
-                transition: 'transform 0.2s ease'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-            >
-              <img
-                src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-                alt="Buy Me A Coffee"
-                style={{
-                  height: 'clamp(30px, 8vmin, 40px)',
-                  width: 'auto',
-                  maxWidth: '100%'
-                }}
-              />
-            </a>
-          </div>
           
-          {/* High Score Display */}
+          {/* Stats Panel - with Vibe Level, Swagger, and Cringe Avoidance */}
+          <StatsPanel stats={stats} getEmojiForScore={getEmojiForScore} />
+          
+          {/* Rizz Level Panel - separate component */}
+          <RizzLevelPanel rizzLevel={rizzLevel} getEmojiForScore={getEmojiForScore} />
+          
+          {/* Card Display */}
+          {showCard && currentCard && (
+            <div
+              className="card-display"
+              style={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'min(90%, 400px)', // Wider container for better layout
+                height: 'auto',
+                maxHeight: '85vh', // Slightly more vertical space
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
+                borderRadius: 'var(--border-radius-lg, 1rem)',
+                background: 'rgba(46, 8, 84, 0.95)',
+                boxShadow: `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
+                           0 0 clamp(40px, 10vmin, 60px) rgba(0, 187, 249, 0.8),
+                           inset 0 0 clamp(15px, 4vmin, 20px) rgba(255, 255, 255, 0.6)`,
+                alignItems: 'center',
+                gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+                zIndex: 9999,
+                animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite, cardHover 4s ease-in-out infinite 0.7s',
+                border: `4px solid var(--color-accent-3, #00F5D4)`,
+                overflowY: 'auto',
+                cursor: 'pointer', // Add pointer cursor to indicate clickability
+                transition: 'transform 0.3s ease-out'
+              }}
+              onClick={handleCardClick} // Add click handler to dismiss card
+              onMouseOver={(e) => {
+                e.currentTarget.style.animation = 'none';
+                e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.05)';
+                e.currentTarget.style.boxShadow = `0 0 clamp(25px, 6vmin, 35px) rgba(241, 91, 181, 0.9),
+                                                 0 0 clamp(50px, 12vmin, 70px) rgba(0, 187, 249, 0.9),
+                                                 0 0 clamp(70px, 15vmin, 90px) rgba(255, 255, 255, 0.3),
+                                                 inset 0 0 clamp(20px, 5vmin, 25px) rgba(255, 255, 255, 0.7)`;
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.animation = 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite, cardHover 4s ease-in-out infinite';
+                e.currentTarget.style.transform = 'translate(-50%, -50%)';
+                e.currentTarget.style.boxShadow = `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
+                                                 0 0 clamp(40px, 10vmin, 60px) rgba(0, 187, 249, 0.8),
+                                                 inset 0 0 clamp(15px, 4vmin, 20px) rgba(255, 255, 255, 0.6)`;
+              }}
+            >
+              <h3 style={{
+                color: 'var(--color-accent-5, #FEE440)',
+                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+                textAlign: 'center',
+                textShadow: `0 0 5px var(--color-accent-5, #FEE440)`,
+                margin: 0,
+                animation: 'cardTextGlow 2s infinite'
+              }}>
+                {currentCard.name}
+              </h3>
+              
+              <div style={{
+                width: '66%', // Scale down to 2/3 of container width
+                aspectRatio: '2/3', // Match the 1024 × 1536 aspect ratio
+                backgroundImage: `url(${getOptimizedImageUrl(currentCard.path, ImageSize.MEDIUM)})`,
+                backgroundSize: 'contain', // Maintain aspect ratio without cropping
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                borderRadius: 'var(--border-radius-md, 0.75rem)',
+                boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+                marginTop: 'clamp(-5px, -1vmin, -2px)',
+                alignSelf: 'center', // Center horizontally within parent
+                animation: 'cardImagePulse 3s infinite'
+              }} />
+              
+              <p style={{
+                color: 'white',
+                fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)',
+                textAlign: 'center',
+                margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) 0',
+                animation: 'cardTextGlow 2.5s infinite 0.5s'
+              }}>
+                {currentCard.description}
+              </p>
+              
+              {currentAttributes && (
+                <div style={{
+                  width: '100%',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                  gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+                  fontSize: 'clamp(0.7rem, 2.2vmin, 0.8rem)',
+                  padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+                  background: 'rgba(0, 0, 0, 0.3)',
+                  borderRadius: 'var(--border-radius-sm, 0.5rem)',
+                  animation: 'cardStatsPulse 3s infinite 1s'
+                }}>
+                  <div style={{
+                    color: currentAttributes.vibeLevel >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)'
+                  }}>
+                    Vibe Level: {currentAttributes.vibeLevel > 0 ? '+' : ''}{currentAttributes.vibeLevel}
+                  </div>
+                  <div style={{
+                    color: currentAttributes.swagger >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)'
+                  }}>
+                    Swagger: {currentAttributes.swagger > 0 ? '+' : ''}{currentAttributes.swagger}
+                  </div>
+                  <div style={{
+                    color: currentAttributes.cringeAvoidance >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)'
+                  }}>
+                    Cringe: {currentAttributes.cringeAvoidance > 0 ? '+' : ''}{currentAttributes.cringeAvoidance}
+                  </div>
+                  <div style={{
+                    color: calculateRizzLevel(currentAttributes) >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)',
+                    fontSize: 'clamp(0.9rem, 2.8vmin, 1rem)',
+                    fontWeight: 'bold',
+                    textShadow: calculateRizzLevel(currentAttributes) >= 0 ?
+                      '0 0 5px var(--color-accent-3, #00F5D4)' :
+                      '0 0 5px var(--color-accent-1, #F15BB5)',
+                    gridColumn: '1 / -1',
+                    textAlign: 'center',
+                    marginTop: 'clamp(0.15rem, 0.75vmin, 0.25rem)'
+                  }}>
+                    Rizz: {calculateRizzLevel(currentAttributes) > 0 ? '+' : ''}{calculateRizzLevel(currentAttributes)}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Special Event */}
+          {showSpecialEvent && currentSpecialEvent && (
+            <SpecialEvent
+              isVisible={showSpecialEvent}
+              eventType={currentSpecialEvent.eventType}
+              statChange={currentSpecialEvent.statChange}
+              statType={currentSpecialEvent.statType}
+            />
+          )}
+          
+          {/* Bank Score Modal */}
+          <BankScoreModal
+            isOpen={showBankModal}
+            onClose={handleCloseBankModal}
+          />
+          
+          {/* Give Up Modal */}
+          <GiveUpModal
+            isOpen={showGiveUpModal}
+            onClose={handleCloseGiveUpModal}
+          />
+          
+          {/* Footer */}
           <div style={{
-            padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-            borderRadius: 'var(--border-radius-md, 0.75rem)',
-            background: 'rgba(46, 8, 84, 0.7)',
-            textAlign: 'center',
-            display: 'flex',
-            gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: '10px'
+            ...styles.footer,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center'
           }}>
-            <span style={{
-              color: 'var(--color-accent-3, #00F5D4)',
-              fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'
-            }}>High Score:</span>
-            <span style={{
-              color: 'var(--color-accent-5, #FEE440)',
-              fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
-              fontWeight: 'bold',
-              textShadow: '0 0 5px var(--color-accent-5, #FEE440)'
-            }}>{highScore}</span>
+            {/* Buy Me A Coffee button */}
+            <div style={styles.bmcContainer}>
+              <a
+                href="https://www.buymeacoffee.com/firemandecko"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  marginTop: '10px',
+                  transition: 'transform 0.2s ease'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <img
+                  src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+                  alt="Buy Me A Coffee"
+                  style={{
+                    height: 'clamp(30px, 8vmin, 40px)',
+                    width: 'auto',
+                    maxWidth: '100%'
+                  }}
+                  loading="lazy" // Add lazy loading for this image
+                />
+              </a>
+            </div>
+            
+            {/* High Score Display */}
+            <div style={{
+              padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+              borderRadius: 'var(--border-radius-md, 0.75rem)',
+              background: 'rgba(46, 8, 84, 0.7)',
+              textAlign: 'center',
+              display: 'flex',
+              gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginTop: '10px'
+            }}>
+              <span style={{
+                color: 'var(--color-accent-3, #00F5D4)',
+                fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'
+              }}>High Score:</span>
+              <span style={{
+                color: 'var(--color-accent-5, #FEE440)',
+                fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
+                fontWeight: 'bold',
+                textShadow: '0 0 5px var(--color-accent-5, #FEE440)'
+              }}>{highScore}</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </OptimizedResourceLoader>
   )
 }
 
