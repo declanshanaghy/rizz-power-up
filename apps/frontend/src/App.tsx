@@ -493,43 +493,66 @@ function App() {
             margin: '0.25rem 0'
           }}></div>
           
-          {/* Rizz Button */}
-          <div style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
-            <RizzButton onClick={handleRizzTap} disabled={showCard} />
-          </div>
-          
-          {/* Bank Score Button - Always visible */}
-          {!showCard && (
-            <div style={{ display: 'flex', justifyContent: 'center', margin: '0.5rem 0' }}>
-              <button
-                onClick={handleBankScore}
-                style={{
-                  padding: '0.75rem 1.5rem',
-                  background: 'linear-gradient(90deg, #F15BB5, #9B5DE5)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontWeight: 'bold',
-                  fontSize: '1rem',
-                  cursor: 'pointer',
-                  boxShadow: '0 0 15px rgba(241, 91, 181, 0.7)',
-                  transition: 'all 0.2s ease',
-                  transform: 'scale(1)',
-                  textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                  e.currentTarget.style.boxShadow = '0 0 20px rgba(241, 91, 181, 0.9)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  e.currentTarget.style.boxShadow = '0 0 15px rgba(241, 91, 181, 0.7)';
-                }}
-              >
-                💰 Bank Your Score
-              </button>
+          {/* Buttons Container - Both buttons in one component */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            width: 'calc(100% - 100px)', // Full width minus 50px on each side
+            maxWidth: '400px', // Maximum width to prevent buttons from getting too large
+            margin: '0.5rem auto',
+            gap: '0.75rem' // Consistent spacing between buttons
+          }}>
+            {/* Rizz Button */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+              margin: '0.25rem 0'
+            }}>
+              <RizzButton onClick={handleRizzTap} disabled={showCard} />
             </div>
-          )}
+            
+            {/* Bank Score Button - Always visible */}
+            {!showCard && (
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                width: '100%',
+                margin: '0.25rem 0'
+              }}>
+                <button
+                  onClick={handleBankScore}
+                  style={{
+                    width: '100%', // Full width of parent
+                    padding: '0.75rem 0', // Vertical padding only
+                    background: 'linear-gradient(90deg, #F15BB5, #9B5DE5)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontWeight: 'bold',
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                    boxShadow: '0 0 15px rgba(241, 91, 181, 0.7)',
+                    transition: 'all 0.2s ease',
+                    transform: 'scale(1)',
+                    textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(241, 91, 181, 0.9)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(241, 91, 181, 0.7)';
+                  }}
+                >
+                  💰 Bank Your Score
+                </button>
+              </div>
+            )}
+          </div>
           
           {/* Quote Display removed */}
           
