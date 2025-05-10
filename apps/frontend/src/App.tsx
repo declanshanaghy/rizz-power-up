@@ -477,8 +477,8 @@ function App() {
                 transform: 'translate(-50%, -50%)',
                 width: 'min(90%, 550px)', // Increased width to accommodate the 512px image plus padding
                 height: 'auto',
-                maxHeight: '85vh', // Increased to better fit the 768px height
-                padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
+                maxHeight: '90vh', // Increased to allow more of the card to be visible
+                padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
                 borderRadius: 'var(--border-radius-lg, 1rem)',
                 background: 'rgba(46, 8, 84, 0.95)', // More opaque background
                 boxShadow: `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
@@ -487,7 +487,7 @@ function App() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
+                gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
                 zIndex: 9999, // Highest z-index to ensure it appears above everything
                 animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite',
                 border: `4px solid var(--color-accent-3, #00F5D4)`,
@@ -496,7 +496,7 @@ function App() {
             >
               <h3 style={{
                 color: 'var(--color-accent-5, #FEE440)',
-                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+                fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
                 textAlign: 'center',
                 textShadow: `0 0 5px var(--color-accent-5, #FEE440)`,
                 margin: 0
@@ -508,7 +508,7 @@ function App() {
                 width: '512px', // Set exact width to 512px
                 height: '768px', // Set exact height to 768px
                 maxWidth: '100%', // Ensure it doesn't overflow container
-                maxHeight: '60vh', // Limit height to prevent overflow on smaller screens
+                maxHeight: '75vh', // Increased to allow more of the image to be visible
                 backgroundImage: `url(${currentCard.path})`,
                 backgroundSize: 'contain', // Keep 'contain' to ensure the entire image is visible
                 backgroundPosition: 'center',
@@ -521,7 +521,7 @@ function App() {
               
               <p style={{
                 color: 'white',
-                fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)',
+                fontSize: 'clamp(0.7rem, 2.2vmin, 0.8rem)',
                 textAlign: 'center',
                 margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) 0'
               }}>
