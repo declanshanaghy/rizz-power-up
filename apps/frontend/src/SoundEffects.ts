@@ -33,7 +33,7 @@ const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
     '/sounds/card_bad_03.mp3',
     '/sounds/card_bad_04.mp3',
   ],
-  [SoundEffectType.BANK_SCORE]: '/sounds/bank_score.mp3',
+  [SoundEffectType.BANK_SCORE]: '/sounds/bank_01.wav',
   [SoundEffectType.RIZZ_LEVEL]: '/sounds/rizz_level_up.mp3',
   [SoundEffectType.SPECIAL_EVENT]: '/sounds/special_event.mp3',
   [SoundEffectType.SPECIAL_EVENT_GOOD]: [

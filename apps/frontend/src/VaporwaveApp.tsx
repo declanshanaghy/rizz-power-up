@@ -3,6 +3,7 @@ import ButtonPanel from './ButtonPanel'
 import StatsPanel from './StatsPanel'
 import RizzLevelPanel from './RizzLevelPanel'
 import SpecialEvent from './SpecialEvent'
+import BankScoreModal from './BankScoreModal'
 import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
 import attributeEmojis from './rizz_attributes_emojis.json'
@@ -23,6 +24,7 @@ function VaporwaveApp() {
   const [currentSpecialEvent, setCurrentSpecialEvent] = useState<SpecialEventData | null>(null)
   const [showCard, setShowCard] = useState(false)
   const [currentCard, setCurrentCard] = useState<MemeImage | null>(null)
+  const [showBankModal, setShowBankModal] = useState(false)
   const [currentAttributes, setCurrentAttributes] = useState<{
     vibeLevel: number;
     swagger: number;
@@ -231,8 +233,8 @@ function VaporwaveApp() {
   
   // Handle banking the score
   const handleBankScore = () => {
-    // Play bank score sound
-    playBankScoreSound();
+    // Show the bank score modal instead of immediately playing sound
+    setShowBankModal(true);
     
     const newHighScore = rizzLevel > highScore ? rizzLevel : highScore;
     
@@ -240,8 +242,13 @@ function VaporwaveApp() {
     if (rizzLevel > highScore) {
       setHighScore(newHighScore);
     }
+  };
+  
+  // Handle closing the bank score modal
+  const handleCloseBankModal = () => {
+    setShowBankModal(false);
     
-    // Reset game
+    // Reset game after modal is closed
     setRizzLevel(0);
     setStats({
       vibeLevel: 0,
@@ -530,6 +537,12 @@ function VaporwaveApp() {
             statType={currentSpecialEvent.statType}
           />
         )}
+        
+        {/* Bank Score Modal */}
+        <BankScoreModal
+          isOpen={showBankModal}
+          onClose={handleCloseBankModal}
+        />
         
         {/* Footer */}
         <div style={{
