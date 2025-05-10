@@ -1,12 +1,19 @@
-# TODO Things
+# Task Rules
 
-## Commit changes to git before task completion
+1. Never complete a task without asking FiremanDecko to confirm that everything 
+   is working as expected.
+2. After confirmation and prior to returning results to the Orchestrator always 
+   commit changes to git before task completion. See the section below for specifics
+
+# Commit changes to git before task completion
 Prior to completing a task, ensure that all changes are committed to git and pushed to the origin
 Create a git commit which includes all changes since last commit on this branch 
 Generate a a summary of changes from the diff of all changed files and your context for the commit message
 Disable the pager for all git commands while figuring out the diff
 Use the latest API cost of this task for the API Cost metric.
 Use time difference between now and the last commit timestamp for the development time metric
+
+# Tasks
 
 - [x] Setup a new git repo for rizz-power-up, then push it up to GitHub in a public repo
 - [x] Read the PRD.md file and create a plan for the project. Ask for feedback using yes or no questions on how the app should operate
@@ -97,19 +104,17 @@ Use time difference between now and the last commit timestamp for the developmen
    - Fixed animation conflict in SpecialEvent component
    - Resolved TypeScript errors preventing build
    - Removed unused imports and variables
-- [] Incorporate sound effects for the following events
-   - Clicking a button
-   - Dealing a card
-   - Banking a score
-   - Rizz level reached
-   - Special event triggered
-- [] Invent some background music for the app that fits with the style of the game and play it in the background at a low level volume
-   - Add 2 volume controls to the app for sound effects and background music
-   - The controls should be in the bottom left corner of the screen
-   - The controls should be the same size
-   - The controls should have a mute button
-   - The controls should have a volume up and volume down button
-   - The controls should have a play and pause button
+- [x] Incorporate sound effects for the following events
+   - When dealing a card randomly select and play one of the upbeat sound effects if the card is good, randomly select and play one of the negative sound effects if the card is bad using these MP3s:
+      - public/sounds/card_good_00.mp3 through card_good_04.mp3
+      - public/sounds/card_bad_00.mp3 through card_bad_04.mp3
+   - Play a cash register sound when banking a score from this mp3: public/sounds/bank_score.mp3
+   - Play a celebratory sound when the Rizz level surpasses the high score using this mp3: public/sounds/rizz_level_up.mp3
+- [] Make the following emojis & scores bigger and more prominent
+   - Rename "Vibe Level" to "Vibe"
+   - Make the scores bigger for: vibe, swagger, cringe avoidance and rizz level
+   - Make the emojis bigger and more prominent for: vibe, swagger, cringe avoidance and rizz level
+   - Add mouseover effects to the emojis so they are highlighted when the mouse is over them
 - [] Implement hybrid visual style (clean base with glitchy effects during special events)
 - [] Set up Google Analytics for basic user engagement tracking
 

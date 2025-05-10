@@ -1,6 +1,8 @@
-# The Dollar Game Style Guide
+# The Rizz Power-Up Style Guide
 
-> *"In the cosmic dance of vertices and edges, we find not merely a game, but a profound meditation on the interconnectedness of all things, man."* — Anonymous l33tc0dzr sipping a single-origin pour-over
+> *"In the cosmic dance of rizz and cringe, we find not merely a game, 
+but a profound meditation on the interconnectedness of all things, 
+man."* — Anonymous l33tc0dzr sipping a single-origin pour-over
 
 ## 1. Introduction & Philosophy
 

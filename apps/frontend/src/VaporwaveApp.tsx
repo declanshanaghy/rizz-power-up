@@ -7,6 +7,14 @@ import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
 import attributeEmojis from './rizz_attributes_emojis.json'
 import { generateSpecialEvent, shouldTriggerSpecialEvent, applySpecialEventToStats, SpecialEventData } from './SpecialEvent'
+import {
+  preloadSoundEffects,
+  playButtonClickSound,
+  playDealCardSound,
+  playBankScoreSound,
+  playRizzLevelSound,
+  playSpecialEventSound
+} from './SoundEffects'
 
 function VaporwaveApp() {
   // Game state
@@ -113,6 +121,9 @@ function VaporwaveApp() {
     if (savedState) {
       setHighScore(savedState.highScore)
     }
+    
+    // Preload sound effects
+    preloadSoundEffects();
   }, [])
   
   // Save high score to localStorage whenever it changes
@@ -133,6 +144,9 @@ function VaporwaveApp() {
   const handleRizzTap = () => {
     if (showCard) return; // Don't allow new cards while one is showing
     
+    // Play button click sound
+    playButtonClickSound();
+    
     // Increment click count
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
@@ -140,6 +154,13 @@ function VaporwaveApp() {
     // Get a random card and display it
     const card = getRandomImage();
     const attributes = generateAttributes(card.bias);
+    
+    // Calculate if this is a "bad" card (negative total attributes)
+    const totalCardEffect = attributes.vibeLevel + attributes.swagger + attributes.cringeAvoidance;
+    const isBadCard = totalCardEffect < 0;
+    
+    // Play appropriate deal card sound based on card effect
+    playDealCardSound(isBadCard);
     
     // Update stats based on the card's attributes
     let newStats = {
@@ -151,7 +172,7 @@ function VaporwaveApp() {
     // Check if a special event should trigger (approximately every 18 taps)
     if (shouldTriggerSpecialEvent(newClickCount)) {
       // Generate a special event
-      const specialEvent = generateSpecialEvent();
+    const specialEvent = generateSpecialEvent();
       
       // Apply the special event to the stats
       newStats = applySpecialEventToStats(newStats, specialEvent);
@@ -159,6 +180,9 @@ function VaporwaveApp() {
       // Set the current special event and show it
       setCurrentSpecialEvent(specialEvent);
       setShowSpecialEvent(true);
+      
+      // Play special event sound based on event type
+      playSpecialEventSound(specialEvent.eventType === 'good');
       
       // Hide the special event after a delay
       setTimeout(() => {
@@ -169,6 +193,12 @@ function VaporwaveApp() {
     
     // Calculate the new Rizz level as the sum of all attributes
     const newRizzLevel = newStats.vibeLevel + newStats.swagger + newStats.cringeAvoidance;
+    
+    // Check if Rizz level has surpassed the high score
+    if (rizzLevel <= highScore && newRizzLevel > highScore) {
+      // Play celebratory sound when surpassing high score
+      playRizzLevelSound();
+    }
     
     // Update the stats and Rizz level
     setStats(newStats);
@@ -201,6 +231,9 @@ function VaporwaveApp() {
   
   // Handle banking the score
   const handleBankScore = () => {
+    // Play bank score sound
+    playBankScoreSound();
+    
     const newHighScore = rizzLevel > highScore ? rizzLevel : highScore;
     
     // Update high score if current rizz level is higher
@@ -220,6 +253,9 @@ function VaporwaveApp() {
 
   // Handle giving up (reset game without updating high score)
   const handleGiveUp = () => {
+    // Play button click sound
+    playButtonClickSound();
+    
     // Reset game without updating high score
     setRizzLevel(0);
     setStats({

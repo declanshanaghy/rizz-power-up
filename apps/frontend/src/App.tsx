@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import RizzBackground from './RizzBackground'
+import SoundControl from './SoundControl'
 import { loadGameState } from './localStorage'
 import './App.css'
 
@@ -17,6 +18,9 @@ function App() {
   return (
     <div className="app-container">
       <RizzBackground />
+      
+      {/* Sound Control component */}
+      <SoundControl position="bottom-left" />
       
       {/* Footer container for Buy Me a Coffee button and High Score panel */}
       <div className="footer-container" style={{
