@@ -88,8 +88,12 @@ Use time difference between now and the last commit timestamp for the developmen
    - Add a background image to the app using bg1.png
 - [x] Ensure that the images display within the card component with the right aspect ratio
    - The images are 1024 × 1536 pixels maintain the aspect ratio when displayed in the card component but scale it down to fit on the screen comfortably
-- [] Create special events system that trigger randomly ~ every 18 taps
-- [] Incorporate sound effects for the followign events
+- [x] Create special events system that trigger randomly ~ every 18 taps
+   - Plsce logic for special events in SpecialEvent.tsx
+   - Ensure the special events are displayed on top of the card component.
+   - The speial event should either increase or decrease the players stats by a large random amount.
+   - The amount shoudl be negative if it's a bad event and positive if it's a good event. 
+- [] Incorporate sound effects for the following events
    - Clicking a button
    - Dealing a card
    - Banking a score
