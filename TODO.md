@@ -77,20 +77,11 @@ Use time difference between now and the last commit timestamp for the developmen
    - It should not be visible when a new game starts
    - Ensure it is not ALWAYS visible, it should only be visible after the user has clicked the Rizz Up button
 - [x] Adjust the vertical scaling of the all component inside the main App to leave 5% space on top and bottom
-- [] Extract the stats Panel into a separate component
-- [] Extract the Rizz Level Panel into a separate component
-- [] Extract the High Score Panel into a separate component
-- [] Fix the sizing of main UI elements
-   - The parent container should always scale wider than the child elements
-      - The child elements are:
-         - BUTTONS CONTAINER
-         - STATS PANEL
-         - RIZZ LEVEL PANEL
-   - Remove the 4th phantom panel underneath the rizz level panel. It's not needed.
-   - The Rizz Up Button & Bank Score Button should be 25% smaller than the parent container
-   - The stats panel and rizz level panel should all scale together 
-   - The stats panel and rizz level panel should all be 10% less wide than the parent container.
-- [] Implement local storage for saving user progress
+- [x] Extract the stats Panel into a separate component
+- [x] Extract the Rizz Level Panel into a separate component
+- [x] Extract the High Score Panel into a separate component
+- [x] Implement local storage for banking the user's high score
+- [] Modify the main display so that the Bank score button only shows when the user has scored more than the high score.
 - [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
 - [] Create special events system that trigger randomly ~ every 10 taps
 - [] Implement hybrid visual style (clean base with glitchy effects during special events)
