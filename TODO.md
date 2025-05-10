@@ -115,6 +115,22 @@ Use time difference between now and the last commit timestamp for the developmen
    - Make the scores bigger for: vibe, swagger, cringe avoidance and rizz level
    - Make the emojis bigger and more prominent for: vibe, swagger, cringe avoidance and rizz level
    - Add mouseover effects to the emojis so they are highlighted when the mouse is over them
+- [] Add the video from public/videos/bank_01.mp4 to the app
+   - The video and a continue button should be displayed in a modal panel 
+     when the user banks a score
+   - The video should play in the top portion of the modal panel
+   - The video should loop continuously
+   - Play the bank_score.mp3 sound continuously along with the video
+   - There should be a button below the video labeled "Continue" to return to the game
+   - When the user clicks the continue button, the modal panel should 
+      close and the video and sound must stop playing
+- [] Adjust the game Timing
+   - In general the game should be faster paced
+   - If the user becomes more impatient and clicks faster, the game should tend to slow down
+     to antagonize them. 
+   - If the user becomes more patient and clicks slower, the game should tend to speed up to 
+     encourage them.
+   - Make it obvious to the user that this is happening, with witty toast messages that pop up and fly away
 - [] Implement hybrid visual style (clean base with glitchy effects during special events)
 - [] Set up Google Analytics for basic user engagement tracking
 

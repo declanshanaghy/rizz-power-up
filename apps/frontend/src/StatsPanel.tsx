@@ -30,17 +30,30 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, getEmojiForScore }) => {
             color: 'var(--color-accent-3, #00F5D4)',
             fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
             textAlign: 'center'
-          }}>Vibe Level</span>
+          }}>Vibe</span>
           <span style={{
             color: stats.vibeLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-            fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
+            fontSize: 'clamp(1.2rem, 4vmin, 1.5rem)',
             fontWeight: 'bold',
             textAlign: 'center'
           }}>{stats.vibeLevel}</span>
-          <span style={{
-            fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-            textAlign: 'center'
-          }}>{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
+          <span
+            className="emoji-hover"
+            style={{
+              fontSize: 'clamp(1.5rem, 5vmin, 1.8rem)',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease, filter 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.2)';
+              e.currentTarget.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.8))';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.filter = 'none';
+            }}
+          >{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
         </div>
         
         {/* Swagger */}
@@ -52,14 +65,27 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, getEmojiForScore }) => {
           }}>Swagger</span>
           <span style={{
             color: stats.swagger >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-            fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
+            fontSize: 'clamp(1.2rem, 4vmin, 1.5rem)',
             fontWeight: 'bold',
             textAlign: 'center'
           }}>{stats.swagger}</span>
-          <span style={{
-            fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-            textAlign: 'center'
-          }}>{getEmojiForScore("Swagger", stats.swagger)}</span>
+          <span
+            className="emoji-hover"
+            style={{
+              fontSize: 'clamp(1.5rem, 5vmin, 1.8rem)',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease, filter 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.2)';
+              e.currentTarget.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.8))';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.filter = 'none';
+            }}
+          >{getEmojiForScore("Swagger", stats.swagger)}</span>
         </div>
         
         {/* Cringe Avoidance */}
@@ -71,14 +97,27 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, getEmojiForScore }) => {
           }}>Cringe Avoidance</span>
           <span style={{
             color: stats.cringeAvoidance >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-            fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
+            fontSize: 'clamp(1.2rem, 4vmin, 1.5rem)',
             fontWeight: 'bold',
             textAlign: 'center'
           }}>{stats.cringeAvoidance}</span>
-          <span style={{
-            fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-            textAlign: 'center'
-          }}>{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
+          <span
+            className="emoji-hover"
+            style={{
+              fontSize: 'clamp(1.5rem, 5vmin, 1.8rem)',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'transform 0.2s ease, filter 0.2s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.2)';
+              e.currentTarget.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.8))';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.filter = 'none';
+            }}
+          >{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
         </div>
       </div>
     </div>

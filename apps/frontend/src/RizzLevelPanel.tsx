@@ -23,15 +23,28 @@ const RizzLevelPanel: React.FC<RizzLevelPanelProps> = ({ rizzLevel, getEmojiForS
       }}>
         <span style={{
           color: rizzLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-          fontSize: 'clamp(1.5rem, 6vmin, 2rem)',
+          fontSize: 'clamp(2rem, 8vmin, 2.5rem)',
           fontWeight: 'bold',
           textShadow: rizzLevel >= 0 ?
-            '0 0 clamp(5px, 2vmin, 10px) var(--color-accent-3, #00F5D4)' :
-            '0 0 clamp(5px, 2vmin, 10px) var(--color-accent-1, #F15BB5)'
+            '0 0 clamp(8px, 3vmin, 15px) var(--color-accent-3, #00F5D4)' :
+            '0 0 clamp(8px, 3vmin, 15px) var(--color-accent-1, #F15BB5)'
         }}>{rizzLevel}</span>
-        <span style={{
-          fontSize: 'clamp(1.5rem, 6vmin, 2rem)'
-        }}>{getEmojiForScore("Rizz Level", rizzLevel)}</span>
+        <span
+          className="emoji-hover"
+          style={{
+            fontSize: 'clamp(2rem, 8vmin, 2.5rem)',
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease, filter 0.2s ease'
+          }}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'scale(1.2)';
+            e.currentTarget.style.filter = 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.filter = 'none';
+          }}
+        >{getEmojiForScore("Rizz Level", rizzLevel)}</span>
       </div>
     </div>
   )
