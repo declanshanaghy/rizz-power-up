@@ -21,35 +21,35 @@ type SoundPath = string | string[];
 const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
   [SoundEffectType.BUTTON_CLICK]: '/sounds/button_click.wav', // Use .wav extension instead of .mp3
   [SoundEffectType.DEAL_CARD]: [
-    '/sounds/card_good_00.mp3',
-    '/sounds/card_good_01.mp3',
-    '/sounds/card_good_02.mp3',
-    '/sounds/card_good_03.mp3',
-    '/sounds/card_good_04.mp3',
+    '/sounds/card_good_00.wav',
+    '/sounds/card_good_01.wav',
+    '/sounds/card_good_02.wav',
+    '/sounds/card_good_03.wav',
+    '/sounds/card_good_04.wav',
   ],
   [SoundEffectType.DEAL_CARD_BAD]: [
-    '/sounds/card_bad_00.mp3',
-    '/sounds/card_bad_01.mp3',
-    '/sounds/card_bad_02.mp3',
-    '/sounds/card_bad_03.mp3',
-    '/sounds/card_bad_04.mp3',
+    '/sounds/card_bad_00.wav',
+    '/sounds/card_bad_01.wav',
+    '/sounds/card_bad_02.wav',
+    '/sounds/card_bad_03.wav',
+    '/sounds/card_bad_04.wav',
   ],
   [SoundEffectType.BANK_SCORE]: '/sounds/bank_01.wav',
   [SoundEffectType.RIZZ_LEVEL]: '/sounds/rizz_level_up.mp3',
-  [SoundEffectType.SPECIAL_EVENT]: '/sounds/card_good_00.mp3', // Use an existing sound file
+  [SoundEffectType.SPECIAL_EVENT]: '/sounds/card_good_00.wav', // Use an existing sound file
   [SoundEffectType.SPECIAL_EVENT_GOOD]: [
-    '/sounds/card_good_00.mp3',
-    '/sounds/card_good_01.mp3',
-    '/sounds/card_good_02.mp3',
-    '/sounds/card_good_03.mp3',
-    '/sounds/card_good_04.mp3',
+    '/sounds/card_good_00.wav',
+    '/sounds/card_good_01.wav',
+    '/sounds/card_good_02.wav',
+    '/sounds/card_good_03.wav',
+    '/sounds/card_good_04.wav',
   ], // Reuse the good card sounds for good events
   [SoundEffectType.SPECIAL_EVENT_BAD]: [
-    '/sounds/card_bad_00.mp3',
-    '/sounds/card_bad_01.mp3',
-    '/sounds/card_bad_02.mp3',
-    '/sounds/card_bad_03.mp3',
-    '/sounds/card_bad_04.mp3',
+    '/sounds/card_bad_00.wav',
+    '/sounds/card_bad_01.wav',
+    '/sounds/card_bad_02.wav',
+    '/sounds/card_bad_03.wav',
+    '/sounds/card_bad_04.wav',
   ], // Reuse the bad card sounds for bad events
   [SoundEffectType.TOAST_NOTIFICATION]: '/sounds/button_click.wav', // Use .wav extension instead of .mp3
 };

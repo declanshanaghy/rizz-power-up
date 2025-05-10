@@ -136,7 +136,7 @@ Use time difference between now and the last commit timestamp for the developmen
      encourage them.
    - Make it obvious to the user that this is happening, with witty toast messages that pop up and fly away
 - [x] Run the linter and fix all errors
-- [] Replace the good card and bad card sounds
+- [x] Replace the good card and bad card sounds
    - sounds/card_good_NN.mp3 have been replaced with sounds/card_good_NN.wav
    - Same for bad sound cards. Integrate the wav files into the app
    - Remove the mp3 files from the project and the git repo.
