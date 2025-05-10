@@ -6,6 +6,7 @@ import StatsPanel from './StatsPanel'
 import RizzLevelPanel from './RizzLevelPanel'
 import HighScorePanel from './HighScorePanel'
 import HighScoreAnimation from './HighScoreAnimation'
+import GiveUpAnimation from './GiveUpAnimation'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages.ts'
 import attributeEmojis from './rizz_attributes_emojis.json'
 import { loadGameState, saveGameState, GameState } from './localStorage'
@@ -102,6 +103,7 @@ function App() {
   const [clickCount, setClickCount] = useState(0)
   const [showHighScoreAnimation, setShowHighScoreAnimation] = useState(false)
   const [newHighScore, setNewHighScore] = useState(0)
+  const [showGiveUpAnimation, setShowGiveUpAnimation] = useState(false)
   
   // Load saved game state from localStorage on initial render
   useEffect(() => {
@@ -300,7 +302,14 @@ function App() {
 
   // Handle giving up (reset game without updating high score)
   const handleGiveUp = () => {
-    // Reset game without updating high score
+    // Show the give up animation
+    setShowGiveUpAnimation(true);
+    // The game will be reset after the animation completes
+  };
+  
+  // Handle give up animation completion
+  const handleGiveUpAnimationComplete = () => {
+    setShowGiveUpAnimation(false);
     resetGame();
   };
 
@@ -616,6 +625,13 @@ function App() {
             <HighScoreAnimation
               score={newHighScore}
               onAnimationComplete={handleAnimationComplete}
+            />
+          )}
+          
+          {/* Give Up Animation */}
+          {showGiveUpAnimation && (
+            <GiveUpAnimation
+              onAnimationComplete={handleGiveUpAnimationComplete}
             />
           )}
           
