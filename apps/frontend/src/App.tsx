@@ -475,9 +475,9 @@ function App() {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 'min(85%, 350px)', // Increased max width to better accommodate the 2:3 aspect ratio
+                width: 'min(90%, 550px)', // Increased width to accommodate the 512px image plus padding
                 height: 'auto',
-                maxHeight: '80vh',
+                maxHeight: '85vh', // Increased to better fit the 768px height
                 padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
                 borderRadius: 'var(--border-radius-lg, 1rem)',
                 background: 'rgba(46, 8, 84, 0.95)', // More opaque background
@@ -505,15 +505,18 @@ function App() {
               </h3>
               
               <div style={{
-                width: '100%',
-                aspectRatio: '2/3', // Changed to match the original 1024 × 1536 aspect ratio
+                width: '512px', // Set exact width to 512px
+                height: '768px', // Set exact height to 768px
+                maxWidth: '100%', // Ensure it doesn't overflow container
+                maxHeight: '60vh', // Limit height to prevent overflow on smaller screens
                 backgroundImage: `url(${currentCard.path})`,
-                backgroundSize: 'contain', // Changed from 'cover' to 'contain' to ensure the entire image is visible
+                backgroundSize: 'contain', // Keep 'contain' to ensure the entire image is visible
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
                 borderRadius: 'var(--border-radius-md, 0.75rem)',
                 boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-                marginTop: 'clamp(-5px, -1vmin, -2px)'
+                marginTop: 'clamp(-5px, -1vmin, -2px)',
+                margin: '0 auto' // Center the image horizontally
               }} />
               
               <p style={{
