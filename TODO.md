@@ -86,7 +86,7 @@ Use time difference between now and the last commit timestamp for the developmen
 - [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
 - [x] Remove the title from the app that reads "RIZZ POWER-UP SIMULATOR"
    - Add a background image to the app using bg1.png
-- [] Ensure that the images display within the card component with the right aspect ratio
+- [x] Ensure that the images display within the card component with the right aspect ratio
    - The images are 1024 × 1536 pixels maintain the aspect ratio when displayed in the card component but scale it down to fit on the screen comfortably
 - [] Create special events system that trigger randomly ~ every 18 taps
 - [] Incorporate sound effects for the followign events
