@@ -319,9 +319,9 @@ function App() {
         style={{
           position: 'relative',
           width: 'auto',
-          height: 'min(95vh, calc(100vh - 20px))',
-          maxHeight: '100vh',
-          margin: '0 auto',
+          height: '90vh', /* Reduced to 90% to leave 5% on top and 5% on bottom */
+          maxHeight: '90vh',
+          margin: '5vh auto', /* Added 5vh margin on top and bottom */
           zIndex: 1,
           display: 'flex',
           flexDirection: 'column',
@@ -368,15 +368,6 @@ function App() {
         }}>
           {/* Header space - title removed */}
           <div style={{ height: '1rem' }}></div>
-          
-          {/* Horizontal line */}
-          <div style={{
-            width: '90%',
-            height: '2px',
-            background: 'linear-gradient(90deg, transparent 0%, #00F5D4 50%, transparent 100%)',
-            boxShadow: '0 0 10px #00F5D4, 0 0 20px #00F5D4',
-            margin: '0.25rem 0'
-          }}></div>
           
           {/* Buttons Container - Both buttons in one component */}
           <div className="flex flex-col items-center justify-center w-full" style={{

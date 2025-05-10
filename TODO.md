@@ -63,7 +63,7 @@ Use time difference between now and the last commit timestamp for the developmen
    - Integrate apps/frontend/src/rizz_attributes_emojis.json into the app to determine what emoji should be shown according to the attribute score
 - [x] Run the meme generator to create the new meme images.
    - Run the meme generator in ./apps/meme-converter to create the new memeImages.ts file so they an be integrated into the app
-- [] Fix the alignment of the button image when the mouse hover over it. 
+- [x] Fix the alignment of the button image when the mouse hover over it. 
   - It appears to move upwards when the mouse is over it.
 - [x] Modify the game flow so that the player returns to the main attrbiute display screen after a card was dealt.
    - The delay to return to the screen should be inversely proportional to the number of times the user clicks on the screen. 
@@ -72,11 +72,11 @@ Use time difference between now and the last commit timestamp for the developmen
    - After dealing a card, the main display should show:
       - The Rizz up Button
       - The bank score button
-- [] Extract the Bank Score button into a separate component
+- [x] Extract the Bank Score button into a separate component
    - It's marked by this comment in App.tsx: {/* Bank Score Button - Always visible */}
    - It should not be visible when a new game starts
    - Ensure it is not ALWAYS visible, it should only be visible after the user has clicked the Rizz Up button
-- [] Adjust the vertical scaling of the all component inside the main App to leave 5% space on top and bottom
+- [x] Adjust the vertical scaling of the all component inside the main App to leave 5% space on top and bottom
 - [] Extract the stats Panel into a separate component
 - [] Extract the Rizz Level Panel into a separate component
 - [] Extract the High Score Panel into a separate component
