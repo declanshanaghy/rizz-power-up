@@ -177,7 +177,7 @@ Use time difference between now and the last commit timestamp for the developmen
    - Ensure that all the images, videos and sounds are preloaded properly
    - Ensure that all the images, videos and sounds are preloaded properly
    - Ensure that all the images, videos and sounds are preloaded properly
-- [] Integrate google analytics
+- [x] Integrate google analytics
    - track events such as 
       clicks, high scores, 
       give up, bank score, 
@@ -197,7 +197,7 @@ Use time difference between now and the last commit timestamp for the developmen
 - [x] Test the infrastructure deployment
 
 ## Testing Tasks
-- [] Test the app on various mobile devices and screen sizes
-- [] Verify that local storage works correctly for saving progress
-- [] Test special events system
-- [] Verify analytics tracking is working properly
+- [x] Test the app on various mobile devices and screen sizes
+- [x] Verify that local storage works correctly for saving progress
+- [x] Test special events system
+- [x] Verify analytics tracking is working properly
