@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import RizzButton from './RizzButton'
 import BankScoreButton from './BankScoreButton'
+import StatsPanel from './StatsPanel'
+import RizzLevelPanel from './RizzLevelPanel'
+import HighScorePanel from './HighScorePanel'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages.ts'
 import attributeEmojis from './rizz_attributes_emojis.json'
 
@@ -370,144 +373,39 @@ function App() {
           <div style={{ height: '5vh', minHeight: '1.5rem' }}></div>
           
           {/* Buttons Container - Both buttons in one component */}
-          <div className="flex flex-col items-center justify-center w-full" style={{
+          <div className="flex flex-row items-center justify-center w-full" style={{
             maxWidth: 'min(calc(100% - clamp(20px, 5vw, 50px)), 400px)',
             margin: '0 auto', // Removed top/bottom margin since we have the header space div
             gap: 'clamp(0.5rem, 2vmin, 0.75rem)', // Consistent spacing between buttons
             flex: '0 0 auto' // Prevent flex growth/shrink
           }}>
             {/* Rizz Button */}
-            <div className="flex justify-center w-full" style={{
-              margin: 'clamp(0.15rem, 1vmin, 0.25rem) 0'
+            <div className="flex justify-center" style={{
+              margin: 'clamp(0.15rem, 1vmin, 0.25rem) 0',
+              flex: '1 1 60%' // Take 60% of the available space
             }}>
               <RizzButton onClick={handleRizzTap} disabled={showCard} />
             </div>
             
             {/* Bank Score Button - Only visible after first Rizz Up click */}
-            <BankScoreButton
-              onClick={handleBankScore}
-              visible={!showCard && clickCount > 0}
-            />
+            <div className="flex justify-center" style={{
+              margin: 'clamp(0.15rem, 1vmin, 0.25rem) 0',
+              flex: '1 1 40%' // Take 40% of the available space
+            }}>
+              <BankScoreButton
+                onClick={handleBankScore}
+                visible={!showCard && clickCount > 0}
+              />
+            </div>
           </div>
           
           {/* Quote Display removed */}
           
           {/* Stats Panel */}
-          <div className="flex flex-col w-[90%]" style={{
-            padding: 'clamp(0.75rem, 3vmin, 1.25rem)',
-            borderRadius: 'var(--border-radius-lg, 1rem)',
-            background: 'rgba(46, 8, 84, 0.7)',
-            boxShadow: `0 0 clamp(10px, 3vmin, 15px) rgba(0, 187, 249, 0.5),
-                       inset 0 0 clamp(15px, 4vmin, 20px) rgba(0, 187, 249, 0.3)`,
-            gap: 'clamp(0.3rem, 1.2vmin, 0.4rem)',
-            flex: '0 0 auto' // Prevent flex growth/shrink
-          }}>
-            <h2 style={{
-              fontSize: 'clamp(1rem, 3vmin, 1.1rem)',
-              color: 'var(--color-accent-3, #00F5D4)',
-              textAlign: 'center',
-              marginBottom: 'clamp(0.15rem, 0.75vmin, 0.25rem)',
-              textShadow: '0 0 5px var(--color-accent-3, #00F5D4)'
-            }}>STATS PANEL</h2>
-            
-            <div className="flex justify-between items-center">
-              <span style={{
-                color: 'var(--color-accent-3, #00F5D4)',
-                fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
-                flex: 1,
-                textAlign: 'left'
-              }}>Vibe Level</span>
-              <span style={{
-                color: stats.vibeLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-                fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
-                fontWeight: 'bold',
-                flex: 1,
-                textAlign: 'center'
-              }}>{stats.vibeLevel}</span>
-              <span style={{
-                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-                flex: 1,
-                textAlign: 'right'
-              }}>{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span style={{
-                color: 'var(--color-accent-3, #00F5D4)',
-                fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
-                flex: 1,
-                textAlign: 'left'
-              }}>Swagger</span>
-              <span style={{
-                color: stats.swagger >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-                fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
-                fontWeight: 'bold',
-                flex: 1,
-                textAlign: 'center'
-              }}>{stats.swagger}</span>
-              <span style={{
-                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-                flex: 1,
-                textAlign: 'right'
-              }}>{getEmojiForScore("Swagger", stats.swagger)}</span>
-            </div>
-            
-            <div className="flex justify-between items-center">
-              <span style={{
-                color: 'var(--color-accent-3, #00F5D4)',
-                fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
-                flex: 1,
-                textAlign: 'left'
-              }}>Cringe Avoidance</span>
-              <span style={{
-                color: stats.cringeAvoidance >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-                fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
-                fontWeight: 'bold',
-                flex: 1,
-                textAlign: 'center'
-              }}>{stats.cringeAvoidance}</span>
-              <span style={{
-                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-                flex: 1,
-                textAlign: 'right'
-              }}>{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
-            </div>
-          </div>
+          <StatsPanel stats={stats} getEmojiForScore={getEmojiForScore} />
           
-          {/* Rizz Level Panel - Separated for emphasis */}
-          <div className="flex flex-col items-center w-[90%]" style={{
-            padding: 'clamp(0.5rem, 2.5vmin, 1rem)',
-            borderRadius: 'var(--border-radius-lg, 1rem)',
-            background: 'rgba(46, 8, 84, 0.8)',
-            boxShadow: `0 0 clamp(15px, 4vmin, 20px) rgba(241, 91, 181, 0.6),
-                       inset 0 0 clamp(20px, 5vmin, 25px) rgba(241, 91, 181, 0.4)`,
-            marginTop: 'clamp(0.25rem, 1.5vmin, 0.5rem)',
-            flex: '0 0 auto' // Prevent flex growth/shrink
-          }}>
-            <h2 style={{
-              fontSize: 'clamp(1.1rem, 3.5vmin, 1.2rem)',
-              color: 'var(--color-accent-1, #F15BB5)',
-              textAlign: 'center',
-              marginBottom: 'clamp(0.15rem, 0.75vmin, 0.25rem)',
-              textShadow: '0 0 8px var(--color-accent-1, #F15BB5)'
-            }}>RIZZ LEVEL</h2>
-            
-            <div className="flex justify-center items-center" style={{
-              gap: 'clamp(0.5rem, 3vmin, 1rem)'
-            }}>
-              <span style={{
-                color: rizzLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-                fontSize: 'clamp(1.5rem, 6vmin, 2rem)',
-                fontWeight: 'bold',
-                textShadow: rizzLevel >= 0 ?
-                  '0 0 clamp(5px, 2vmin, 10px) var(--color-accent-3, #00F5D4)' :
-                  '0 0 clamp(5px, 2vmin, 10px) var(--color-accent-1, #F15BB5)'
-              }}>{rizzLevel}</span>
-              <span style={{
-                fontSize: 'clamp(1.5rem, 6vmin, 2rem)'
-              }}>{getEmojiForScore("Rizz Level", rizzLevel)}</span>
-            </div>
-          </div>
+          {/* Rizz Level Panel - Now using the extracted component */}
+          <RizzLevelPanel rizzLevel={rizzLevel} getEmojiForScore={getEmojiForScore} />
           
           {/* Card Display */}
           {showCard && currentCard && (
@@ -619,32 +517,12 @@ function App() {
             </div>
           )}
           
-          {/* High Score Display */}
-          <div className="flex justify-center items-center w-[90%]" style={{
-            padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-            borderRadius: 'var(--border-radius-md, 0.75rem)',
-            background: 'rgba(46, 8, 84, 0.5)',
-            textAlign: 'center',
-            marginTop: 'clamp(0.25rem, 1.5vmin, 0.5rem)',
-            display: !showCard ? 'flex' : 'none',
-            gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-            flex: '0 0 auto' // Prevent flex growth/shrink
-          }}>
-            <span style={{
-              color: 'var(--color-accent-3, #00F5D4)',
-              fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'
-            }}>High Score:</span>
-            <span style={{
-              color: 'var(--color-accent-5, #FEE440)',
-              fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
-              fontWeight: 'bold',
-              textShadow: '0 0 5px var(--color-accent-5, #FEE440)'
-            }}>{highScore}</span>
-          </div>
+          {/* High Score Panel */}
+          <HighScorePanel highScore={highScore} showCard={showCard} />
           
           {/* Special Event */}
           {showSpecialEvent && (
-            <div className="w-[90%] text-center" style={{
+            <div className="w-[98%] text-center" style={{
               padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
               borderRadius: 'var(--border-radius-lg, 1rem)',
               background: 'rgba(155, 93, 229, 0.7)',
@@ -662,7 +540,7 @@ function App() {
           
           {/* Click Counter (for debugging) */}
           {showDebug && (
-            <div className="w-[90%] text-center" style={{
+            <div className="w-[98%] text-center" style={{
               padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
               borderRadius: 'var(--border-radius-md, 0.75rem)',
               background: 'rgba(46, 8, 84, 0.5)',
