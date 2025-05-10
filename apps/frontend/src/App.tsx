@@ -5,6 +5,7 @@ import GiveUpButton from './GiveUpButton'
 import StatsPanel from './StatsPanel'
 import RizzLevelPanel from './RizzLevelPanel'
 import HighScorePanel from './HighScorePanel'
+import HighScoreAnimation from './HighScoreAnimation'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages.ts'
 import attributeEmojis from './rizz_attributes_emojis.json'
 import { loadGameState, saveGameState, GameState } from './localStorage'
@@ -99,6 +100,8 @@ function App() {
   const [showBankOptions, setShowBankOptions] = useState(false)
   const [highScore, setHighScore] = useState(0)
   const [clickCount, setClickCount] = useState(0)
+  const [showHighScoreAnimation, setShowHighScoreAnimation] = useState(false)
+  const [newHighScore, setNewHighScore] = useState(0)
   
   // Load saved game state from localStorage on initial render
   useEffect(() => {
@@ -264,15 +267,28 @@ function App() {
   
   // Handle banking the score
   const handleBankScore = () => {
-    const newHighScore = rizzLevel > highScore ? rizzLevel : highScore;
+    const newHighScoreValue = rizzLevel > highScore ? rizzLevel : highScore;
     
     // Update high score if current rizz level is higher
     if (rizzLevel > highScore) {
-      setHighScore(newHighScore);
+      setNewHighScore(rizzLevel); // Store the new high score for the animation
+      setShowHighScoreAnimation(true); // Show the animation
+      setHighScore(newHighScoreValue);
       // Note: We don't need to explicitly save here as the useEffect will handle it
+    } else {
+      // If no new high score, just reset the game
+      resetGame();
     }
-    
-    // Reset game
+  };
+  
+  // Handle animation completion
+  const handleAnimationComplete = () => {
+    setShowHighScoreAnimation(false);
+    resetGame();
+  };
+  
+  // Reset game state
+  const resetGame = () => {
     setRizzLevel(0);
     setStats({
       vibeLevel: 0,
@@ -285,13 +301,7 @@ function App() {
   // Handle giving up (reset game without updating high score)
   const handleGiveUp = () => {
     // Reset game without updating high score
-    setRizzLevel(0);
-    setStats({
-      vibeLevel: 0,
-      swagger: 0,
-      cringeAvoidance: 0
-    });
-    setClickCount(0); // Reset click count when giving up
+    resetGame();
   };
 
   return (
@@ -599,6 +609,14 @@ function App() {
             }}>
               ✨ Sigma Surge Activated! ✨
             </div>
+          )}
+          
+          {/* High Score Animation */}
+          {showHighScoreAnimation && (
+            <HighScoreAnimation
+              score={newHighScore}
+              onAnimationComplete={handleAnimationComplete}
+            />
           )}
           
           {/* Click Counter (for debugging) */}
