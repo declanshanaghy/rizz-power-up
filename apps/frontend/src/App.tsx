@@ -7,6 +7,8 @@ import RizzLevelPanel from './RizzLevelPanel'
 import HighScorePanel from './HighScorePanel'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages.ts'
 import attributeEmojis from './rizz_attributes_emojis.json'
+import { loadGameState, saveGameState, GameState } from './localStorage'
+import { seedRandomWithCurrentTime } from './randomGenerator'
 
 // Add keyframe animations for cards
 const addKeyframeStyles = () => {
@@ -97,6 +99,18 @@ function App() {
   const [showBankOptions, setShowBankOptions] = useState(false)
   const [highScore, setHighScore] = useState(0)
   const [clickCount, setClickCount] = useState(0)
+  
+  // Load saved game state from localStorage on initial render
+  useEffect(() => {
+    // Seed the random number generator with the current time
+    seedRandomWithCurrentTime();
+    console.log("Random number generator seeded with current time:", Date.now());
+    
+    const savedState = loadGameState()
+    if (savedState) {
+      setHighScore(savedState.highScore)
+    }
+  }, [])
   
   // We're removing the complex dimension calculation function and using CSS for responsive design
   
@@ -236,9 +250,25 @@ function App() {
   
   // Handle banking the score
   const handleBankScore = () => {
+    const newHighScore = rizzLevel > highScore ? rizzLevel : highScore;
+    
+    // Update high score if current rizz level is higher
     if (rizzLevel > highScore) {
-      setHighScore(rizzLevel);
+      setHighScore(newHighScore);
     }
+    
+    // Save game state to localStorage
+    const gameState: GameState = {
+      rizzLevel: 0, // Reset rizz level
+      stats: {
+        vibeLevel: 0,
+        swagger: 0,
+        cringeAvoidance: 0
+      },
+      highScore: newHighScore
+    };
+    saveGameState(gameState);
+    
     // Reset game
     setRizzLevel(0);
     setStats({
@@ -386,24 +416,27 @@ function App() {
           <div style={{ height: '5vh', minHeight: '1.5rem' }}></div>
           
           {/* Buttons Container - Both buttons in one component */}
-          <div className="flex flex-row items-center justify-center w-full" style={{
-            maxWidth: 'min(calc(100% - clamp(20px, 5vw, 50px)), 400px)',
+          <div className="flex flex-row items-center justify-center w-full" style={{ // Restored to flex-row
+            maxWidth: 'min(calc(100% - clamp(20px, 5vw, 50px)), 1200px)', // Keep the increased width
             margin: '0 auto', // Removed top/bottom margin since we have the header space div
             gap: 'clamp(0.5rem, 2vmin, 0.75rem)', // Consistent spacing between buttons
-            flex: '0 0 auto' // Prevent flex growth/shrink
+            flex: '0 0 auto', // Prevent flex growth/shrink
+            padding: 'clamp(0.5rem, 2vmin, 1rem)' // Add padding around the buttons container
           }}>
             {/* Rizz Button */}
             <div className="flex justify-center" style={{
-              margin: 'clamp(0.15rem, 1vmin, 0.25rem) 0',
-              flex: '1 1 60%' // Take 60% of the available space
+              margin: 'clamp(0.15rem, 1vmin, 0.25rem)',
+              flex: '1 1 50%', // Equal space for both buttons
+              maxWidth: '50%' // Ensure button doesn't exceed 50% of container width
             }}>
               <RizzButton onClick={handleRizzTap} disabled={showCard} />
             </div>
             
             {/* Bank Score Button or Give Up Button - Only visible after first Rizz Up click */}
             <div className="flex justify-center" style={{
-              margin: 'clamp(0.15rem, 1vmin, 0.25rem) 0',
-              flex: '1 1 40%' // Take 40% of the available space
+              margin: 'clamp(0.15rem, 1vmin, 0.25rem)',
+              flex: '1 1 50%', // Equal space for both buttons
+              maxWidth: '50%' // Ensure button doesn't exceed 50% of container width
             }}>
               {rizzLevel >= highScore ? (
                 <BankScoreButton

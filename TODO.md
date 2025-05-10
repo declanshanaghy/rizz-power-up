@@ -80,9 +80,9 @@ Use time difference between now and the last commit timestamp for the developmen
 - [x] Extract the stats Panel into a separate component
 - [x] Extract the Rizz Level Panel into a separate component
 - [x] Extract the High Score Panel into a separate component
-- [x] Implement local storage for banking the user's high score
-- [] Modify the main display so that the Bank score button only shows when the user has scored more than the high score.
 - [] Ensure the Rizz up button, Bank button and Give up buttons are all the same size in both x and y.
+- [] Implement local storage for banking the user's high score
+- [] Modify the main display so that the Bank score button only shows when the user has scored more than the high score.
 - [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
 - [] Create special events system that trigger randomly ~ every 10 taps
 - [] Implement hybrid visual style (clean base with glitchy effects during special events)

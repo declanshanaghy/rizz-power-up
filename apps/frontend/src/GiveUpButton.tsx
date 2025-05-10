@@ -25,19 +25,26 @@ const GiveUpButton: React.FC<GiveUpButtonProps> = ({ onClick, visible }) => {
 
   return (
     <div className="flex justify-center w-full h-full" style={{
-      margin: 0
+      margin: 0,
+      aspectRatio: '1.61803398875/1', // Golden ratio
+      minWidth: 'min(580px, 100%)', // Responsive minimum width
+      minHeight: 'min(358px, 20vh)', // Height based on golden ratio (580/1.618)
+      maxWidth: '100%', // Ensure it doesn't overflow its container
+      boxSizing: 'border-box', // Include padding in width/height calculations
+      padding: 'clamp(0.5rem, 2vmin, 1rem)' // Padding for visual appeal
     }}>
       <button
         onClick={onClick}
         style={{
           width: '100%', // Full width of parent
+          height: '100%', // Full height of parent
           padding: 'clamp(0.5rem, 2vmin, 1rem) clamp(1rem, 4vmin, 2rem)', // Match RizzButton padding
           background: `linear-gradient(90deg, #FF5733, #FFC300)`, // Red to orange gradient
           color: 'white',
           border: 'none',
           borderRadius: 'var(--border-radius-md, 0.75rem)',
           fontWeight: 'bold',
-          fontSize: 'clamp(1rem, 3vmin, 1.3rem)',
+          fontSize: 'clamp(1.5rem, 5vmin, 2.5rem)', // Adjusted font size
           cursor: 'pointer',
           boxShadow: '0 0 clamp(10px, 2vmin, 20px) rgba(255, 87, 51, 0.7)',
           transition: 'all 0.2s ease',
@@ -48,16 +55,31 @@ const GiveUpButton: React.FC<GiveUpButtonProps> = ({ onClick, visible }) => {
         onMouseOut={(e) => handleHover(e, false)}
         aria-label="Give Up Button"
       >
-        <span style={{
-          position: 'relative',
-          zIndex: 1,
-          display: 'inline-flex',
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: 'clamp(0.3rem, 1vmin, 0.5rem)'
+          zIndex: 1,
+          padding: '10px' // Add padding to ensure content doesn't touch edges
         }}>
-          🏳️ GIVE UP
-        </span>
+          <span style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'clamp(0.3rem, 1vmin, 0.5rem)',
+            textAlign: 'center',
+            maxWidth: '100%', // Ensure text doesn't overflow
+            overflow: 'hidden', // Hide any overflow
+            whiteSpace: 'nowrap' // Keep text on one line
+          }}>
+            <span style={{ fontSize: '0.9em' }}>🏳️</span> GIVE UP
+          </span>
+        </div>
       </button>
     </div>
   );
