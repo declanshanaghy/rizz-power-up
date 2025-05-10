@@ -93,6 +93,10 @@ Use time difference between now and the last commit timestamp for the developmen
    - Ensure the special events are displayed on top of the card component.
    - The speial event should either increase or decrease the players stats by a large random amount.
    - The amount shoudl be negative if it's a bad event and positive if it's a good event. 
+- [x] Fix the error in GitHub Actions workflow
+   - Fixed animation conflict in SpecialEvent component
+   - Resolved TypeScript errors preventing build
+   - Removed unused imports and variables
 - [] Incorporate sound effects for the following events
    - Clicking a button
    - Dealing a card
