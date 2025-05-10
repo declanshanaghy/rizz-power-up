@@ -28,67 +28,64 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, getEmojiForScore }) => {
         textShadow: '0 0 5px var(--color-accent-3, #00F5D4)'
       }}>STATS PANEL</h2>
       
+      {/* 1-row layout with all three stats */}
       <div className="flex justify-between items-center">
-        <span style={{
-          color: 'var(--color-accent-3, #00F5D4)',
-          fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
-          flex: 1,
-          textAlign: 'left'
-        }}>Vibe Level</span>
-        <span style={{
-          color: stats.vibeLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-          fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
-          fontWeight: 'bold',
-          flex: 1,
-          textAlign: 'center'
-        }}>{stats.vibeLevel}</span>
-        <span style={{
-          fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-          flex: 1,
-          textAlign: 'right'
-        }}>{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
-      </div>
-      
-      <div className="flex justify-between items-center">
-        <span style={{
-          color: 'var(--color-accent-3, #00F5D4)',
-          fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
-          flex: 1,
-          textAlign: 'left'
-        }}>Swagger</span>
-        <span style={{
-          color: stats.swagger >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-          fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
-          fontWeight: 'bold',
-          flex: 1,
-          textAlign: 'center'
-        }}>{stats.swagger}</span>
-        <span style={{
-          fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-          flex: 1,
-          textAlign: 'right'
-        }}>{getEmojiForScore("Swagger", stats.swagger)}</span>
-      </div>
-      
-      <div className="flex justify-between items-center">
-        <span style={{
-          color: 'var(--color-accent-3, #00F5D4)',
-          fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
-          flex: 1,
-          textAlign: 'left'
-        }}>Cringe Avoidance</span>
-        <span style={{
-          color: stats.cringeAvoidance >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
-          fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
-          fontWeight: 'bold',
-          flex: 1,
-          textAlign: 'center'
-        }}>{stats.cringeAvoidance}</span>
-        <span style={{
-          fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
-          flex: 1,
-          textAlign: 'right'
-        }}>{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
+        {/* Vibe Level */}
+        <div className="flex flex-col items-center" style={{ flex: 1 }}>
+          <span style={{
+            color: 'var(--color-accent-3, #00F5D4)',
+            fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
+            textAlign: 'center'
+          }}>Vibe Level</span>
+          <span style={{
+            color: stats.vibeLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
+            fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
+            fontWeight: 'bold',
+            textAlign: 'center'
+          }}>{stats.vibeLevel}</span>
+          <span style={{
+            fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+            textAlign: 'center'
+          }}>{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
+        </div>
+        
+        {/* Swagger */}
+        <div className="flex flex-col items-center" style={{ flex: 1 }}>
+          <span style={{
+            color: 'var(--color-accent-3, #00F5D4)',
+            fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
+            textAlign: 'center'
+          }}>Swagger</span>
+          <span style={{
+            color: stats.swagger >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
+            fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
+            fontWeight: 'bold',
+            textAlign: 'center'
+          }}>{stats.swagger}</span>
+          <span style={{
+            fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+            textAlign: 'center'
+          }}>{getEmojiForScore("Swagger", stats.swagger)}</span>
+        </div>
+        
+        {/* Cringe Avoidance */}
+        <div className="flex flex-col items-center" style={{ flex: 1 }}>
+          <span style={{
+            color: 'var(--color-accent-3, #00F5D4)',
+            fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
+            textAlign: 'center'
+          }}>Cringe Avoidance</span>
+          <span style={{
+            color: stats.cringeAvoidance >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
+            fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
+            fontWeight: 'bold',
+            textAlign: 'center'
+          }}>{stats.cringeAvoidance}</span>
+          <span style={{
+            fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+            textAlign: 'center'
+          }}>{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
+        </div>
       </div>
     </div>
   )
