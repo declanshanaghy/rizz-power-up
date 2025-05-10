@@ -28,7 +28,7 @@ export interface MemeImage {
   promptTitle?: string;
   /** Original prompt ID from the rizz_image_prompts_no_text_overlay.md file */
   promptId?: number;
-  /** Bias value that influences attribute generation (-10 to +10) */
+  /** Bias value that influences attribute generation (-1.0 to +1.0) */
   bias: number;
   /** Whether this is a good (positive) or bad (negative) meme */
   isGood: boolean;
@@ -442,7 +442,7 @@ export const memeImages: MemeImage[] = [
 
 /**
  * Generate random attribute values based on the card's bias
- * @param bias The card's bias value (-10 to +10)
+ * @param bias The card's bias value (-1.0 to +1.0)
  * @returns Object with randomly generated attribute values
  */
 export function generateAttributes(bias: number): {
@@ -450,15 +450,19 @@ export function generateAttributes(bias: number): {
   swagger: number;
   cringeAvoidance: number;
 } {
-  // Base range for attribute generation
-  const range = 5;
+  // Base range for attribute generation (between -15 and +15)
+  const minValue = -15;
+  const maxValue = 15;
+  
+  // Scale the bias from -1.0...1.0 to -15...15 range
+  const scaledBias = bias * 15;
   
   // Generate random values with bias influence
-  // Higher bias means more likely to get positive values
+  // Each attribute gets a random value between -15 and +15, shifted by the scaled bias
   return {
-    vibeLevel: Math.floor(getRandom() * range * 2) - range + Math.floor(bias / 2),
-    swagger: Math.floor(getRandom() * range * 2) - range + Math.floor(bias / 2),
-    cringeAvoidance: Math.floor(getRandom() * range * 2) - range + Math.floor(bias / 2)
+    vibeLevel: Math.floor(getRandom() * (maxValue - minValue + 1)) + minValue + Math.floor(scaledBias),
+    swagger: Math.floor(getRandom() * (maxValue - minValue + 1)) + minValue + Math.floor(scaledBias),
+    cringeAvoidance: Math.floor(getRandom() * (maxValue - minValue + 1)) + minValue + Math.floor(scaledBias)
   };
 }
 
@@ -473,9 +477,54 @@ export function calculateRizzLevel(attributes: { vibeLevel: number; swagger: num
 
 /**
  * Get a random image from all available memes
+ * @param cardBias Optional bias parameter (-1.0 to 1.0) that influences good vs bad card selection
  * @returns A random meme image
  */
-export function getRandomImage(): MemeImage {
+export function getRandomImage(cardBias?: number): MemeImage {
+  // If no bias is provided, use completely random selection
+  if (cardBias === undefined) {
+    return memeImages[getRandomInt(0, memeImages.length)];
+  }
+  
+  // Constrain bias to -1.0 to 1.0 range
+  const bias = Math.max(-1.0, Math.min(1.0, cardBias));
+  
+  // Calculate probability of getting a good card based on bias
+  // bias = -1.0 → 0% chance of good card
+  // bias = 0.0 → 50% chance of good card
+  // bias = 1.0 → 100% chance of good card
+  const goodCardProbability = (bias + 1) / 2;
+  
+  // Determine if we should select a good or bad card
+  const selectGoodCard = getRandom() < goodCardProbability;
+  
+  // Get all good or bad cards
+  const filteredImages = memeImages.filter(img => img.isGood === selectGoodCard);
+  
+  // If we're selecting a good card and bias is high, favor cards with higher bias values
+  // If we're selecting a bad card and bias is low, favor cards with lower bias values
+  if (filteredImages.length > 0) {
+    // Sort the cards by bias (ascending for bad cards, descending for good cards)
+    const sortedImages = [...filteredImages].sort((a, b) => {
+      if (selectGoodCard) {
+        // For good cards with positive bias, sort by descending bias
+        return b.bias - a.bias;
+      } else {
+        // For bad cards with negative bias, sort by ascending bias (more negative first)
+        return a.bias - b.bias;
+      }
+    });
+    
+    // Calculate weighted index based on bias strength
+    // Stronger bias means more likely to pick from the beginning of the sorted array
+    const biasStrength = Math.abs(bias);
+    const weightedIndex = Math.floor(getRandom() * getRandom() * sortedImages.length * (1 - biasStrength * 0.8));
+    
+    // Return the card at the weighted index
+    return sortedImages[weightedIndex];
+  }
+  
+  // Fallback to completely random selection if no cards match the filter
   return memeImages[getRandomInt(0, memeImages.length)];
 }
 

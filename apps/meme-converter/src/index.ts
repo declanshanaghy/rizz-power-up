@@ -398,15 +398,15 @@ function matchImagesToPrompts(
 /**
  * Generate bias value for a meme image
  * @param isGood Whether the meme is a good (positive) or bad (negative) meme
- * @returns Bias value between -10 and +10
+ * @returns Bias value between -1.0 and +1.0
  */
 function generateBias(isGood: boolean): number {
   if (isGood) {
-    // For good memes: bias between +3 and +10 (favoring positive outcomes)
-    return Math.floor(Math.random() * 8) + 3;
+    // For good memes: bias between +0.3 and +1.0
+    return Math.round((Math.random() * 0.7 + 0.3) * 100) / 100;
   } else {
-    // For bad memes: bias between -10 and -2 (less severe negative outcomes)
-    return Math.floor(Math.random() * 9) - 10;
+    // For bad memes: bias between -1.0 and -0.3
+    return Math.round((Math.random() * -0.7 - 0.3) * 100) / 100;
   }
 }
 
@@ -494,7 +494,7 @@ export interface MemeImage {
   promptTitle?: string;
   /** Original prompt ID from the rizz_image_prompts_no_text_overlay.md file */
   promptId?: number;
-  /** Bias value that influences attribute generation (-10 to +10) */
+  /** Bias value that influences attribute generation (-1.0 to +1.0) */
   bias: number;
   /** Whether this is a good (positive) or bad (negative) meme */
   isGood: boolean;
@@ -507,7 +507,7 @@ export const memeImages: MemeImage[] = ${JSON.stringify(memeImages, null, 2)};
 
 /**
  * Generate random attribute values based on the card's bias
- * @param bias The card's bias value (-10 to +10)
+ * @param bias The card's bias value (-1.0 to +1.0)
  * @returns Object with randomly generated attribute values
  */
 export function generateAttributes(bias: number): {
@@ -515,15 +515,21 @@ export function generateAttributes(bias: number): {
   swagger: number;
   cringeAvoidance: number;
 } {
-  // Base range for attribute generation
-  const range = 5;
+  // Base range for attribute generation (between -15 and +17)
+  const minValue = -15;
+  const maxValue = 17;
+  const range = Math.floor((maxValue - minValue) / 2);
+  const midPoint = Math.floor((maxValue + minValue) / 2);
   
   // Generate random values with bias influence
   // Higher bias means more likely to get positive values
+  // Scale the bias from -1.0...1.0 to have stronger effect
+  const scaledBias = bias * 15; // Scale to approximately -15...15
+  
   return {
-    vibeLevel: Math.floor(Math.random() * range * 2) - range + Math.floor(bias / 2),
-    swagger: Math.floor(Math.random() * range * 2) - range + Math.floor(bias / 2),
-    cringeAvoidance: Math.floor(Math.random() * range * 2) - range + Math.floor(bias / 2)
+    vibeLevel: Math.floor(Math.random() * range * 2) + midPoint + Math.floor(scaledBias),
+    swagger: Math.floor(Math.random() * range * 2) + midPoint + Math.floor(scaledBias),
+    cringeAvoidance: Math.floor(Math.random() * range * 2) + midPoint + Math.floor(scaledBias)
   };
 }
 

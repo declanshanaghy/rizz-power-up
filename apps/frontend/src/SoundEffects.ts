@@ -11,6 +11,7 @@ export enum SoundEffectType {
   SPECIAL_EVENT = 'specialEvent',
   SPECIAL_EVENT_GOOD = 'specialEventGood',
   SPECIAL_EVENT_BAD = 'specialEventBad',
+  TOAST_NOTIFICATION = 'toastNotification',
 }
 
 // Define the paths to the sound effect files
@@ -18,7 +19,7 @@ export enum SoundEffectType {
 type SoundPath = string | string[];
 
 const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
-  [SoundEffectType.BUTTON_CLICK]: '/sounds/button_click.mp3',
+  [SoundEffectType.BUTTON_CLICK]: '/sounds/button_click.wav', // Use .wav extension instead of .mp3
   [SoundEffectType.DEAL_CARD]: [
     '/sounds/card_good_00.mp3',
     '/sounds/card_good_01.mp3',
@@ -35,7 +36,7 @@ const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
   ],
   [SoundEffectType.BANK_SCORE]: '/sounds/bank_01.wav',
   [SoundEffectType.RIZZ_LEVEL]: '/sounds/rizz_level_up.mp3',
-  [SoundEffectType.SPECIAL_EVENT]: '/sounds/special_event.mp3',
+  [SoundEffectType.SPECIAL_EVENT]: '/sounds/card_good_00.mp3', // Use an existing sound file
   [SoundEffectType.SPECIAL_EVENT_GOOD]: [
     '/sounds/card_good_00.mp3',
     '/sounds/card_good_01.mp3',
@@ -50,6 +51,7 @@ const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
     '/sounds/card_bad_03.mp3',
     '/sounds/card_bad_04.mp3',
   ], // Reuse the bad card sounds for bad events
+  [SoundEffectType.TOAST_NOTIFICATION]: '/sounds/button_click.wav', // Use .wav extension instead of .mp3
 };
 
 // Cache for preloaded audio elements
@@ -89,7 +91,7 @@ export function preloadSoundEffects(): void {
     }
   });
   
-  console.log('Sound effects preloaded');
+  // Removed console log to declutter
 }
 
 /**
@@ -103,7 +105,7 @@ export function preloadSoundEffects(): void {
  */
 function getRandomSound<T>(sounds: T[]): T {
   const randomIndex = Math.floor(Math.random() * sounds.length);
-  console.log(`Selected random sound index: ${randomIndex} from ${sounds.length} options`);
+  // Removed console log to declutter
   return sounds[randomIndex];
 }
 
@@ -124,11 +126,11 @@ export function playSoundEffect(type: SoundEffectType): void {
     // Get a random audio element from cache or create a new one
     if (Array.isArray(cachedAudio)) {
       audio = getRandomSound(cachedAudio);
-      console.log(`Playing sound effect: ${type} - Using cached audio element`);
+      // Removed console log to declutter
     } else {
       // If not cached yet, create a new audio element with a random sound path
       const randomPath = getRandomSound(soundPath);
-      console.log(`Playing sound effect: ${type} - Creating new audio with path: ${randomPath}`);
+      // Removed console log to declutter
       audio = new Audio(randomPath);
       
       // We don't update the cache here since we're expecting an array
@@ -149,11 +151,11 @@ export function playSoundEffect(type: SoundEffectType): void {
     // Handle single sound path
     let audio = cachedAudio as HTMLAudioElement;
     if (!audio) {
-      console.log(`Playing sound effect: ${type} - Creating new audio with path: ${soundPath}`);
+      // Removed console log to declutter
       audio = new Audio(soundPath);
       audioCache[type] = audio;
     } else {
-      console.log(`Playing sound effect: ${type} - Using cached audio with path: ${soundPath}`);
+      // Removed console log to declutter
     }
     
     // Reset the audio to the beginning if it's already playing
@@ -248,4 +250,11 @@ export function playSpecialEventSound(isGood?: boolean): void {
   } else {
     playSoundEffect(SoundEffectType.SPECIAL_EVENT);
   }
+}
+
+/**
+ * Play the toast notification sound
+ */
+export function playToastSound(): void {
+  playSoundEffect(SoundEffectType.TOAST_NOTIFICATION);
 }

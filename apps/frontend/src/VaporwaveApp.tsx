@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import ButtonPanel from './ButtonPanel'
 import StatsPanel from './StatsPanel'
 import RizzLevelPanel from './RizzLevelPanel'
@@ -6,13 +6,12 @@ import SpecialEvent from './SpecialEvent'
 import BankScoreModal from './BankScoreModal'
 import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
-import attributeEmojis from './rizz_attributes_emojis.json'
-import { generateSpecialEvent, shouldTriggerSpecialEvent, applySpecialEventToStats, SpecialEventData } from './SpecialEvent'
+import attributeEmojis from './rizz_attributes_emojis'
+import { generateSpecialEvent, shouldTriggerSpecialEvent, applySpecialEventToStats, SpecialEventData } from './SpecialEventUtils'
 import {
   preloadSoundEffects,
   playButtonClickSound,
   playDealCardSound,
-  playBankScoreSound,
   playRizzLevelSound,
   playSpecialEventSound
 } from './SoundEffects'
@@ -32,6 +31,10 @@ function VaporwaveApp() {
   } | null>(null)
   const [highScore, setHighScore] = useState(0)
   const [clickCount, setClickCount] = useState(0)
+  
+  // Game timing
+  const [cardDisplayTime, setCardDisplayTime] = useState(2000) // Default card display time in ms
+  
   
   // Sample quotes - currently not used but kept for future implementation
   // const quotes = [
@@ -138,7 +141,7 @@ function VaporwaveApp() {
         highScore: highScore
       };
       saveGameState(gameState);
-      console.log("High score saved to localStorage:", highScore);
+      // Removed console log for high score to declutter
     }
   }, [highScore, rizzLevel, stats])
   
@@ -153,9 +156,15 @@ function VaporwaveApp() {
     const newClickCount = clickCount + 1;
     setClickCount(newClickCount);
     
-    // Get a random card and display it
+    // Get a random card
     const card = getRandomImage();
+    
+    // Generate attributes based on the card's bias
     const attributes = generateAttributes(card.bias);
+    
+    // Log score calculations
+    console.log(`Card: ${card.name} (bias: ${card.bias.toFixed(2)})`);
+    console.log(`Generated attributes:`, attributes);
     
     // Calculate if this is a "bad" card (negative total attributes)
     const totalCardEffect = attributes.vibeLevel + attributes.swagger + attributes.cringeAvoidance;
@@ -196,6 +205,10 @@ function VaporwaveApp() {
     // Calculate the new Rizz level as the sum of all attributes
     const newRizzLevel = newStats.vibeLevel + newStats.swagger + newStats.cringeAvoidance;
     
+    // Log the updated stats and rizz level
+    console.log(`Updated stats:`, newStats);
+    console.log(`New Rizz Level: ${newRizzLevel}`);
+    
     // Check if Rizz level has surpassed the high score
     if (rizzLevel <= highScore && newRizzLevel > highScore) {
       // Play celebratory sound when surpassing high score
@@ -214,7 +227,7 @@ function VaporwaveApp() {
     setCurrentAttributes(attributes);
     setShowCard(true);
     
-    // Make card disappear after a delay with animation
+    // Make card disappear after a delay with animation - using dynamic timing
     setTimeout(() => {
       // Add fadeOut class to the card
       const cardElement = document.querySelector('.card-display');
@@ -228,7 +241,7 @@ function VaporwaveApp() {
       } else {
         setShowCard(false);
       }
-    }, 3000);
+    }, cardDisplayTime);
   }
   
   // Handle banking the score
@@ -271,31 +284,64 @@ function VaporwaveApp() {
       cringeAvoidance: 0
     });
     setClickCount(0); // Reset click count when giving up
+    setCardDisplayTime(2000); // Reset card display time
   };
+  
+  // Handle card click to dismiss it
+  const handleCardClick = useCallback(() => {
+    if (!showCard) return;
+    
+    // Play button click sound
+    playButtonClickSound();
+    
+    // Add fadeOut class to the card
+    const cardElement = document.querySelector('.card-display');
+    if (cardElement) {
+      cardElement.classList.add('fadeOut');
+      
+      // Wait for animation to complete before hiding
+      setTimeout(() => {
+        setShowCard(false);
+      }, 500); // Match this to the fadeOut animation duration
+    } else {
+      setShowCard(false);
+    }
+  }, [showCard]);
 
   // Helper function to get emoji for attribute score
   const getEmojiForScore = (attribute: string, score: number) => {
-    // Scale the score from -10 to 10 range to -500 to 500 range
-    const scaledScore = Math.round(score * 50);
+    // Clamp the score to the -5000 to 5000 range
+    const clampedScore = Math.max(-5000, Math.min(5000, score));
+    
+    // Round to the nearest 250 to match the TypeScript structure
+    const roundedScore = Math.round(clampedScore / 250) * 250;
+    
+    // Log the score scaling for debugging
+    console.log(`Score scaling: original=${score}, clamped=${clampedScore}, rounded=${roundedScore}`);
     
     // Get the appropriate attribute mapping
     const attributeMap = attributeEmojis[attribute as keyof typeof attributeEmojis];
     if (!attributeMap) return '❓'; // Fallback emoji if attribute not found
     
-    // Find the closest available score in the emoji mapping
-    const availableScores = Object.keys(attributeMap)
-      .map(Number)
-      .sort((a, b) => a - b);
+    // Try to get the emoji directly using the rounded score as a number
+    let emoji = attributeMap[roundedScore];
     
-    let closestScore = availableScores[0];
-    for (const availableScore of availableScores) {
-      if (Math.abs(availableScore - scaledScore) < Math.abs(closestScore - scaledScore)) {
-        closestScore = availableScore;
+    // If no exact match, find the closest available score
+    if (!emoji) {
+      const availableScores = Object.keys(attributeMap)
+        .map(Number)
+        .sort((a, b) => a - b);
+      
+      let closestScore = availableScores[0];
+      for (const availableScore of availableScores) {
+        if (Math.abs(availableScore - roundedScore) < Math.abs(closestScore - roundedScore)) {
+          closestScore = availableScore;
+        }
       }
+      
+      emoji = attributeMap[closestScore];
     }
     
-    // Safely access the emoji with the closest score
-    const emoji = attributeMap[closestScore.toString() as keyof typeof attributeMap];
     return emoji || '❓'; // Fallback emoji if not found
   };
   
@@ -441,8 +487,10 @@ function VaporwaveApp() {
               zIndex: 9999,
               animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite',
               border: `4px solid var(--color-accent-3, #00F5D4)`,
-              overflowY: 'auto'
+              overflowY: 'auto',
+              cursor: 'pointer' // Add pointer cursor to indicate clickability
             }}
+            onClick={handleCardClick} // Add click handler to dismiss card
           >
             <h3 style={{
               color: 'var(--color-accent-5, #FEE440)',

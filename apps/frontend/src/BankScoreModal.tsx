@@ -15,33 +15,37 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
 
   // Handle modal open/close effects
   useEffect(() => {
+    // Store ref values in variables to use in cleanup function
+    const videoElement = videoRef.current;
+    const audioElement = audioRef.current;
+    
     if (isOpen) {
       // Start video and audio when modal opens
-      if (videoRef.current) {
-        videoRef.current.play().catch(err => console.error('Error playing video:', err));
+      if (videoElement) {
+        videoElement.play().catch((err: Error) => console.error('Error playing video:', err));
       }
-      if (audioRef.current) {
-        audioRef.current.play().catch(err => console.error('Error playing audio:', err));
+      if (audioElement) {
+        audioElement.play().catch((err: Error) => console.error('Error playing audio:', err));
       }
     } else {
       // Stop video and audio when modal closes
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.currentTime = 0;
       }
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.currentTime = 0;
       }
     }
 
     // Cleanup function to stop media when component unmounts
     return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
+      if (videoElement) {
+        videoElement.pause();
       }
-      if (audioRef.current) {
-        audioRef.current.pause();
+      if (audioElement) {
+        audioElement.pause();
       }
     };
   }, [isOpen]);
