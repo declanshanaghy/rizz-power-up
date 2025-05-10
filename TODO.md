@@ -65,7 +65,7 @@ Use time difference between now and the last commit timestamp for the developmen
    - Run the meme generator in ./apps/meme-converter to create the new memeImages.ts file so they an be integrated into the app
 - [] Fix the alignment of the button image when the mouse hover over it. 
   - It appears to move upwards when the mouse is over it.
-- [] Modify the game flow so that the player returns to the main attrbiute display screen after a card was dealt.
+- [x] Modify the game flow so that the player returns to the main attrbiute display screen after a card was dealt.
    - The delay to return to the screen should be inversely proportional to the number of times the user clicks on the screen. 
    - The more the user clicks, the slower they return to the main screen.
    - Cap the maxumum time to 5 seconds and minimum time to 1 second.
