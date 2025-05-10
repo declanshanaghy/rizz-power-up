@@ -21,6 +21,7 @@ import {
   playGiveUpSound
 } from './SoundEffects'
 import { setupMediaCaching, getOptimizedImageUrl, ImageSize } from './MediaOptimizer'
+import { trackGameEvents, trackEvent } from './analytics'
 
 function VaporwaveApp() {
   // Game state
@@ -66,6 +67,9 @@ function VaporwaveApp() {
     };
   }, []);
   
+  // Track session duration
+  const [sessionStartTime] = useState<number>(Date.now());
+  
   // Load saved game state from localStorage on initial render
   useEffect(() => {
     const savedState = loadGameState()
@@ -78,7 +82,16 @@ function VaporwaveApp() {
     
     // Preload critical sound effects immediately
     preloadCriticalSoundEffects();
-  }, [])
+    
+    // Track game session start
+    trackGameEvents.sessionStart();
+    
+    // Track session end when component unmounts
+    return () => {
+      const sessionDuration = Math.floor((Date.now() - sessionStartTime) / 1000); // in seconds
+      trackGameEvents.sessionEnd(sessionDuration, rizzLevel);
+    };
+  }, [rizzLevel, sessionStartTime])
   
   // Save high score to localStorage whenever it changes
   useEffect(() => {
@@ -96,6 +109,9 @@ function VaporwaveApp() {
   // Handle button tap
   const handleRizzTap = () => {
     if (showCard) return; // Don't allow new cards while one is showing
+    
+    // Track button click
+    trackGameEvents.buttonClick('rizz_button');
     
     // Play button click sound
     playButtonClickSound();
@@ -117,6 +133,9 @@ function VaporwaveApp() {
     // Calculate if this is a "bad" card (negative total attributes)
     const totalCardEffect = attributes.vibeLevel + attributes.swagger + attributes.cringeAvoidance;
     const isBadCard = totalCardEffect < 0;
+    
+    // Track card deal event
+    trackGameEvents.dealCard(card.name, card.bias, isBadCard);
     
     // Play appropriate deal card sound based on card effect
     playDealCardSound(isBadCard);
@@ -152,7 +171,7 @@ function VaporwaveApp() {
     // Check if a special event should trigger (approximately every 18 taps)
     if (shouldTriggerSpecialEvent(newClickCount)) {
       // Generate a special event
-    const specialEvent = generateSpecialEvent();
+      const specialEvent = generateSpecialEvent();
       
       // Apply the special event to the stats
       newStats = applySpecialEventToStats(newStats, specialEvent);
@@ -160,6 +179,13 @@ function VaporwaveApp() {
       // Set the current special event and show it
       setCurrentSpecialEvent(specialEvent);
       setShowSpecialEvent(true);
+      
+      // Track special event
+      trackGameEvents.specialEvent(
+        specialEvent.eventType,
+        specialEvent.statChange,
+        specialEvent.statType
+      );
       
       // Play special event sound based on event type
       playSpecialEventSound(specialEvent.eventType === 'good');
@@ -182,6 +208,9 @@ function VaporwaveApp() {
     if (rizzLevel <= highScore && newRizzLevel > highScore) {
       // Play celebratory sound when surpassing high score
       playRizzLevelSound();
+      
+      // Track high score achievement
+      trackGameEvents.highScore(newRizzLevel);
     }
     
     // Update the stats and Rizz level
@@ -212,13 +241,20 @@ function VaporwaveApp() {
   
   // Handle banking the score
   const handleBankScore = () => {
+    // Track bank score button click
+    trackGameEvents.buttonClick('bank_score_button');
+    
     // Show the bank score modal instead of immediately playing sound
     setShowBankModal(true);
     
     const newHighScore = rizzLevel > highScore ? rizzLevel : highScore;
+    const isNewHighScore = rizzLevel > highScore;
+    
+    // Track banking score
+    trackGameEvents.bankScore(rizzLevel, isNewHighScore);
     
     // Update high score if current rizz level is higher
-    if (rizzLevel > highScore) {
+    if (isNewHighScore) {
       setHighScore(newHighScore);
     }
   };
@@ -239,6 +275,12 @@ function VaporwaveApp() {
 
   // Handle giving up (reset game without updating high score)
   const handleGiveUp = () => {
+    // Track give up button click
+    trackGameEvents.buttonClick('give_up_button');
+    
+    // Track give up event with current score
+    trackGameEvents.giveUp(rizzLevel);
+    
     // Play give up sound
     playGiveUpSound();
     
@@ -265,6 +307,9 @@ function VaporwaveApp() {
   const handleCardClick = useCallback(() => {
     if (!showCard) return;
     
+    // Track card click
+    trackEvent('user_interaction', 'card_click', currentCard?.name);
+    
     // Play button click sound
     playButtonClickSound();
     
@@ -280,7 +325,7 @@ function VaporwaveApp() {
     } else {
       setShowCard(false);
     }
-  }, [showCard]);
+  }, [showCard, currentCard]);
 
   // Helper function to get emoji for attribute score
   const getEmojiForScore = (attribute: string, score: number) => {
@@ -626,6 +671,7 @@ function VaporwaveApp() {
                   marginTop: '10px',
                   transition: 'transform 0.2s ease'
                 }}
+                onClick={() => trackEvent('user_interaction', 'button_click', 'buy_me_coffee')}
                 onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                 onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
               >

@@ -167,7 +167,7 @@ Use time difference between now and the last commit timestamp for the developmen
    - Animate the give up modal as it's opened and closed
    - Animate the Rizz level as it's increased
    - Animate the special events as they're triggered
-- [] Optimize the app sounds, videos and images
+- [x] Optimize the app sounds, videos and images
    - Allow the main screen to display and the game to start before all the resources are loaded
    - Optimize the build so that all audio, video and image files are compressed as much as possible,
    - convert formats if necessary
@@ -177,8 +177,18 @@ Use time difference between now and the last commit timestamp for the developmen
    - Ensure that all the images, videos and sounds are preloaded properly
    - Ensure that all the images, videos and sounds are preloaded properly
    - Ensure that all the images, videos and sounds are preloaded properly
-   - 
-
+- [] Integrate google analytics
+   - track events such as 
+      clicks, high scores, 
+      give up, bank score, 
+      special events
+   - track users by device, browser, operating system and screen size
+   - track users by country, region and city
+   - track users by referrer and landing page
+   - track users by time of day and day of week
+   - track users by page views and bounce rate
+   - track users by clickstream  
+   
 ## Infrastructure Tasks
 - [x] Update S3 bucket configuration for rizz-power-up
 - [x] Configure CloudFront distribution for the new app
