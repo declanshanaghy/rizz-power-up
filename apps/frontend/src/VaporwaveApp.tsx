@@ -358,19 +358,20 @@ function VaporwaveApp() {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: 'min(85%, 300px)',
+              width: 'min(90%, 400px)', // Wider container for better layout
               height: 'auto',
-              maxHeight: '80vh',
-              padding: 'clamp(0.75rem, 3vmin, 1rem)',
+              maxHeight: '85vh', // Slightly more vertical space
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
               borderRadius: 'var(--border-radius-lg, 1rem)',
               background: 'rgba(46, 8, 84, 0.95)',
               boxShadow: `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
                          0 0 clamp(40px, 10vmin, 60px) rgba(0, 187, 249, 0.8),
                          inset 0 0 clamp(15px, 4vmin, 20px) rgba(255, 255, 255, 0.6)`,
-              display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
+              gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
               zIndex: 9999,
               animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite',
               border: `4px solid var(--color-accent-3, #00F5D4)`,
@@ -388,14 +389,16 @@ function VaporwaveApp() {
             </h3>
             
             <div style={{
-              width: '100%',
-              aspectRatio: '16/9',
+              width: '66%', // Scale down to 2/3 of container width
+              aspectRatio: '2/3', // Match the 1024 × 1536 aspect ratio
               backgroundImage: `url(${currentCard.path})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'top center',
+              backgroundSize: 'contain', // Maintain aspect ratio without cropping
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
               borderRadius: 'var(--border-radius-md, 0.75rem)',
               boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-              marginTop: 'clamp(-5px, -1vmin, -2px)'
+              marginTop: 'clamp(-5px, -1vmin, -2px)',
+              alignSelf: 'center' // Center horizontally within parent
             }} />
             
             <p style={{
