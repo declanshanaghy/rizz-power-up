@@ -416,18 +416,20 @@ function App() {
           <div style={{ height: '5vh', minHeight: '1.5rem' }}></div>
           
           {/* Buttons Container - Both buttons in one component */}
-          <div className="flex flex-row items-center justify-center w-full" style={{ // Restored to flex-row
-            maxWidth: 'min(calc(100% - clamp(20px, 5vw, 50px)), 1200px)', // Keep the increased width
-            margin: '0 auto', // Removed top/bottom margin since we have the header space div
-            gap: 'clamp(0.5rem, 2vmin, 0.75rem)', // Consistent spacing between buttons
-            flex: '0 0 auto', // Prevent flex growth/shrink
-            padding: 'clamp(0.5rem, 2vmin, 1rem)' // Add padding around the buttons container
+          <div className="flex flex-row items-center justify-center w-full" style={{
+            maxWidth: 'min(calc(100% - clamp(20px, 5vw, 50px)), 1200px)',
+            margin: '0 auto',
+            gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
+            flex: '0 0 auto',
+            padding: 'clamp(0.5rem, 2vmin, 1rem)'
           }}>
+            {/* Common button container style for consistent sizing */}
             {/* Rizz Button */}
             <div className="flex justify-center" style={{
               margin: 'clamp(0.15rem, 1vmin, 0.25rem)',
-              flex: '1 1 50%', // Equal space for both buttons
-              maxWidth: '50%' // Ensure button doesn't exceed 50% of container width
+              flex: '1 1 0', // Changed from 50% to 0 to ensure equal sizing
+              width: '50%', // Fixed width instead of maxWidth
+              aspectRatio: '1.61803398875/1', // Golden ratio - same as in ButtonStyles
             }}>
               <RizzButton onClick={handleRizzTap} disabled={showCard} />
             </div>
@@ -435,8 +437,9 @@ function App() {
             {/* Bank Score Button or Give Up Button - Only visible after first Rizz Up click */}
             <div className="flex justify-center" style={{
               margin: 'clamp(0.15rem, 1vmin, 0.25rem)',
-              flex: '1 1 50%', // Equal space for both buttons
-              maxWidth: '50%' // Ensure button doesn't exceed 50% of container width
+              flex: '1 1 0', // Changed from 50% to 0 to ensure equal sizing
+              width: '50%', // Fixed width instead of maxWidth
+              aspectRatio: '1.61803398875/1', // Golden ratio - same as in ButtonStyles
             }}>
               {rizzLevel >= highScore ? (
                 <BankScoreButton
