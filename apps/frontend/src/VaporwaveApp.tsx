@@ -2,15 +2,17 @@ import { useState, useEffect } from 'react'
 import ButtonPanel from './ButtonPanel'
 import StatsPanel from './StatsPanel'
 import RizzLevelPanel from './RizzLevelPanel'
+import SpecialEvent from './SpecialEvent'
 import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
 import attributeEmojis from './rizz_attributes_emojis.json'
+import { generateSpecialEvent, shouldTriggerSpecialEvent, applySpecialEventToStats, SpecialEventData } from './SpecialEvent'
 
 function VaporwaveApp() {
   // Game state
   const [rizzLevel, setRizzLevel] = useState(0)
-  const [quote, setQuote] = useState('Tap the button to increase your Rizz!')
   const [showSpecialEvent, setShowSpecialEvent] = useState(false)
+  const [currentSpecialEvent, setCurrentSpecialEvent] = useState<SpecialEventData | null>(null)
   const [showCard, setShowCard] = useState(false)
   const [currentCard, setCurrentCard] = useState<MemeImage | null>(null)
   const [currentAttributes, setCurrentAttributes] = useState<{
@@ -21,16 +23,15 @@ function VaporwaveApp() {
   const [highScore, setHighScore] = useState(0)
   const [clickCount, setClickCount] = useState(0)
   
-  // Sample quotes - expand this list to at least 1000 later.
-  // Ensure the final deployed build is compacted for efficiency.
-  const quotes = [
-    "Your vibe just went up by 10 points!",
-    "That's some serious swagger right there!",
-    "Cringe levels decreasing... Rizz increasing!",
-    "You're radiating pure charisma now!",
-    "Your Rizz power is growing stronger!",
-    "Your aura just disrupted the algorithm."
-  ]
+  // Sample quotes - currently not used but kept for future implementation
+  // const quotes = [
+  //   "Your vibe just went up by 10 points!",
+  //   "That's some serious swagger right there!",
+  //   "Cringe levels decreasing... Rizz increasing!",
+  //   "You're radiating pure charisma now!",
+  //   "Your Rizz power is growing stronger!",
+  //   "Your aura just disrupted the algorithm."
+  // ]
   
   // Stats that increase with each tap
   const [stats, setStats] = useState({
@@ -86,6 +87,15 @@ function VaporwaveApp() {
         }
       }
       
+      @keyframes pulse {
+        0% {
+          transform: translate(-50%, -50%) scale(1);
+        }
+        100% {
+          transform: translate(-50%, -50%) scale(1.05);
+        }
+      }
+      
       .fadeOut {
         animation: fadeOut 0.5s ease-out forwards !important;
       }
@@ -124,18 +134,38 @@ function VaporwaveApp() {
     if (showCard) return; // Don't allow new cards while one is showing
     
     // Increment click count
-    setClickCount(prevCount => prevCount + 1);
+    const newClickCount = clickCount + 1;
+    setClickCount(newClickCount);
     
     // Get a random card and display it
     const card = getRandomImage();
     const attributes = generateAttributes(card.bias);
     
     // Update stats based on the card's attributes
-    const newStats = {
+    let newStats = {
       vibeLevel: stats.vibeLevel + attributes.vibeLevel,
       swagger: stats.swagger + attributes.swagger,
       cringeAvoidance: stats.cringeAvoidance + attributes.cringeAvoidance
     };
+    
+    // Check if a special event should trigger (approximately every 18 taps)
+    if (shouldTriggerSpecialEvent(newClickCount)) {
+      // Generate a special event
+      const specialEvent = generateSpecialEvent();
+      
+      // Apply the special event to the stats
+      newStats = applySpecialEventToStats(newStats, specialEvent);
+      
+      // Set the current special event and show it
+      setCurrentSpecialEvent(specialEvent);
+      setShowSpecialEvent(true);
+      
+      // Hide the special event after a delay
+      setTimeout(() => {
+        setShowSpecialEvent(false);
+        setCurrentSpecialEvent(null);
+      }, 3000);
+    }
     
     // Calculate the new Rizz level as the sum of all attributes
     const newRizzLevel = newStats.vibeLevel + newStats.swagger + newStats.cringeAvoidance;
@@ -144,9 +174,8 @@ function VaporwaveApp() {
     setStats(newStats);
     setRizzLevel(newRizzLevel);
     
-    // Get a random quote
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
-    setQuote(randomQuote)
+    // Get a random quote (not used currently)
+    // const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
     
     // Set the current card and attributes for display
     setCurrentCard(card);
@@ -168,12 +197,6 @@ function VaporwaveApp() {
         setShowCard(false);
       }
     }, 3000);
-    
-    // Check for special event (every 10 taps)
-    if (newRizzLevel % 10 === 0) {
-      setShowSpecialEvent(true)
-      setTimeout(() => setShowSpecialEvent(false), 3000)
-    }
   }
   
   // Handle banking the score
@@ -463,10 +486,13 @@ function VaporwaveApp() {
         )}
         
         {/* Special Event */}
-        {showSpecialEvent && (
-          <div style={styles.specialEvent}>
-            ✨ Sigma Surge Activated! ✨
-          </div>
+        {showSpecialEvent && currentSpecialEvent && (
+          <SpecialEvent
+            isVisible={showSpecialEvent}
+            eventType={currentSpecialEvent.eventType}
+            statChange={currentSpecialEvent.statChange}
+            statType={currentSpecialEvent.statType}
+          />
         )}
         
         {/* Footer */}

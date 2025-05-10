@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import RizzBackground from './RizzBackground'
-import HighScorePanel from './HighScorePanel'
 import { loadGameState } from './localStorage'
 import './App.css'
 

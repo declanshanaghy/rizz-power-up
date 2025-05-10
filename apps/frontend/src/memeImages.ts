@@ -10,7 +10,7 @@
  * to ensure consistent randomness seeded with the current time.
  */
 
-import { getRandom, getRandomInt, getRandomIntInclusive } from './randomGenerator';
+import { getRandom, getRandomInt } from './randomGenerator';
 
 /**
  * Interface for meme image data
