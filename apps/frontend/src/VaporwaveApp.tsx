@@ -10,6 +10,7 @@ import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
 import attributeEmojis from './rizz_attributes_emojis'
 import { generateSpecialEvent, shouldTriggerSpecialEvent, applySpecialEventToStats, SpecialEventData } from './SpecialEventUtils'
+import { allAnimations } from './Animations'
 import {
   preloadSoundEffects,
   playButtonClickSound,
@@ -58,64 +59,12 @@ function VaporwaveApp() {
     cringeAvoidance: 0
   })
   
-  // Add keyframe animations for cards
+  // Add all animations to the document
   useEffect(() => {
     const styleEl = document.createElement('style');
-    styleEl.textContent = `
-      @keyframes cardEntrance {
-        0% {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.3) rotate(-15deg);
-        }
-        40% {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
-        }
-        60% {
-          transform: translate(-50%, -50%) scale(0.95) rotate(-2deg);
-        }
-        80% {
-          transform: translate(-50%, -50%) scale(1.05) rotate(1deg);
-        }
-        100% {
-          transform: translate(-50%, -50%) scale(1) rotate(0);
-        }
-      }
-      
-      @keyframes cardGlow {
-        0% {
-          box-shadow: 0 0 20px #F15BB5, 0 0 40px #00BBF9;
-        }
-        50% {
-          box-shadow: 0 0 30px #00F5D4, 0 0 50px #9B5DE5;
-        }
-        100% {
-          box-shadow: 0 0 20px #F15BB5, 0 0 40px #00BBF9;
-        }
-      }
-      
-      @keyframes fadeOut {
-        from {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1) rotate(0);
-        }
-        to {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.8) rotate(5deg);
-        }
-      }
-      
-      @keyframes pulse {
-        0% {
-          transform: translate(-50%, -50%) scale(1);
-        }
-        100% {
-          transform: translate(-50%, -50%) scale(1.05);
-        }
-      }
-      
+    styleEl.textContent = allAnimations + `
       .fadeOut {
-        animation: fadeOut 0.5s ease-out forwards !important;
+        animation: cardExit 0.8s ease-out forwards !important;
       }
     `;
     document.head.appendChild(styleEl);
@@ -179,17 +128,17 @@ function VaporwaveApp() {
     playDealCardSound(isBadCard);
     
     // Update stats based on the card's attributes
-    // Apply a 1.25x multiplier to good cards
+    // Apply a 1.05x multiplier to good cards
     let newStats;
     if (!isBadCard) {
-      // For good cards, apply a 1.25x multiplier to the attribute values
-      const multiplier = 1.25;
+      // For good cards, apply a 1.05x multiplier to the attribute values
+      const multiplier = 1.05;
       newStats = {
         vibeLevel: stats.vibeLevel + Math.round(attributes.vibeLevel * multiplier),
         swagger: stats.swagger + Math.round(attributes.swagger * multiplier),
         cringeAvoidance: stats.cringeAvoidance + Math.round(attributes.cringeAvoidance * multiplier)
       };
-      console.log(`Applied 1.25x multiplier to good card attributes:`, {
+      console.log(`Applied 1.05x multiplier to good card attributes:`, {
         original: attributes,
         multiplied: {
           vibeLevel: Math.round(attributes.vibeLevel * multiplier),
@@ -263,7 +212,7 @@ function VaporwaveApp() {
         // Wait for animation to complete before hiding
         setTimeout(() => {
           setShowCard(false);
-        }, 500); // Match this to the fadeOut animation duration
+        }, 800); // Match this to the cardExit animation duration
       } else {
         setShowCard(false);
       }
@@ -299,8 +248,8 @@ function VaporwaveApp() {
 
   // Handle giving up (reset game without updating high score)
   const handleGiveUp = () => {
-    // Play button click sound
-    playButtonClickSound();
+    // Play give up sound
+    playGiveUpSound();
     
     // Show the give up modal instead of immediately resetting
     setShowGiveUpModal(true);
@@ -336,7 +285,7 @@ function VaporwaveApp() {
       // Wait for animation to complete before hiding
       setTimeout(() => {
         setShowCard(false);
-      }, 500); // Match this to the fadeOut animation duration
+      }, 800); // Match this to the cardExit animation duration
     } else {
       setShowCard(false);
     }
@@ -584,19 +533,36 @@ function VaporwaveApp() {
               alignItems: 'center',
               gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
               zIndex: 9999,
-              animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite',
+              animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite, cardHover 4s ease-in-out infinite 0.7s',
               border: `4px solid var(--color-accent-3, #00F5D4)`,
               overflowY: 'auto',
-              cursor: 'pointer' // Add pointer cursor to indicate clickability
+              cursor: 'pointer', // Add pointer cursor to indicate clickability
+              transition: 'transform 0.3s ease-out'
             }}
             onClick={handleCardClick} // Add click handler to dismiss card
+            onMouseOver={(e) => {
+              e.currentTarget.style.animation = 'none';
+              e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.05)';
+              e.currentTarget.style.boxShadow = `0 0 clamp(25px, 6vmin, 35px) rgba(241, 91, 181, 0.9),
+                                               0 0 clamp(50px, 12vmin, 70px) rgba(0, 187, 249, 0.9),
+                                               0 0 clamp(70px, 15vmin, 90px) rgba(255, 255, 255, 0.3),
+                                               inset 0 0 clamp(20px, 5vmin, 25px) rgba(255, 255, 255, 0.7)`;
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.animation = 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite, cardHover 4s ease-in-out infinite';
+              e.currentTarget.style.transform = 'translate(-50%, -50%)';
+              e.currentTarget.style.boxShadow = `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
+                                               0 0 clamp(40px, 10vmin, 60px) rgba(0, 187, 249, 0.8),
+                                               inset 0 0 clamp(15px, 4vmin, 20px) rgba(255, 255, 255, 0.6)`;
+            }}
           >
             <h3 style={{
               color: 'var(--color-accent-5, #FEE440)',
               fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
               textAlign: 'center',
               textShadow: `0 0 5px var(--color-accent-5, #FEE440)`,
-              margin: 0
+              margin: 0,
+              animation: 'cardTextGlow 2s infinite'
             }}>
               {currentCard.name}
             </h3>
@@ -611,14 +577,16 @@ function VaporwaveApp() {
               borderRadius: 'var(--border-radius-md, 0.75rem)',
               boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
               marginTop: 'clamp(-5px, -1vmin, -2px)',
-              alignSelf: 'center' // Center horizontally within parent
+              alignSelf: 'center', // Center horizontally within parent
+              animation: 'cardImagePulse 3s infinite'
             }} />
             
             <p style={{
               color: 'white',
               fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)',
               textAlign: 'center',
-              margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) 0'
+              margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) 0',
+              animation: 'cardTextGlow 2.5s infinite 0.5s'
             }}>
               {currentCard.description}
             </p>
@@ -632,7 +600,8 @@ function VaporwaveApp() {
                 fontSize: 'clamp(0.7rem, 2.2vmin, 0.8rem)',
                 padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
                 background: 'rgba(0, 0, 0, 0.3)',
-                borderRadius: 'var(--border-radius-sm, 0.5rem)'
+                borderRadius: 'var(--border-radius-sm, 0.5rem)',
+                animation: 'cardStatsPulse 3s infinite 1s'
               }}>
                 <div style={{
                   color: currentAttributes.vibeLevel >= 0 ?

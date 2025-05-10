@@ -18,7 +18,8 @@ interface ResourceStats {
  * Component that preloads all images, videos, and sounds used in the app
  */
 const ResourcePreloader: React.FC<ResourcePreloaderProps> = ({ onComplete }) => {
-  const [stats, setStats] = useState<ResourceStats>({
+  // Stats are used for tracking loading progress but not rendered
+  const [_stats, setStats] = useState<ResourceStats>({
     totalResources: 0,
     loadedResources: 0,
     totalSizeBytes: 0,

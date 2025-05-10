@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { getRandomVideoPath, getRandomAudioPath } from './MediaUtils';
+import { modalAnimations } from './Animations';
 
 interface GiveUpModalProps {
   isOpen: boolean;
@@ -13,14 +14,29 @@ interface GiveUpModalProps {
 const GiveUpModal: React.FC<GiveUpModalProps> = ({ isOpen, onClose }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
   
   // Generate random media paths when the modal opens
   const [videoPath, setVideoPath] = useState<string>('');
   const [audioPath, setAudioPath] = useState<string>('');
+  const [isClosing, setIsClosing] = useState(false);
+
+  // Add animations to the document
+  useEffect(() => {
+    const styleEl = document.createElement('style');
+    styleEl.textContent = modalAnimations;
+    document.head.appendChild(styleEl);
+    
+    return () => {
+      document.head.removeChild(styleEl);
+    };
+  }, []);
 
   // Generate new random paths when the modal opens
   useEffect(() => {
     if (isOpen) {
+      setIsClosing(false);
+      
       // Generate random paths
       const newVideoPath = getRandomVideoPath('giveup');
       const newAudioPath = getRandomAudioPath('giveup');
@@ -94,6 +110,22 @@ const GiveUpModal: React.FC<GiveUpModalProps> = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
+  // Handle the close animation
+  const handleClose = () => {
+    setIsClosing(true);
+    
+    // Add exit animation and wait for it to complete before actually closing
+    if (modalRef.current) {
+      modalRef.current.style.animation = 'modalExit 0.5s forwards';
+      
+      setTimeout(() => {
+        onClose();
+      }, 500); // Match this to the modalExit animation duration
+    } else {
+      onClose();
+    }
+  };
+
   // Don't render anything if modal is closed
   if (!isOpen) {
     return null;
@@ -128,6 +160,7 @@ const GiveUpModal: React.FC<GiveUpModalProps> = ({ isOpen, onClose }) => {
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
+      animation: isClosing ? 'modalExit 0.5s forwards' : 'modalEntrance 0.7s forwards, modalGlow 3s infinite',
     },
     videoContainer: {
       width: '100%',
@@ -158,14 +191,15 @@ const GiveUpModal: React.FC<GiveUpModalProps> = ({ isOpen, onClose }) => {
       transition: 'all 0.2s ease',
       cursor: 'pointer',
       fontSize: 'clamp(1rem, 3vmin, 1.2rem)',
+      animation: 'buttonPulse 2s infinite',
     },
   };
 
   return (
     <div style={modalStyles.overlay}>
-      <div style={modalStyles.modal}>
+      <div ref={modalRef} style={modalStyles.modal}>
         <div style={modalStyles.videoContainer}>
-          <video 
+          <video
             ref={videoRef}
             style={modalStyles.video}
             src={videoPath}
@@ -175,15 +209,23 @@ const GiveUpModal: React.FC<GiveUpModalProps> = ({ isOpen, onClose }) => {
         </div>
         
         {/* Hidden audio element for sound effect */}
-        <audio 
+        <audio
           ref={audioRef}
           src={audioPath}
           loop
         />
         
-        <button 
+        <button
           style={modalStyles.button}
-          onClick={onClose}
+          onClick={handleClose}
+          onMouseOver={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+            e.currentTarget.style.boxShadow = '0 0 20px rgba(241, 91, 181, 0.9), 0 0 30px rgba(0, 187, 249, 0.5)';
+          }}
+          onMouseOut={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 0 clamp(10px, 3vmin, 15px) rgba(241, 91, 181, 0.7)';
+          }}
         >
           I confe$$, I have no R13z
         </button>

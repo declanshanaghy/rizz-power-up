@@ -1,4 +1,5 @@
 /* This file contains the entry point for the React application */
+// @ts-ignore - React is needed for JSX
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'

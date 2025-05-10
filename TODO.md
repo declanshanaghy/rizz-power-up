@@ -2,9 +2,10 @@
 
 1. Code Mode must never complete a task without asking FiremanDecko to 
    confirm that everything is working as expected.
-2. After confirmation and prior to returning results to the Orchestrator always 
+2. Always run the frontend build locally to ensure that the github actions won't fail
+3. After confirmation and prior to returning results to the Orchestrator always 
    commit changes to git. See the section below for specifics (Commit changes to git before task completion)
-3. The Orchestrator must always re-read TODO.md before starting a new task. Things might have 
+4. The Orchestrator must always re-read TODO.md before starting a new task. Things might have 
    changed since the last time you read it.
 
 # Commit changes to git before task completion
