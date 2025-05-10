@@ -95,6 +95,7 @@ function App() {
   const [showCard, setShowCard] = useState(false)
   const [showBankOptions, setShowBankOptions] = useState(false)
   const [highScore, setHighScore] = useState(0)
+  const [clickCount, setClickCount] = useState(0)
   
   // Function to calculate optimal dimensions for 18:9 aspect ratio
   const calculateOptimalDimensions = () => {
@@ -277,7 +278,10 @@ function App() {
   
   // Handle button tap
   const handleRizzTap = () => {
-    if (showCard || showBankOptions) return; // Don't allow new cards while one is showing
+    if (showCard) return; // Don't allow new cards while one is showing
+    
+    // Increment click count
+    setClickCount(prevCount => prevCount + 1);
     
     // Deal a random card
     const card = getRandomImage();
@@ -301,7 +305,14 @@ function App() {
     const calculatedRizzLevel = newStats.vibeLevel + newStats.swagger + newStats.cringeAvoidance;
     setRizzLevel(calculatedRizzLevel);
     
-    // Make card disappear after a few seconds
+    // Calculate delay time inversely proportional to click count
+    // More clicks = slower return (up to max 5 seconds)
+    // Minimum delay is 1 second, maximum is 5 seconds
+    const baseDelay = 1000; // 1 second base delay
+    const clickFactor = Math.min(clickCount * 200, 4000); // 200ms per click, max 4000ms additional
+    const totalDelay = baseDelay + clickFactor; // Between 1000ms and 5000ms
+    
+    // Make card disappear after calculated delay
     setTimeout(() => {
       // Add fadeOut class to the card
       const cardElement = document.querySelector('.card-display');
@@ -311,13 +322,12 @@ function App() {
         // Wait for animation to complete before hiding
         setTimeout(() => {
           setShowCard(false);
-          setShowBankOptions(true);
+          // Don't show bank options modal, instead show bank button in main display
         }, 500); // Match this to the fadeOut animation duration
       } else {
         setShowCard(false);
-        setShowBankOptions(true);
       }
-    }, 4500); // Show card for 4.5 seconds before starting fadeOut
+    }, totalDelay); // Show card for calculated delay before starting fadeOut
     
     // Check for special event (every 10 taps)
     if (calculatedRizzLevel % 10 === 0) {
@@ -338,66 +348,7 @@ function App() {
       swagger: 0,
       cringeAvoidance: 0
     });
-    setShowBankOptions(false);
-  };
-  
-  // Handle dealing another card
-  const handleDealAgain = () => {
-    setShowBankOptions(false);
-    
-    // Ensure we're not in a state where a card is already showing
-    if (showCard) {
-      setShowCard(false);
-    }
-    
-    // Automatically deal another card after a short delay
-    setTimeout(() => {
-      // Get a random card
-      const card = getRandomImage();
-      
-      // Generate random attributes based on the card's bias
-      const attributes = generateAttributes(card.bias);
-      setCurrentAttributes(attributes);
-      
-      setCurrentCard(card);
-      setShowCard(true);
-      
-      // Update stats based on generated attributes
-      const newStats = {
-        vibeLevel: stats.vibeLevel + attributes.vibeLevel,
-        swagger: stats.swagger + attributes.swagger,
-        cringeAvoidance: stats.cringeAvoidance + attributes.cringeAvoidance
-      };
-      setStats(newStats);
-      
-      // Calculate the new Rizz level as the sum of all attributes
-      const calculatedRizzLevel = newStats.vibeLevel + newStats.swagger + newStats.cringeAvoidance;
-      setRizzLevel(calculatedRizzLevel);
-      
-      // Make card disappear after a few seconds
-      setTimeout(() => {
-        // Add fadeOut class to the card
-        const cardElement = document.querySelector('.card-display');
-        if (cardElement) {
-          cardElement.classList.add('fadeOut');
-          
-          // Wait for animation to complete before hiding
-          setTimeout(() => {
-            setShowCard(false);
-            setShowBankOptions(true);
-          }, 500); // Match this to the fadeOut animation duration
-        } else {
-          setShowCard(false);
-          setShowBankOptions(true);
-        }
-      }, 4500); // Show card for 4.5 seconds before starting fadeOut
-      
-      // Check for special event (every 10 taps)
-      if (calculatedRizzLevel % 10 === 0) {
-        setShowSpecialEvent(true);
-        setTimeout(() => setShowSpecialEvent(false), 3000);
-      }
-    }, 300);
+    setClickCount(0); // Reset click count when banking score
   };
 
   return (
@@ -544,8 +495,41 @@ function App() {
           
           {/* Rizz Button */}
           <div style={{ display: 'flex', justifyContent: 'center', margin: '0.25rem 0' }}>
-            <RizzButton onClick={handleRizzTap} />
+            <RizzButton onClick={handleRizzTap} disabled={showCard} />
           </div>
+          
+          {/* Bank Score Button - Always visible */}
+          {!showCard && (
+            <div style={{ display: 'flex', justifyContent: 'center', margin: '0.5rem 0' }}>
+              <button
+                onClick={handleBankScore}
+                style={{
+                  padding: '0.75rem 1.5rem',
+                  background: 'linear-gradient(90deg, #F15BB5, #9B5DE5)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '12px',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  cursor: 'pointer',
+                  boxShadow: '0 0 15px rgba(241, 91, 181, 0.7)',
+                  transition: 'all 0.2s ease',
+                  transform: 'scale(1)',
+                  textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 0 20px rgba(241, 91, 181, 0.9)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(241, 91, 181, 0.7)';
+                }}
+              >
+                💰 Bank Your Score
+              </button>
+            </div>
+          )}
           
           {/* Quote Display removed */}
           
@@ -733,127 +717,27 @@ function App() {
             </div>
           )}
           
-          {/* Bank or Deal Options */}
-          {showBankOptions && (
-            <div style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '90%',
-              maxWidth: '350px',
-              padding: '1.5rem',
-              borderRadius: '15px',
-              background: 'rgba(46, 8, 84, 0.9)',
-              boxShadow: '0 0 20px rgba(241, 91, 181, 0.7), 0 0 40px rgba(0, 187, 249, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.5)',
-              textAlign: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1rem',
-              zIndex: 100,
-              animation: 'fadeIn 0.7s ease-out',
-              border: '3px solid #00F5D4'
-            }}>
-              <h3 style={{
-                color: '#FEE440',
-                fontSize: '1.3rem',
-                textAlign: 'center',
-                textShadow: '0 0 5px #FEE440',
-                margin: 0
-              }}>
-                What's your next move?
-              </h3>
-              
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '1rem',
-                marginBottom: '0.5rem'
-              }}>
-                <div style={{ color: '#00F5D4', fontSize: '1.1rem' }}>Current Rizz:</div>
-                <div style={{
-                  color: '#F15BB5',
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
-                  textShadow: '0 0 10px #F15BB5'
-                }}>{rizzLevel}</div>
-              </div>
-              
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '1rem',
-                marginBottom: '1rem'
-              }}>
-                <div style={{ color: '#00F5D4', fontSize: '1.1rem' }}>High Score:</div>
-                <div style={{
-                  color: '#FEE440',
-                  fontSize: '1.5rem',
-                  fontWeight: 'bold',
-                  textShadow: '0 0 10px #FEE440'
-                }}>{highScore}</div>
-              </div>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <button
-                  onClick={handleDealAgain}
-                  style={{
-                    padding: '1rem',
-                    background: 'linear-gradient(90deg, #00BBF9, #00F5D4)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontWeight: 'bold',
-                    fontSize: '1.2rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 0 15px rgba(0, 187, 249, 0.7)',
-                    transition: 'all 0.2s ease',
-                    transform: 'scale(1)',
-                    textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 187, 249, 0.9)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 187, 249, 0.7)';
-                  }}
-                >
-                  🎮 Deal Another Card
-                </button>
-                <button
-                  onClick={handleBankScore}
-                  style={{
-                    padding: '1rem',
-                    background: 'linear-gradient(90deg, #F15BB5, #9B5DE5)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontWeight: 'bold',
-                    fontSize: '1.2rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 0 15px rgba(241, 91, 181, 0.7)',
-                    transition: 'all 0.2s ease',
-                    transform: 'scale(1)',
-                    textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.boxShadow = '0 0 20px rgba(241, 91, 181, 0.9)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(241, 91, 181, 0.7)';
-                  }}
-                >
-                  💰 Bank Your Score
-                </button>
-              </div>
-            </div>
-          )}
+          {/* High Score Display */}
+          <div style={{
+            width: '90%',
+            padding: '0.5rem',
+            borderRadius: '10px',
+            background: 'rgba(46, 8, 84, 0.5)',
+            textAlign: 'center',
+            marginTop: '0.5rem',
+            display: !showCard ? 'flex' : 'none',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '0.5rem'
+          }}>
+            <span style={{ color: '#00F5D4', fontSize: '0.9rem' }}>High Score:</span>
+            <span style={{
+              color: '#FEE440',
+              fontSize: '1.1rem',
+              fontWeight: 'bold',
+              textShadow: '0 0 5px #FEE440'
+            }}>{highScore}</span>
+          </div>
           
           {/* Special Event */}
           {showSpecialEvent && (
@@ -871,6 +755,23 @@ function App() {
               textShadow: '0 0 5px #FEE440'
             }}>
               ✨ Sigma Surge Activated! ✨
+            </div>
+          )}
+          
+          {/* Click Counter (for debugging) */}
+          {showDebug && (
+            <div style={{
+              width: '90%',
+              padding: '0.5rem',
+              borderRadius: '10px',
+              background: 'rgba(46, 8, 84, 0.5)',
+              textAlign: 'center',
+              marginTop: '0.5rem'
+            }}>
+              <span style={{ color: '#00F5D4', fontSize: '0.9rem' }}>Click Count: {clickCount}</span>
+              <span style={{ color: '#FEE440', fontSize: '0.9rem', marginLeft: '1rem' }}>
+                Delay: {Math.min(1 + (clickCount * 0.2), 5).toFixed(1)}s
+              </span>
             </div>
           )}
           
