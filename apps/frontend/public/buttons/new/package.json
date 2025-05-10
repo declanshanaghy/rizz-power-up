@@ -1,0 +1,12 @@
+{
+  "name": "rizz-button-generator",
+  "version": "1.0.0",
+  "description": "Generate button images for Rizz Power Up app",
+  "main": "generate_buttons.js",
+  "scripts": {
+    "generate": "node generate_buttons.js"
+  },
+  "dependencies": {
+    "puppeteer": "^20.0.0"
+  }
+}

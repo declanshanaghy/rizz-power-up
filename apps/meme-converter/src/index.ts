@@ -271,6 +271,28 @@ function matchImagesToPrompts(
       };
     }
     
+    if (baseName === 'monk-in-zen-tranquility' && files[0].includes('/good/')) {
+      // Create a custom prompt for monk-in-zen-tranquility in the good directory
+      return {
+        id: 101, // Use a high ID to avoid conflicts
+        title: "Monk in zen tranquility",
+        prompt: "A monk meditating in perfect tranquility, surrounded by peaceful energy.",
+        description: "You've reached a state of perfect spiritual balance, radiating calm confidence that draws others to your peaceful presence.",
+        type: "good"
+      };
+    }
+    
+    if (baseName === 'skyscraper-dawn-awe' && files[0].includes('/good/')) {
+      // Create a custom prompt for skyscraper-dawn-awe in the good directory
+      return {
+        id: 102, // Use a high ID to avoid conflicts
+        title: "Skyscraper dawn awe",
+        prompt: "A person standing atop a skyscraper at dawn, arms outstretched in awe of the view.",
+        description: "You've reached new heights of social confidence, standing above the crowd with a perspective that impresses everyone around you.",
+        type: "good"
+      };
+    }
+    
     if (baseName === 'boho-vibe-overload') {
       // This should match the Rizz Zen prompt
       return prompts.find(p => p.id === 9); // "Rizz Zen achieved"
@@ -333,15 +355,38 @@ function matchImagesToPrompts(
     
     // If still no match, use a default prompt based on the directory
     if (!matchedPrompt) {
+      // Determine if this is a good or bad image based on the file path
       const isGood = files[0].includes('/good/');
-      const defaultPrompt: Prompt = {
-        id: 0,
-        title: baseName.replace(/-/g, ' '),
-        prompt: `A ${isGood ? 'positive' : 'negative'} rizz image showing ${baseName.replace(/-/g, ' ')}.`,
-        description: `A ${isGood ? 'charming' : 'awkward'} moment that ${isGood ? 'enhances' : 'diminishes'} your social appeal.`,
-        type: isGood ? 'good' : 'bad'
-      };
-      matchedPrompt = defaultPrompt;
+      console.log(`Using default prompt for ${baseName}, isGood: ${isGood}`);
+      
+      // Use the appropriate default prompt based on the directory
+      if (isGood) {
+        // Find the default good prompt we added earlier
+        matchedPrompt = prompts.find(p => p.id === 999);
+        // Fallback in case the prompt is not found
+        if (!matchedPrompt) {
+          matchedPrompt = {
+            id: 999,
+            title: "Positive rizz energy",
+            prompt: "A positive rizz image showing confidence and charm.",
+            description: "A charming moment that enhances your social appeal.",
+            type: "good"
+          };
+        }
+      } else {
+        // Find the default bad prompt we added earlier
+        matchedPrompt = prompts.find(p => p.id === 998);
+        // Fallback in case the prompt is not found
+        if (!matchedPrompt) {
+          matchedPrompt = {
+            id: 998,
+            title: "Negative rizz energy",
+            prompt: "A negative rizz image showing awkwardness and lack of charm.",
+            description: "An awkward moment that diminishes your social appeal.",
+            type: "bad"
+          };
+        }
+      }
     }
     
     matches.set(baseName, { files, prompt: matchedPrompt });
@@ -381,11 +426,16 @@ async function generateTypeScriptFile(
       // Generate positive bias for good memes
       const bias = generateBias(true);
       
+      // Force a positive description for good images
+      const description = file.includes('/good/')
+        ? "A charming moment that enhances your social appeal."
+        : prompt.description;
+        
       memeImages.push({
         id: `${baseName}-${index + 1}`,
         name: baseName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
         path: `/memes/good/${file}`,
-        description: prompt.description, // Use the description field instead of the prompt
+        description: description,
         promptTitle: prompt.title,
         promptId: prompt.id,
         bias: bias,
@@ -400,11 +450,16 @@ async function generateTypeScriptFile(
       // Generate negative bias for bad memes
       const bias = generateBias(false);
       
+      // Force a negative description for bad images
+      const description = file.includes('/bad/')
+        ? "An awkward moment that diminishes your social appeal."
+        : prompt.description;
+        
       memeImages.push({
         id: `${baseName}-${index + 1}`,
         name: baseName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
         path: `/memes/bad/${file}`,
-        description: prompt.description, // Use the description field instead of the prompt
+        description: description,
         promptTitle: prompt.title,
         promptId: prompt.id,
         bias: bias,
@@ -571,9 +626,31 @@ async function main() {
     const goodGroups = groupImagesByName(goodFiles);
     const badGroups = groupImagesByName(badFiles);
     
+    // Create a default good prompt for images without matches
+    const defaultGoodPrompt: Prompt = {
+      id: 999,
+      title: "Positive rizz energy",
+      prompt: "A positive rizz image showing confidence and charm.",
+      description: "A charming moment that enhances your social appeal.",
+      type: "good"
+    };
+    
+    // Create a default bad prompt for images without matches
+    const defaultBadPrompt: Prompt = {
+      id: 998,
+      title: "Negative rizz energy",
+      prompt: "A negative rizz image showing awkwardness and lack of charm.",
+      description: "An awkward moment that diminishes your social appeal.",
+      type: "bad"
+    };
+    
+    // Add these default prompts to the prompts array
+    prompts.push(defaultGoodPrompt);
+    prompts.push(defaultBadPrompt);
+    
     // Match images to prompts
-    const goodMatches = matchImagesToPrompts(goodGroups, prompts.filter(p => p.type === 'good'));
-    const badMatches = matchImagesToPrompts(badGroups, prompts.filter(p => p.type === 'bad' || p.type === 'bonus'));
+    const goodMatches = matchImagesToPrompts(goodGroups, [...prompts.filter(p => p.type === 'good'), defaultGoodPrompt]);
+    const badMatches = matchImagesToPrompts(badGroups, [...prompts.filter(p => p.type === 'bad' || p.type === 'bonus'), defaultBadPrompt]);
     
     // Generate TypeScript file
     console.log('Generating TypeScript file...');

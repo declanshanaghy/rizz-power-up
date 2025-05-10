@@ -6,36 +6,55 @@ interface RizzButtonProps {
 }
 
 /**
- * RizzButton component that uses the rizz.png image for different states
- * The image is expected to have three states stacked vertically:
- * 1. Top third: Disabled state
- * 2. Middle third: Enabled state (no hover)
- * 3. Bottom third: Enabled state (hovering)
+ * RizzButton component that uses three separate images for different states:
+ * 1. rizz_inactive.png: Disabled state
+ * 2. rizz_active.png: Enabled state (no hover)
+ * 3. rizz_hover.png: Enabled state (hovering)
  */
 const RizzButton: React.FC<RizzButtonProps> = ({ onClick, disabled = false }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   
-  // Determine which part of the image to show based on the button state
-  const getBackgroundPosition = () => {
+  // Determine which image to show based on the button state
+  const getButtonImage = () => {
     if (disabled) {
-      return '0 0'; // Top third - disabled state
+      return '/buttons/rizz_button_disabled_new.png'; // Disabled state
     } else if (isHovering) {
-      return '0 100%'; // Bottom third - hover state
+      return '/buttons/rizz_button_hover_new.png'; // Hover state
     } else {
-      return '0 50%'; // Middle third - normal state
+      return '/buttons/rizz_button_active_new.png'; // Normal state
     }
   };
 
   // Handle image loading error
-  const [imageLoaded, setImageLoaded] = useState(true);
+  const [imagesLoaded, setImagesLoaded] = useState(true);
   
   useEffect(() => {
-    // Check if the button image exists
-    const img = new Image();
-    img.src = '/buttons/rizz.png';
-    img.onload = () => setImageLoaded(true);
-    img.onerror = () => setImageLoaded(false);
+    // Check if all button images exist
+    const checkImages = async () => {
+      try {
+        const imagePromises = [
+          '/buttons/rizz_button_active_new.png',
+          '/buttons/rizz_button_disabled_new.png',
+          '/buttons/rizz_button_hover_new.png'
+        ].map(src => {
+          return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = resolve;
+            img.onerror = reject;
+          });
+        });
+        
+        await Promise.all(imagePromises);
+        setImagesLoaded(true);
+      } catch (error) {
+        console.error('Failed to load button images:', error);
+        setImagesLoaded(false);
+      }
+    };
+    
+    checkImages();
   }, []);
   
   return (
@@ -51,25 +70,37 @@ const RizzButton: React.FC<RizzButtonProps> = ({ onClick, disabled = false }) =>
       onMouseUp={() => setIsPressed(false)}
       className={`rizz-button ${disabled ? 'disabled' : ''}`}
       style={{
-        width: '300px', // Increased from 200px for better proportions
-        height: '120px', // Increased from 80px for better proportions
-        background: `url('/buttons/rizz.png') no-repeat`,
-        backgroundPosition: getBackgroundPosition(),
-        backgroundSize: '100% 300%', // 100% width, 300% height to accommodate 3 states
+        position: 'relative',
+        width: '700px', // Fixed width - no responsive scaling
+        height: '240px', // Fixed height - no responsive scaling
+        display: 'block',
         border: 'none',
         padding: 0,
+        margin: '0 auto', // Center the button horizontally within its parent
         cursor: disabled ? 'not-allowed' : 'pointer',
-        transform: isPressed && !disabled ? 'scale(0.95)' : 'scale(1)',
+        transform: isPressed && !disabled ? 'scale(0.95)' : 'none',
+        transformOrigin: 'center center', // Ensure scaling happens from the center
+        transition: 'transform 0.1s ease', // Smooth transform for press effect only
         // No text content - the image contains all visual elements
         fontSize: 0,
         color: 'transparent',
-        // Removed the clipPath to show the full button design
-        margin: '10px',
       }}
       aria-label="Rizz Up Button"
     >
+      {/* Background image */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        background: `url('${getButtonImage()}') no-repeat center center`,
+        backgroundSize: '700px 240px', // Exact size - no scaling
+        backgroundPosition: 'center', // Center the image
+      }} />
+      
       {/* Hidden text for screen readers */}
-      {!imageLoaded && (
+      {!imagesLoaded && (
         <span style={{
           position: 'absolute',
           top: '50%',

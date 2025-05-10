@@ -195,14 +195,14 @@ body {
   height: auto;
 }
 
-/* Preload the button image to avoid flickering on state changes */
+/* Preload the button images to avoid flickering on state changes */
 body::after {
   position: absolute;
   width: 0;
   height: 0;
   overflow: hidden;
   z-index: -1;
-  content: url('/buttons/rizz.png');
+  content: url('/buttons/rizz_button_active_cropped.png') url('/buttons/rizz_button_disabled_cropped.png') url('/buttons/rizz_button_hover_cropped.png');
 }
 
 /* Alternative button states for different image formats */
@@ -212,10 +212,7 @@ body::after {
   cursor: not-allowed;
 }
 
-.rizz-button:hover:not(.disabled) {
-  transform: scale(1.05);
-  /* Remove the pink box-shadow */
-}
+/* Removed the hover styles since we're using separate images for each state */
 
 .rizz-button:active:not(.disabled) {
   transform: scale(0.95);

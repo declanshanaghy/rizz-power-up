@@ -34,13 +34,53 @@ export interface MemeImage {
  */
 export const memeImages: MemeImage[] = [
   {
+    "id": "sci-fi-lab-chaos-1",
+    "name": "Sci Fi Lab Chaos",
+    "path": "/memes/good/sci-fi-lab-chaos-01jtw0wmpveckvy88b7wnmjbg2.png",
+    "description": "Your unique energy is so powerful it breaks the digital systems trying to categorize you, causing beautiful chaos.",
+    "promptTitle": "Your aura just disrupted the algorithm.",
+    "promptId": 6,
+    "bias": 9,
+    "isGood": true
+  },
+  {
+    "id": "sci-fi-lab-chaos-2",
+    "name": "Sci Fi Lab Chaos",
+    "path": "/memes/good/sci-fi-lab-chaos-01jtw0wmptex5thqj6z2eknb6w.png",
+    "description": "Your unique energy is so powerful it breaks the digital systems trying to categorize you, causing beautiful chaos.",
+    "promptTitle": "Your aura just disrupted the algorithm.",
+    "promptId": 6,
+    "bias": 6,
+    "isGood": true
+  },
+  {
+    "id": "renaissance-elegance-with-cherubs-1",
+    "name": "Renaissance Elegance With Cherubs",
+    "path": "/memes/good/renaissance-elegance-with-cherubs-01jtw0pz07fyasp35ykx4jm156.png",
+    "description": "You radiate confidence as you walk through life, turning heads and commanding attention with your effortless presence.",
+    "promptTitle": "Main character energy.",
+    "promptId": 1,
+    "bias": 8,
+    "isGood": true
+  },
+  {
+    "id": "renaissance-elegance-with-cherubs-2",
+    "name": "Renaissance Elegance With Cherubs",
+    "path": "/memes/good/renaissance-elegance-with-cherubs-01jtw0pz06ea5rz1gt42dsq80z.png",
+    "description": "You radiate confidence as you walk through life, turning heads and commanding attention with your effortless presence.",
+    "promptTitle": "Main character energy.",
+    "promptId": 1,
+    "bias": 9,
+    "isGood": true
+  },
+  {
     "id": "primal-power-unleashed-1",
     "name": "Primal Power Unleashed",
     "path": "/memes/good/primal-power-unleashed-01jtfbzvwjf0frbzz2fgx0ehr5.png",
     "description": "Your raw charismatic energy has broken through all restraints, unleashing your most powerful and authentic self.",
     "promptTitle": "Unleashed primal rizz beast mode.",
     "promptId": 10,
-    "bias": 3,
+    "bias": 9,
     "isGood": true
   },
   {
@@ -50,27 +90,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your raw charismatic energy has broken through all restraints, unleashing your most powerful and authentic self.",
     "promptTitle": "Unleashed primal rizz beast mode.",
     "promptId": 10,
-    "bias": 6,
-    "isGood": true
-  },
-  {
-    "id": "meditative-cat-serenity-1",
-    "name": "Meditative Cat Serenity",
-    "path": "/memes/good/meditative-cat-serenity-01jtfbyb6bejg9zh72d5aqsv6n.png",
-    "description": "A awkward moment that diminishes your social appeal.",
-    "promptTitle": "meditative cat serenity",
-    "promptId": 0,
     "bias": 10,
-    "isGood": true
-  },
-  {
-    "id": "meditative-cat-serenity-2",
-    "name": "Meditative Cat Serenity",
-    "path": "/memes/good/meditative-cat-serenity-01jtfbyb6afw8vsn1whywp6kgv.png",
-    "description": "A awkward moment that diminishes your social appeal.",
-    "promptTitle": "meditative cat serenity",
-    "promptId": 0,
-    "bias": 7,
     "isGood": true
   },
   {
@@ -80,7 +100,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your influence and style are off the charts, generating social media buzz with every step you take.",
     "promptTitle": "Exuding max clout per nanosecond.",
     "promptId": 2,
-    "bias": 5,
+    "bias": 7,
     "isGood": true
   },
   {
@@ -90,7 +110,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your influence and style are off the charts, generating social media buzz with every step you take.",
     "promptTitle": "Exuding max clout per nanosecond.",
     "promptId": 2,
-    "bias": 9,
+    "bias": 5,
     "isGood": true
   },
   {
@@ -100,7 +120,7 @@ export const memeImages: MemeImage[] = [
     "description": "You radiate confidence as you walk through life, turning heads and commanding attention with your effortless presence.",
     "promptTitle": "Main character energy.",
     "promptId": 1,
-    "bias": 7,
+    "bias": 9,
     "isGood": true
   },
   {
@@ -110,7 +130,27 @@ export const memeImages: MemeImage[] = [
     "description": "You radiate confidence as you walk through life, turning heads and commanding attention with your effortless presence.",
     "promptTitle": "Main character energy.",
     "promptId": 1,
+    "bias": 4,
+    "isGood": true
+  },
+  {
+    "id": "glitching-digital-control-center-1",
+    "name": "Glitching Digital Control Center",
+    "path": "/memes/good/glitching-digital-control-center-01jtw0q5etfndvdcf9eq5y5pss.png",
+    "description": "Your unique energy is so powerful it breaks the digital systems trying to categorize you, causing beautiful chaos.",
+    "promptTitle": "Your aura just disrupted the algorithm.",
+    "promptId": 6,
     "bias": 8,
+    "isGood": true
+  },
+  {
+    "id": "glitching-digital-control-center-2",
+    "name": "Glitching Digital Control Center",
+    "path": "/memes/good/glitching-digital-control-center-01jtw0q5esewa85yxkrb0xycez.png",
+    "description": "Your unique energy is so powerful it breaks the digital systems trying to categorize you, causing beautiful chaos.",
+    "promptTitle": "Your aura just disrupted the algorithm.",
+    "promptId": 6,
+    "bias": 9,
     "isGood": true
   },
   {
@@ -120,7 +160,7 @@ export const memeImages: MemeImage[] = [
     "description": "You've reached a state of perfect balance between confidence and humility, attracting others through peaceful energy.",
     "promptTitle": "Rizz Zen achieved.",
     "promptId": 9,
-    "bias": 10,
+    "bias": 4,
     "isGood": true
   },
   {
@@ -130,8 +170,88 @@ export const memeImages: MemeImage[] = [
     "description": "You've reached a state of perfect balance between confidence and humility, attracting others through peaceful energy.",
     "promptTitle": "Rizz Zen achieved.",
     "promptId": 9,
+    "bias": 8,
+    "isGood": true
+  },
+  {
+    "id": "rizzatao-the-catto-energy-observed-1",
+    "name": "Rizzatao The Catto Energy Observed",
+    "path": "/memes/good/rizzatao-the-catto-energy-observed-01jtw2jrh4f579bj791ejy3q74.png",
+    "description": "Your unique energy is so powerful it breaks the digital systems trying to categorize you, causing beautiful chaos.",
+    "promptTitle": "Your aura just disrupted the algorithm.",
+    "promptId": 6,
+    "bias": 8,
+    "isGood": true
+  },
+  {
+    "id": "rizzatao-the-catto-energy-observed-2",
+    "name": "Rizzatao The Catto Energy Observed",
+    "path": "/memes/good/rizzatao-the-catto-energy-observed-01jtw2jrh3f2g8z565dg0g8dn1.png",
+    "description": "Your unique energy is so powerful it breaks the digital systems trying to categorize you, causing beautiful chaos.",
+    "promptTitle": "Your aura just disrupted the algorithm.",
+    "promptId": 6,
     "bias": 10,
     "isGood": true
+  },
+  {
+    "id": "rizz-zen-achieved-1",
+    "name": "Rizz Zen Achieved",
+    "path": "/memes/good/rizz-zen-achieved-01jtw2gsc0fe9r6xmamx8qdknq.png",
+    "description": "You've reached a state of perfect balance between confidence and humility, attracting others through peaceful energy.",
+    "promptTitle": "Rizz Zen achieved.",
+    "promptId": 9,
+    "bias": 6,
+    "isGood": true
+  },
+  {
+    "id": "rizz-zen-achieved-2",
+    "name": "Rizz Zen Achieved",
+    "path": "/memes/good/rizz-zen-achieved-01jtw2gsbzevqbwxkyt0ac2ttq.png",
+    "description": "You've reached a state of perfect balance between confidence and humility, attracting others through peaceful energy.",
+    "promptTitle": "Rizz Zen achieved.",
+    "promptId": 9,
+    "bias": 7,
+    "isGood": true
+  },
+  {
+    "id": "sigma-mode-initiated-1",
+    "name": "Sigma Mode Initiated",
+    "path": "/memes/good/sigma-mode-initiated-01jtw2gb9tf0g8704552tbyvsm.png",
+    "description": "Your timeless appeal combines classical elegance with modern allure, creating an aura of sophisticated mystery.",
+    "promptTitle": "You're giving rizztastic renaissance mystique.",
+    "promptId": 5,
+    "bias": 9,
+    "isGood": true
+  },
+  {
+    "id": "sigma-mode-initiated-2",
+    "name": "Sigma Mode Initiated",
+    "path": "/memes/good/sigma-mode-initiated-01jtw2gb9ses3t1sfn1yw6gnst.png",
+    "description": "Your timeless appeal combines classical elegance with modern allure, creating an aura of sophisticated mystery.",
+    "promptTitle": "You're giving rizztastic renaissance mystique.",
+    "promptId": 5,
+    "bias": 8,
+    "isGood": true
+  },
+  {
+    "id": "spaceship-emergency-alert-1",
+    "name": "Spaceship Emergency Alert",
+    "path": "/memes/bad/spaceship-emergency-alert-01jtw1nrhtff89svr98z1362rp.png",
+    "description": "An awkward moment that diminishes your social appeal.",
+    "promptTitle": "Negative rizz energy",
+    "promptId": 998,
+    "bias": -2,
+    "isGood": false
+  },
+  {
+    "id": "spaceship-emergency-alert-2",
+    "name": "Spaceship Emergency Alert",
+    "path": "/memes/bad/spaceship-emergency-alert-01jtw1nrhsekq9mgff0f44xzh6.png",
+    "description": "An awkward moment that diminishes your social appeal.",
+    "promptTitle": "Negative rizz energy",
+    "promptId": 998,
+    "bias": -4,
+    "isGood": false
   },
   {
     "id": "rizz-core-crisis-1",
@@ -140,7 +260,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your social skills have catastrophically imploded, creating a chain reaction of awkwardness that tears apart the fabric of conversation.",
     "promptTitle": "Quantum rizzwave collapse.",
     "promptId": 14,
-    "bias": -9,
+    "bias": -8,
     "isGood": false
   },
   {
@@ -150,7 +270,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your social skills have catastrophically imploded, creating a chain reaction of awkwardness that tears apart the fabric of conversation.",
     "promptTitle": "Quantum rizzwave collapse.",
     "promptId": 14,
-    "bias": -4,
+    "bias": -10,
     "isGood": false
   },
   {
@@ -160,7 +280,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your charm has completely collapsed under pressure, leaving you stranded in a storm of rejection and awkwardness.",
     "promptTitle": "Your rizz has been obliterated.",
     "promptId": 11,
-    "bias": -9,
+    "bias": -10,
     "isGood": false
   },
   {
@@ -170,7 +290,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your charm has completely collapsed under pressure, leaving you stranded in a storm of rejection and awkwardness.",
     "promptTitle": "Your rizz has been obliterated.",
     "promptId": 11,
-    "bias": -6,
+    "bias": -4,
     "isGood": false
   },
   {
@@ -180,7 +300,7 @@ export const memeImages: MemeImage[] = [
     "description": "You're completely lacking in appeal, sitting on the sidelines while everyone else enjoys the social warmth.",
     "promptTitle": "Rizzless, like an uncooked glizzy.",
     "promptId": 13,
-    "bias": -3,
+    "bias": -7,
     "isGood": false
   },
   {
@@ -190,7 +310,47 @@ export const memeImages: MemeImage[] = [
     "description": "You're completely lacking in appeal, sitting on the sidelines while everyone else enjoys the social warmth.",
     "promptTitle": "Rizzless, like an uncooked glizzy.",
     "promptId": 13,
-    "bias": -2,
+    "bias": -9,
+    "isGood": false
+  },
+  {
+    "id": "human-reboot-animation-1",
+    "name": "Human Reboot Animation",
+    "path": "/memes/bad/human-reboot-animation-01jtw1gaq4fq5bvmt3snhssq2p.png",
+    "description": "An awkward moment that diminishes your social appeal.",
+    "promptTitle": "Negative rizz energy",
+    "promptId": 998,
+    "bias": -10,
+    "isGood": false
+  },
+  {
+    "id": "human-reboot-animation-2",
+    "name": "Human Reboot Animation",
+    "path": "/memes/bad/human-reboot-animation-01jtw1gaq3ffbs369pzdepnks4.png",
+    "description": "An awkward moment that diminishes your social appeal.",
+    "promptTitle": "Negative rizz energy",
+    "promptId": 998,
+    "bias": -5,
+    "isGood": false
+  },
+  {
+    "id": "flirting-under-heat-lamps-1",
+    "name": "Flirting Under Heat Lamps",
+    "path": "/memes/bad/flirting-under-heat-lamps-01jtw1fqatfj6as74gctm2mnqw.png",
+    "description": "Your charm has completely collapsed under pressure, leaving you stranded in a storm of rejection and awkwardness.",
+    "promptTitle": "Your rizz has been obliterated.",
+    "promptId": 11,
+    "bias": -3,
+    "isGood": false
+  },
+  {
+    "id": "flirting-under-heat-lamps-2",
+    "name": "Flirting Under Heat Lamps",
+    "path": "/memes/bad/flirting-under-heat-lamps-01jtw1fqase79vhxkdckbnvhz5.png",
+    "description": "Your charm has completely collapsed under pressure, leaving you stranded in a storm of rejection and awkwardness.",
+    "promptTitle": "Your rizz has been obliterated.",
+    "promptId": 11,
+    "bias": -10,
     "isGood": false
   },
   {
@@ -200,7 +360,7 @@ export const memeImages: MemeImage[] = [
     "description": "You've completely run out of charm and energy, stranded in the middle of nowhere with no social fuel left.",
     "promptTitle": "Rizz tank empty.",
     "promptId": 18,
-    "bias": -6,
+    "bias": -3,
     "isGood": false
   },
   {
@@ -220,7 +380,7 @@ export const memeImages: MemeImage[] = [
     "description": "Your attempt at being cool has backfired spectacularly, triggering everyone's secondhand embarrassment sensors.",
     "promptTitle": "Main cringe energy detected.",
     "promptId": 12,
-    "bias": -10,
+    "bias": -3,
     "isGood": false
   },
   {
@@ -230,7 +390,27 @@ export const memeImages: MemeImage[] = [
     "description": "Your attempt at being cool has backfired spectacularly, triggering everyone's secondhand embarrassment sensors.",
     "promptTitle": "Main cringe energy detected.",
     "promptId": 12,
-    "bias": -8,
+    "bias": -9,
+    "isGood": false
+  },
+  {
+    "id": "chaotic-lab-catastrophe-1",
+    "name": "Chaotic Lab Catastrophe",
+    "path": "/memes/bad/chaotic-lab-catastrophe-01jtw18mzee4rbcax2paw0g0n5.png",
+    "description": "An awkward moment that diminishes your social appeal.",
+    "promptTitle": "Negative rizz energy",
+    "promptId": 998,
+    "bias": -2,
+    "isGood": false
+  },
+  {
+    "id": "chaotic-lab-catastrophe-2",
+    "name": "Chaotic Lab Catastrophe",
+    "path": "/memes/bad/chaotic-lab-catastrophe-01jtw18mzdfc4txb0dswqv9cpk.png",
+    "description": "An awkward moment that diminishes your social appeal.",
+    "promptTitle": "Negative rizz energy",
+    "promptId": 998,
+    "bias": -4,
     "isGood": false
   },
   {

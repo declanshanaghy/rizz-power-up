@@ -106,7 +106,7 @@ A chaotic desktop covered in flickering error popups and glowing smoothie spills
 
 **Description:** Your attempt to be smooth has caused a catastrophic error in your social operating system, crashing all your functions.
 
-### 20. "Rizztao the catto energy observed."
+### 20. "Rizzatao the catto energy observed."
 A meditative cat sits cross-legged on a mountain edge, surrounded by glowing paw prints, incense smoke, and floating fish emojis. **Keep image entirely wordless.**
 
 **Description:** You've achieved a zen-like state of feline indifference that paradoxically makes everyone want your attention and approval.
