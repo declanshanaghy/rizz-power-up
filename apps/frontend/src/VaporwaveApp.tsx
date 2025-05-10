@@ -5,7 +5,8 @@ function VaporwaveApp() {
   const [quote, setQuote] = useState('Tap the button to increase your Rizz!')
   const [showSpecialEvent, setShowSpecialEvent] = useState(false)
   
-  // Sample quotes - in a real app, this would be a larger database
+  // Sample quotes - expnand this list to at least 1000 later.
+  // Ensure the final deployed build is compacted for efficiency.
   const quotes = [
     "Your vibe just went up by 10 points!",
     "That's some serious swagger right there!",
@@ -46,7 +47,7 @@ function VaporwaveApp() {
     }
   }
 
-  // Vaporwave-inspired styles
+  // Vaporwave-inspired styles using CSS variables for responsive design
   const styles = {
     container: {
       display: 'flex',
@@ -54,87 +55,95 @@ function VaporwaveApp() {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '100vh',
-      padding: '2rem',
-      backgroundColor: '#1A1A1A',
-      color: '#FFFFFF',
-      fontFamily: '"Source Sans Pro", sans-serif'
+      padding: 'clamp(1rem, 5vmin, 2rem)',
+      backgroundColor: 'var(--color-bg-primary, #1A1A1A)',
+      color: 'var(--color-text-primary, #FFFFFF)',
+      fontFamily: '"Source Sans Pro", sans-serif',
+      overflowX: 'hidden' as const
     },
     content: {
-      maxWidth: '500px',
+      maxWidth: 'min(90vw, 500px)',
       width: '100%'
     },
     title: {
-      fontSize: '1.875rem',
+      fontSize: 'clamp(1.25rem, 5vmin, 1.875rem)',
       textAlign: 'center' as const,
       fontFamily: '"Playfair Display", serif',
-      color: '#F15BB5',
-      marginBottom: '0.5rem',
+      color: 'var(--color-accent-1, #F15BB5)',
+      marginBottom: 'clamp(0.5rem, 2vmin, 1rem)',
       textShadow: '0 0 5px #FFF'
     },
     quoteBox: {
       fontStyle: 'italic',
-      padding: '1rem',
-      borderLeft: '4px solid #00BBF9',
+      padding: 'clamp(0.75rem, 3vmin, 1rem)',
+      borderLeft: '4px solid var(--color-accent-2, #00BBF9)',
       backgroundColor: 'rgba(255, 255, 255, 0.05)',
-      marginBottom: '1.5rem',
-      color: '#00F5D4'
+      marginBottom: 'clamp(1rem, 4vmin, 1.5rem)',
+      color: 'var(--color-accent-3, #00F5D4)',
+      borderRadius: '0 var(--border-radius-sm, 0.5rem) var(--border-radius-sm, 0.5rem) 0'
     },
     buttonContainer: {
       display: 'flex',
       justifyContent: 'center',
-      margin: '1.5rem 0'
+      margin: 'clamp(1rem, 4vmin, 1.5rem) 0',
+      width: '100%'
     },
     neonButton: {
-      background: 'linear-gradient(90deg, #F15BB5, #00BBF9)',
+      background: 'linear-gradient(90deg, var(--color-accent-1, #F15BB5), var(--color-accent-2, #00BBF9))',
       color: 'white',
       fontWeight: 'bold',
-      padding: '1rem 2rem',
+      padding: 'clamp(0.75rem, 3vmin, 1rem) clamp(1.5rem, 6vmin, 2rem)',
       border: 'none',
-      borderRadius: '9999px',
+      borderRadius: 'var(--border-radius-lg, 1rem)',
       textShadow: '0 0 5px #FFF',
-      boxShadow: '0 0 15px #F15BB5',
-      transition: 'transform 0.2s',
-      cursor: 'pointer'
+      boxShadow: '0 0 clamp(10px, 3vmin, 15px) var(--color-accent-1, #F15BB5)',
+      transition: 'all 0.2s ease',
+      cursor: 'pointer',
+      width: 'min(100%, 300px)'
     },
     statsGrid: {
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '0.5rem',
-      fontSize: '0.875rem',
-      backgroundColor: '#2D2D2D',
-      padding: '1rem',
-      borderRadius: '0.5rem'
+      gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+      gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
+      fontSize: 'clamp(0.8rem, 2.5vmin, 0.875rem)',
+      backgroundColor: 'var(--color-bg-secondary, #2D2D2D)',
+      padding: 'clamp(0.75rem, 3vmin, 1rem)',
+      borderRadius: 'var(--border-radius-md, 0.75rem)',
+      width: '100%'
     },
-    rizzValue: { color: '#FEE440' },
-    vibeValue: { color: '#00F5D4' },
-    swaggerValue: { color: '#00BBF9' },
-    cringeValue: { color: '#9B5DE5' },
+    rizzValue: { color: 'var(--color-accent-5, #FEE440)' },
+    vibeValue: { color: 'var(--color-accent-3, #00F5D4)' },
+    swaggerValue: { color: 'var(--color-accent-2, #00BBF9)' },
+    cringeValue: { color: 'var(--color-accent-4, #9B5DE5)' },
     specialEvent: {
-      marginTop: '1rem',
+      marginTop: 'clamp(0.75rem, 3vmin, 1rem)',
       backgroundColor: 'rgba(155, 93, 229, 0.7)',
       textAlign: 'center' as const,
-      color: '#FEE440',
-      padding: '0.75rem',
-      borderRadius: '0.5rem',
-      animation: 'glitch 0.5s infinite'
+      color: 'var(--color-accent-5, #FEE440)',
+      padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
+      borderRadius: 'var(--border-radius-md, 0.75rem)',
+      animation: 'glitch 0.5s infinite',
+      width: '100%'
     },
     footer: {
-      marginTop: '1.5rem',
+      marginTop: 'clamp(1rem, 4vmin, 1.5rem)',
       textAlign: 'center' as const,
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
-      gap: '1rem'
+      gap: 'clamp(0.75rem, 3vmin, 1rem)',
+      width: '100%'
     },
     menuButton: {
-      fontSize: '0.875rem',
+      fontSize: 'clamp(0.75rem, 2.5vmin, 0.875rem)',
       color: '#7E7E7E',
       background: 'none',
       border: 'none',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      padding: 'clamp(0.25rem, 1vmin, 0.5rem)'
     },
     bmcContainer: {
-      marginTop: '1rem'
+      marginTop: 'clamp(0.75rem, 3vmin, 1rem)'
     }
   }
 
@@ -156,6 +165,14 @@ function VaporwaveApp() {
           <button
             style={styles.neonButton}
             onClick={handleRizzTap}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = `0 0 clamp(15px, 4vmin, 20px) var(--color-accent-1, #F15BB5)`;
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = `0 0 clamp(10px, 3vmin, 15px) var(--color-accent-1, #F15BB5)`;
+            }}
           >
             🔥 TAP TO RIZZ UP 🔥
           </button>
@@ -196,8 +213,9 @@ function VaporwaveApp() {
                 src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
                 alt="Buy Me A Coffee"
                 style={{
-                  height: '40px',
-                  width: 'auto'
+                  height: 'clamp(30px, 8vmin, 40px)',
+                  width: 'auto',
+                  maxWidth: '100%'
                 }}
               />
             </a>

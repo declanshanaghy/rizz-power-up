@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import RizzButton from './RizzButton'
+import BankScoreButton from './BankScoreButton'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages.ts'
 import attributeEmojis from './rizz_attributes_emojis.json'
 
@@ -74,15 +75,11 @@ function App() {
   const [rizzLevel, setRizzLevel] = useState(0)
   // Removed unused quote state
   const [showSpecialEvent, setShowSpecialEvent] = useState(false)
-  const [containerDimensions, setContainerDimensions] = useState({ width: '95vw', height: 'auto' })
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showDebug, setShowDebug] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   
-  // State to track content scaling factor and screen size
-  const [contentScale, setContentScale] = useState(1)
-  const [isMobile, setIsMobile] = useState(false)
-  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth)
+  // State to track container size
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
   
   // State for card display
@@ -97,83 +94,7 @@ function App() {
   const [highScore, setHighScore] = useState(0)
   const [clickCount, setClickCount] = useState(0)
   
-  // Function to calculate optimal dimensions for 18:9 aspect ratio
-  const calculateOptimalDimensions = () => {
-    try {
-      // Get current window dimensions
-      const windowWidth = window.innerWidth
-      const windowHeight = window.innerHeight
-      const isPortrait = windowHeight > windowWidth
-      
-      // Determine if we're on a mobile device
-      const isMobileDevice = windowWidth <= 768
-      setIsMobile(isMobileDevice)
-      
-      // Use a more flexible approach to aspect ratio
-      // Default target is 18:9 (2:1) but we'll adjust based on device orientation
-      let targetAspectRatio = 18 / 9 // Default 2:1 ratio
-      
-      // Adjust aspect ratio based on orientation for better fit
-      if (isPortrait) {
-        // In portrait, use a taller container (less wide)
-        targetAspectRatio = isMobileDevice ? 9 / 16 : 9 / 14
-      }
-      
-      // Calculate available space (with margins)
-      const maxWidth = windowWidth * (isMobileDevice ? 0.98 : 0.95)
-      const maxHeight = windowHeight * (isMobileDevice ? 0.98 : 0.95)
-      
-      // Calculate dimensions based on available space and target aspect ratio
-      let width, height
-      
-      if (maxWidth / maxHeight > targetAspectRatio) {
-        // Window is wider than our target aspect ratio
-        height = maxHeight
-        width = height * targetAspectRatio
-      } else {
-        // Window is taller than our target aspect ratio
-        width = maxWidth
-        height = width / targetAspectRatio
-      }
-      
-      // Calculate content scaling factor based on container size
-      // Base design width varies based on orientation
-      const baseWidth = isPortrait ? 400 : 500
-      
-      // Adjust scaling limits based on device type
-      const minScale = isMobileDevice ? 0.65 : 0.75
-      const maxScale = isMobileDevice ? 1.35 : 1.25
-      
-      const scaleFactor = Math.max(minScale, Math.min(maxScale, width / baseWidth))
-      
-      setContentScale(scaleFactor)
-      setContainerDimensions({
-        width: `${width}px`,
-        height: `${height}px`
-      })
-      
-      // Log dimensions for debugging
-      if (showDebug) {
-        console.log(`Window: ${windowWidth}x${windowHeight}, Container: ${width}x${height}, Scale: ${scaleFactor}`)
-      }
-    } catch (error) {
-      // Fallback for browsers with issues
-      console.warn('Error calculating dimensions, using fallback', error)
-      const isPortrait = window.innerHeight > window.innerWidth
-      
-      if (isPortrait) {
-        setContainerDimensions({
-          width: '95vw',
-          height: '170vw' // Taller in portrait
-        })
-      } else {
-        setContainerDimensions({
-          width: '95vw',
-          height: '47.5vw' // 95vw ÷ 2 for 18:9 ratio in landscape
-        })
-      }
-    }
-  }
+  // We're removing the complex dimension calculation function and using CSS for responsive design
   
   // Set up resize listener and fullscreen change detection
   // Use ResizeObserver for more accurate container size tracking
@@ -181,36 +102,11 @@ function App() {
     // Add keyframe animations
     addKeyframeStyles();
     
-    calculateOptimalDimensions()
-    
-    const handleResize = () => {
-      const newIsPortrait = window.innerHeight > window.innerWidth
-      if (isPortrait !== newIsPortrait) {
-        setIsPortrait(newIsPortrait)
-      }
-      calculateOptimalDimensions()
-    }
-    
-    const handleOrientationChange = () => {
-      // Add a small delay to ensure dimensions are calculated after orientation change completes
-      setTimeout(() => {
-        setIsPortrait(window.innerHeight > window.innerWidth)
-        calculateOptimalDimensions()
-      }, 100)
-    }
-    
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement)
-      // Recalculate dimensions after fullscreen change
-      setTimeout(calculateOptimalDimensions, 100)
     }
     
-    // Initial check for mobile
-    setIsMobile(window.innerWidth <= 768)
-    
     // Add event listeners
-    window.addEventListener('resize', handleResize)
-    window.addEventListener('orientationchange', handleOrientationChange)
     document.addEventListener('fullscreenchange', handleFullscreenChange)
     
     // Set up ResizeObserver to monitor container size changes
@@ -231,15 +127,13 @@ function App() {
     }
     
     return () => {
-      window.removeEventListener('resize', handleResize)
-      window.removeEventListener('orientationchange', handleOrientationChange)
       document.removeEventListener('fullscreenchange', handleFullscreenChange)
       
       if (resizeObserver) {
         resizeObserver.disconnect()
       }
     }
-  }, [showDebug, isPortrait]) // Add dependencies
+  }, [showDebug]) // Add dependencies
   
   // Stats that increase with each tap
   
@@ -306,11 +200,11 @@ function App() {
     setRizzLevel(calculatedRizzLevel);
     
     // Calculate delay time inversely proportional to click count
-    // More clicks = slower return (up to max 5 seconds)
-    // Minimum delay is 1 second, maximum is 5 seconds
-    const baseDelay = 1000; // 1 second base delay
-    const clickFactor = Math.min(clickCount * 200, 4000); // 200ms per click, max 4000ms additional
-    const totalDelay = baseDelay + clickFactor; // Between 1000ms and 5000ms
+    // More clicks = slower return (up to max 8 seconds)
+    // Minimum delay is 3 seconds, maximum is 8 seconds
+    const baseDelay = 3000; // 3 second base delay
+    const clickFactor = Math.min(clickCount * 250, 5000); // 250ms per click, max 5000ms additional
+    const totalDelay = baseDelay + clickFactor; // Between 3000ms and 8000ms
     
     // Make card disappear after calculated delay
     setTimeout(() => {
@@ -352,16 +246,11 @@ function App() {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #2E0854 0%, #5B0E91 50%, #FF1B6B 100%)',
-      color: '#FFFFFF',
-      overflow: 'hidden',
-      position: 'relative'
+    <div className="flex flex-col items-center justify-center min-h-screen relative" style={{
+      background: 'linear-gradient(135deg, var(--color-bg-primary, #2E0854) 0%, #5B0E91 50%, #FF1B6B 100%)',
+      color: 'var(--color-text-primary, #FFFFFF)',
+      overflowX: 'hidden',
+      overflowY: 'auto'
     }}>
       {/* Buy Me a Coffee button - fixed in bottom right corner */}
       <a
@@ -370,16 +259,16 @@ function App() {
         rel="noopener noreferrer"
         style={{
           position: 'fixed',
-          bottom: isMobile ? '5px' : '10px',
-          right: isMobile ? '5px' : '10px',
+          bottom: 'clamp(5px, 1.5vmin, 10px)',
+          right: 'clamp(5px, 1.5vmin, 10px)',
           zIndex: 9999,
           display: 'inline-block',
           backgroundColor: '#FFDD00',
           color: '#000000',
-          padding: isMobile ? '3px 10px' : '5px 15px',
-          borderRadius: '5px',
+          padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
+          borderRadius: 'var(--border-radius-sm, 0.5rem)',
           fontFamily: 'Cookie, cursive',
-          fontSize: isMobile ? '16px' : '18px',
+          fontSize: 'clamp(16px, 4vmin, 18px)',
           fontWeight: 'bold',
           textDecoration: 'none',
           boxShadow: '0 0 10px rgba(255, 221, 0, 0.5)',
@@ -426,19 +315,22 @@ function App() {
       {/* Main content container */}
       <div
         ref={containerRef}
-        className="aspect-container"
+        className="aspect-container aspect-ratio aspect-ratio-9-16"
         style={{
           position: 'relative',
-          width: containerDimensions.width,
-          height: containerDimensions.height,
+          width: 'auto',
+          height: 'min(95vh, calc(100vh - 20px))',
+          maxHeight: '100vh',
           margin: '0 auto',
           zIndex: 1,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: isMobile ? '0.5rem' : '1rem',
-          overflow: 'hidden' // Ensure content stays within container
+          padding: 'clamp(0.5rem, 2vmin, 1rem)',
+          overflowX: 'hidden',
+          overflowY: 'auto', // Allow vertical scrolling when needed
+          aspectRatio: '9/16'
         }}
       >
         {/* Debug overlay */}
@@ -448,38 +340,31 @@ function App() {
             top: 0,
             left: 0,
             background: 'rgba(0,0,0,0.7)',
-            color: '#00F5D4',
+            color: 'var(--color-accent-3, #00F5D4)',
             padding: '4px 8px',
             fontSize: '10px',
             zIndex: 1000,
             fontFamily: 'monospace',
             borderRadius: '0 0 4px 0'
           }}>
-            <div>Mode: {isPortrait ? 'Portrait' : 'Landscape'}</div>
-            <div>Device: {isMobile ? 'Mobile' : 'Desktop'}</div>
+            <div>Mode: {window.innerHeight > window.innerWidth ? 'Portrait' : 'Landscape'}</div>
+            <div>Device: {window.innerWidth <= 768 ? 'Mobile' : 'Desktop'}</div>
             <div>Window: {window.innerWidth}x{window.innerHeight}</div>
-            <div>Container: {containerDimensions.width}x{containerDimensions.height}</div>
             <div>Observed: {containerSize.width.toFixed(0)}x{containerSize.height.toFixed(0)}</div>
-            <div>Scale: {contentScale.toFixed(2)}x</div>
+            <div>CSS Variables: {getComputedStyle(document.documentElement).getPropertyValue('--font-size-base')}</div>
           </div>
         )}
 
         {/* Game content */}
-        <div style={{
+        <div className="flex flex-col items-center justify-center w-full h-full" style={{
+          maxWidth: 'min(100%, 500px)',
           width: '100%',
-          maxWidth: isMobile ? '100%' : '500px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: isMobile ? '0.5rem' : '0.75rem', // Reduced gap between elements
-          transform: `scale(${contentScale})`,
-          transformOrigin: 'center center', // Center origin for better scaling
-          transition: 'transform 0.3s ease',
           height: '100%',
-          justifyContent: 'center', // Center content vertically
-          // Prevent content from overflowing during scaling
-          maxHeight: isPortrait ? '170vh' : '80vh',
-          overflowY: 'hidden'
+          gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
+          transition: 'all 0.3s ease',
+          overflowY: 'auto',
+          padding: 'clamp(0.5rem, 2vmin, 1rem)',
+          boxSizing: 'border-box'
         }}>
           {/* Header space - title removed */}
           <div style={{ height: '1rem' }}></div>
@@ -494,158 +379,141 @@ function App() {
           }}></div>
           
           {/* Buttons Container - Both buttons in one component */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            flexDirection: 'column',
-            width: 'calc(100% - 100px)', // Full width minus 50px on each side
-            maxWidth: '400px', // Maximum width to prevent buttons from getting too large
-            margin: '0.5rem auto',
-            gap: '0.75rem' // Consistent spacing between buttons
+          <div className="flex flex-col items-center justify-center w-full" style={{
+            maxWidth: 'min(calc(100% - clamp(20px, 5vw, 50px)), 400px)',
+            margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) auto',
+            gap: 'clamp(0.5rem, 2vmin, 0.75rem)', // Consistent spacing between buttons
+            flex: '0 0 auto' // Prevent flex growth/shrink
           }}>
             {/* Rizz Button */}
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              width: '100%',
-              margin: '0.25rem 0'
+            <div className="flex justify-center w-full" style={{
+              margin: 'clamp(0.15rem, 1vmin, 0.25rem) 0'
             }}>
               <RizzButton onClick={handleRizzTap} disabled={showCard} />
             </div>
             
-            {/* Bank Score Button - Always visible */}
-            {!showCard && (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                width: '100%',
-                margin: '0.25rem 0'
-              }}>
-                <button
-                  onClick={handleBankScore}
-                  style={{
-                    width: '100%', // Full width of parent
-                    padding: '0.75rem 0', // Vertical padding only
-                    background: 'linear-gradient(90deg, #F15BB5, #9B5DE5)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '12px',
-                    fontWeight: 'bold',
-                    fontSize: '1rem',
-                    cursor: 'pointer',
-                    boxShadow: '0 0 15px rgba(241, 91, 181, 0.7)',
-                    transition: 'all 0.2s ease',
-                    transform: 'scale(1)',
-                    textShadow: '0 0 5px rgba(255, 255, 255, 0.7)'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                    e.currentTarget.style.boxShadow = '0 0 20px rgba(241, 91, 181, 0.9)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    e.currentTarget.style.boxShadow = '0 0 15px rgba(241, 91, 181, 0.7)';
-                  }}
-                >
-                  💰 Bank Your Score
-                </button>
-              </div>
-            )}
+            {/* Bank Score Button - Only visible after first Rizz Up click */}
+            <BankScoreButton
+              onClick={handleBankScore}
+              visible={!showCard && clickCount > 0}
+            />
           </div>
           
           {/* Quote Display removed */}
           
           {/* Stats Panel */}
-          <div style={{
-            width: '90%',
-            padding: isMobile ? '1rem' : '1.25rem',
-            borderRadius: '20px',
+          <div className="flex flex-col w-[90%]" style={{
+            padding: 'clamp(0.75rem, 3vmin, 1.25rem)',
+            borderRadius: 'var(--border-radius-lg, 1rem)',
             background: 'rgba(46, 8, 84, 0.7)',
-            boxShadow: '0 0 15px rgba(0, 187, 249, 0.5), inset 0 0 20px rgba(0, 187, 249, 0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.4rem'
+            boxShadow: `0 0 clamp(10px, 3vmin, 15px) rgba(0, 187, 249, 0.5),
+                       inset 0 0 clamp(15px, 4vmin, 20px) rgba(0, 187, 249, 0.3)`,
+            gap: 'clamp(0.3rem, 1.2vmin, 0.4rem)',
+            flex: '0 0 auto' // Prevent flex growth/shrink
           }}>
             <h2 style={{
-              fontSize: '1.1rem',
-              color: '#00F5D4',
+              fontSize: 'clamp(1rem, 3vmin, 1.1rem)',
+              color: 'var(--color-accent-3, #00F5D4)',
               textAlign: 'center',
-              marginBottom: '0.25rem',
-              textShadow: '0 0 5px #00F5D4'
+              marginBottom: 'clamp(0.15rem, 0.75vmin, 0.25rem)',
+              textShadow: '0 0 5px var(--color-accent-3, #00F5D4)'
             }}>STATS PANEL</h2>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#00F5D4', fontSize: '0.95rem', flex: 1, textAlign: 'left' }}>Vibe Level</span>
+            <div className="flex justify-between items-center">
               <span style={{
-                color: stats.vibeLevel >= 0 ? '#00F5D4' : '#F15BB5',
-                fontSize: '1.1rem',
+                color: 'var(--color-accent-3, #00F5D4)',
+                fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
+                flex: 1,
+                textAlign: 'left'
+              }}>Vibe Level</span>
+              <span style={{
+                color: stats.vibeLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
+                fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
                 fontWeight: 'bold',
                 flex: 1,
                 textAlign: 'center'
               }}>{stats.vibeLevel}</span>
-              <span style={{ fontSize: '1.2rem', flex: 1, textAlign: 'right' }}>{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
+              <span style={{
+                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+                flex: 1,
+                textAlign: 'right'
+              }}>{getEmojiForScore("Vibe Level", stats.vibeLevel)}</span>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#00F5D4', fontSize: '0.95rem', flex: 1, textAlign: 'left' }}>Swagger</span>
+            <div className="flex justify-between items-center">
               <span style={{
-                color: stats.swagger >= 0 ? '#00F5D4' : '#F15BB5',
-                fontSize: '1.1rem',
+                color: 'var(--color-accent-3, #00F5D4)',
+                fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
+                flex: 1,
+                textAlign: 'left'
+              }}>Swagger</span>
+              <span style={{
+                color: stats.swagger >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
+                fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
                 fontWeight: 'bold',
                 flex: 1,
                 textAlign: 'center'
               }}>{stats.swagger}</span>
-              <span style={{ fontSize: '1.2rem', flex: 1, textAlign: 'right' }}>{getEmojiForScore("Swagger", stats.swagger)}</span>
+              <span style={{
+                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+                flex: 1,
+                textAlign: 'right'
+              }}>{getEmojiForScore("Swagger", stats.swagger)}</span>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#00F5D4', fontSize: '0.95rem', flex: 1, textAlign: 'left' }}>Cringe Avoidance</span>
+            <div className="flex justify-between items-center">
               <span style={{
-                color: stats.cringeAvoidance >= 0 ? '#00F5D4' : '#F15BB5',
-                fontSize: '1.1rem',
+                color: 'var(--color-accent-3, #00F5D4)',
+                fontSize: 'clamp(0.85rem, 2.5vmin, 0.95rem)',
+                flex: 1,
+                textAlign: 'left'
+              }}>Cringe Avoidance</span>
+              <span style={{
+                color: stats.cringeAvoidance >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
+                fontSize: 'clamp(0.95rem, 3vmin, 1.1rem)',
                 fontWeight: 'bold',
                 flex: 1,
                 textAlign: 'center'
               }}>{stats.cringeAvoidance}</span>
-              <span style={{ fontSize: '1.2rem', flex: 1, textAlign: 'right' }}>{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
+              <span style={{
+                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
+                flex: 1,
+                textAlign: 'right'
+              }}>{getEmojiForScore("Cringe Avoidance", stats.cringeAvoidance)}</span>
             </div>
           </div>
           
           {/* Rizz Level Panel - Separated for emphasis */}
-          <div style={{
-            width: '90%',
-            padding: isMobile ? '0.75rem' : '1rem',
-            borderRadius: '20px',
+          <div className="flex flex-col items-center w-[90%]" style={{
+            padding: 'clamp(0.5rem, 2.5vmin, 1rem)',
+            borderRadius: 'var(--border-radius-lg, 1rem)',
             background: 'rgba(46, 8, 84, 0.8)',
-            boxShadow: '0 0 20px rgba(241, 91, 181, 0.6), inset 0 0 25px rgba(241, 91, 181, 0.4)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            marginTop: '0.5rem'
+            boxShadow: `0 0 clamp(15px, 4vmin, 20px) rgba(241, 91, 181, 0.6),
+                       inset 0 0 clamp(20px, 5vmin, 25px) rgba(241, 91, 181, 0.4)`,
+            marginTop: 'clamp(0.25rem, 1.5vmin, 0.5rem)',
+            flex: '0 0 auto' // Prevent flex growth/shrink
           }}>
             <h2 style={{
-              fontSize: '1.2rem',
-              color: '#F15BB5',
+              fontSize: 'clamp(1.1rem, 3.5vmin, 1.2rem)',
+              color: 'var(--color-accent-1, #F15BB5)',
               textAlign: 'center',
-              marginBottom: '0.25rem',
-              textShadow: '0 0 8px #F15BB5'
+              marginBottom: 'clamp(0.15rem, 0.75vmin, 0.25rem)',
+              textShadow: '0 0 8px var(--color-accent-1, #F15BB5)'
             }}>RIZZ LEVEL</h2>
             
-            <div style={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: '1rem'
+            <div className="flex justify-center items-center" style={{
+              gap: 'clamp(0.5rem, 3vmin, 1rem)'
             }}>
               <span style={{
-                color: rizzLevel >= 0 ? '#00F5D4' : '#F15BB5',
-                fontSize: '2rem',
+                color: rizzLevel >= 0 ? 'var(--color-accent-3, #00F5D4)' : 'var(--color-accent-1, #F15BB5)',
+                fontSize: 'clamp(1.5rem, 6vmin, 2rem)',
                 fontWeight: 'bold',
-                textShadow: rizzLevel >= 0 ? '0 0 10px #00F5D4' : '0 0 10px #F15BB5'
+                textShadow: rizzLevel >= 0 ?
+                  '0 0 clamp(5px, 2vmin, 10px) var(--color-accent-3, #00F5D4)' :
+                  '0 0 clamp(5px, 2vmin, 10px) var(--color-accent-1, #F15BB5)'
               }}>{rizzLevel}</span>
               <span style={{
-                fontSize: '2rem'
+                fontSize: 'clamp(1.5rem, 6vmin, 2rem)'
               }}>{getEmojiForScore("Rizz Level", rizzLevel)}</span>
             </div>
           </div>
@@ -655,30 +523,34 @@ function App() {
             <div
               className="card-display"
               style={{
-                position: 'absolute',
+                position: 'fixed', // Fixed positioning relative to viewport
                 top: '50%',
                 left: '50%',
-                transform: 'translate(-50%, -50%) scale(0.9)',
-                width: '80%',
-                maxWidth: '350px',
-                padding: '1rem',
-                borderRadius: '15px',
-                background: 'rgba(46, 8, 84, 0.9)',
-                boxShadow: '0 0 20px rgba(241, 91, 181, 0.7), 0 0 40px rgba(0, 187, 249, 0.7), inset 0 0 15px rgba(255, 255, 255, 0.5)',
+                transform: 'translate(-50%, -50%)',
+                width: 'min(85%, 300px)',
+                height: 'auto',
+                maxHeight: '80vh',
+                padding: 'clamp(0.75rem, 3vmin, 1rem)',
+                borderRadius: 'var(--border-radius-lg, 1rem)',
+                background: 'rgba(46, 8, 84, 0.95)', // More opaque background
+                boxShadow: `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
+                           0 0 clamp(40px, 10vmin, 60px) rgba(0, 187, 249, 0.8),
+                           inset 0 0 clamp(15px, 4vmin, 20px) rgba(255, 255, 255, 0.6)`,
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '0.75rem',
-                zIndex: 100,
+                gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
+                zIndex: 9999, // Highest z-index to ensure it appears above everything
                 animation: 'cardEntrance 0.7s ease-out forwards, cardGlow 3s infinite',
-                border: '3px solid #00F5D4'
+                border: `4px solid var(--color-accent-3, #00F5D4)`,
+                overflowY: 'auto'
               }}
             >
               <h3 style={{
-                color: '#FEE440',
-                fontSize: '1.2rem',
+                color: 'var(--color-accent-5, #FEE440)',
+                fontSize: 'clamp(1rem, 3.5vmin, 1.2rem)',
                 textAlign: 'center',
-                textShadow: '0 0 5px #FEE440',
+                textShadow: `0 0 5px var(--color-accent-5, #FEE440)`,
                 margin: 0
               }}>
                 {currentCard.name}
@@ -686,20 +558,20 @@ function App() {
               
               <div style={{
                 width: '100%',
-                height: '220px',
+                aspectRatio: '16/9',
                 backgroundImage: `url(${currentCard.path})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'top center',
-                borderRadius: '10px',
+                borderRadius: 'var(--border-radius-md, 0.75rem)',
                 boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
-                marginTop: '-5px'
+                marginTop: 'clamp(-5px, -1vmin, -2px)'
               }} />
               
               <p style={{
                 color: 'white',
-                fontSize: '0.9rem',
+                fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)',
                 textAlign: 'center',
-                margin: '0.5rem 0'
+                margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) 0'
               }}>
                 {currentCard.description}
               </p>
@@ -708,30 +580,46 @@ function App() {
                 <div style={{
                   width: '100%',
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: '0.5rem',
-                  fontSize: '0.8rem',
-                  padding: '0.5rem',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                  gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+                  fontSize: 'clamp(0.7rem, 2.2vmin, 0.8rem)',
+                  padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
                   background: 'rgba(0, 0, 0, 0.3)',
-                  borderRadius: '8px'
+                  borderRadius: 'var(--border-radius-sm, 0.5rem)'
                 }}>
-                  <div style={{ color: currentAttributes.vibeLevel >= 0 ? '#00F5D4' : '#F15BB5' }}>
+                  <div style={{
+                    color: currentAttributes.vibeLevel >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)'
+                  }}>
                     Vibe Level: {currentAttributes.vibeLevel > 0 ? '+' : ''}{currentAttributes.vibeLevel}
                   </div>
-                  <div style={{ color: currentAttributes.swagger >= 0 ? '#00F5D4' : '#F15BB5' }}>
+                  <div style={{
+                    color: currentAttributes.swagger >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)'
+                  }}>
                     Swagger: {currentAttributes.swagger > 0 ? '+' : ''}{currentAttributes.swagger}
                   </div>
-                  <div style={{ color: currentAttributes.cringeAvoidance >= 0 ? '#00F5D4' : '#F15BB5' }}>
+                  <div style={{
+                    color: currentAttributes.cringeAvoidance >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)'
+                  }}>
                     Cringe: {currentAttributes.cringeAvoidance > 0 ? '+' : ''}{currentAttributes.cringeAvoidance}
                   </div>
                   <div style={{
-                    color: calculateRizzLevel(currentAttributes) >= 0 ? '#00F5D4' : '#F15BB5',
-                    fontSize: '1rem',
+                    color: calculateRizzLevel(currentAttributes) >= 0 ?
+                      'var(--color-accent-3, #00F5D4)' :
+                      'var(--color-accent-1, #F15BB5)',
+                    fontSize: 'clamp(0.9rem, 2.8vmin, 1rem)',
                     fontWeight: 'bold',
-                    textShadow: calculateRizzLevel(currentAttributes) >= 0 ? '0 0 5px #00F5D4' : '0 0 5px #F15BB5',
-                    gridColumn: '1 / span 2',
+                    textShadow: calculateRizzLevel(currentAttributes) >= 0 ?
+                      '0 0 5px var(--color-accent-3, #00F5D4)' :
+                      '0 0 5px var(--color-accent-1, #F15BB5)',
+                    gridColumn: '1 / -1',
                     textAlign: 'center',
-                    marginTop: '0.25rem'
+                    marginTop: 'clamp(0.15rem, 0.75vmin, 0.25rem)'
                   }}>
                     Rizz: {calculateRizzLevel(currentAttributes) > 0 ? '+' : ''}{calculateRizzLevel(currentAttributes)}
                   </div>
@@ -741,41 +629,41 @@ function App() {
           )}
           
           {/* High Score Display */}
-          <div style={{
-            width: '90%',
-            padding: '0.5rem',
-            borderRadius: '10px',
+          <div className="flex justify-center items-center w-[90%]" style={{
+            padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+            borderRadius: 'var(--border-radius-md, 0.75rem)',
             background: 'rgba(46, 8, 84, 0.5)',
             textAlign: 'center',
-            marginTop: '0.5rem',
+            marginTop: 'clamp(0.25rem, 1.5vmin, 0.5rem)',
             display: !showCard ? 'flex' : 'none',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '0.5rem'
+            gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+            flex: '0 0 auto' // Prevent flex growth/shrink
           }}>
-            <span style={{ color: '#00F5D4', fontSize: '0.9rem' }}>High Score:</span>
             <span style={{
-              color: '#FEE440',
-              fontSize: '1.1rem',
+              color: 'var(--color-accent-3, #00F5D4)',
+              fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'
+            }}>High Score:</span>
+            <span style={{
+              color: 'var(--color-accent-5, #FEE440)',
+              fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
               fontWeight: 'bold',
-              textShadow: '0 0 5px #FEE440'
+              textShadow: '0 0 5px var(--color-accent-5, #FEE440)'
             }}>{highScore}</span>
           </div>
           
           {/* Special Event */}
           {showSpecialEvent && (
-            <div style={{
-              width: '90%',
-              padding: '0.75rem',
-              borderRadius: '20px',
+            <div className="w-[90%] text-center" style={{
+              padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
+              borderRadius: 'var(--border-radius-lg, 1rem)',
               background: 'rgba(155, 93, 229, 0.7)',
-              boxShadow: '0 0 15px rgba(155, 93, 229, 0.7)',
-              textAlign: 'center',
+              boxShadow: '0 0 clamp(10px, 3vmin, 15px) rgba(155, 93, 229, 0.7)',
               animation: 'glitch 0.5s infinite',
-              color: '#FEE440',
+              color: 'var(--color-accent-5, #FEE440)',
               fontWeight: 'bold',
-              fontSize: '1rem',
-              textShadow: '0 0 5px #FEE440'
+              fontSize: 'clamp(0.9rem, 2.8vmin, 1rem)',
+              textShadow: '0 0 5px var(--color-accent-5, #FEE440)',
+              flex: '0 0 auto' // Prevent flex growth/shrink
             }}>
               ✨ Sigma Surge Activated! ✨
             </div>
@@ -783,50 +671,51 @@ function App() {
           
           {/* Click Counter (for debugging) */}
           {showDebug && (
-            <div style={{
-              width: '90%',
-              padding: '0.5rem',
-              borderRadius: '10px',
+            <div className="w-[90%] text-center" style={{
+              padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+              borderRadius: 'var(--border-radius-md, 0.75rem)',
               background: 'rgba(46, 8, 84, 0.5)',
-              textAlign: 'center',
-              marginTop: '0.5rem'
+              marginTop: 'clamp(0.25rem, 1.5vmin, 0.5rem)'
             }}>
-              <span style={{ color: '#00F5D4', fontSize: '0.9rem' }}>Click Count: {clickCount}</span>
-              <span style={{ color: '#FEE440', fontSize: '0.9rem', marginLeft: '1rem' }}>
+              <span style={{
+                color: 'var(--color-accent-3, #00F5D4)',
+                fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'
+              }}>Click Count: {clickCount}</span>
+              <span style={{
+                color: 'var(--color-accent-5, #FEE440)',
+                fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)',
+                marginLeft: 'clamp(0.5rem, 2vmin, 1rem)'
+              }}>
                 Delay: {Math.min(1 + (clickCount * 0.2), 5).toFixed(1)}s
               </span>
             </div>
           )}
           
           {/* Footer with controls */}
-          <div style={{
-            marginTop: 'auto',
-            textAlign: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%'
+          <div className="mt-auto text-center flex flex-col items-center w-full" style={{
+            flex: '0 0 auto' // Prevent flex growth/shrink
           }}>
             
             {/* Controls row - hidden in small buttons */}
-            <div style={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginTop: '1rem',
+            <div className="w-full flex justify-between items-center" style={{
+              marginTop: 'clamp(0.5rem, 3vmin, 1rem)',
               opacity: 0.5,
-              fontSize: '0.7rem'
+              fontSize: 'clamp(0.6rem, 2vmin, 0.7rem)'
             }}>
               <button style={{
                 color: '#7E7E7E',
                 background: 'none',
                 border: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                padding: 'clamp(0.2rem, 1vmin, 0.3rem)'
               }}>☰</button>
               
               <div
-                style={{ color: '#7E7E7E', cursor: 'pointer' }}
+                style={{
+                  color: '#7E7E7E',
+                  cursor: 'pointer',
+                  padding: 'clamp(0.2rem, 1vmin, 0.3rem)'
+                }}
                 onClick={() => setShowDebug(!showDebug)}
               >
                 {showDebug ? '🔍' : '⚙️'}
@@ -835,10 +724,11 @@ function App() {
               <button
                 onClick={toggleFullScreen}
                 style={{
-                  color: isFullscreen ? '#F15BB5' : '#7E7E7E',
+                  color: isFullscreen ? 'var(--color-accent-1, #F15BB5)' : '#7E7E7E',
                   background: 'none',
                   border: 'none',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  padding: 'clamp(0.2rem, 1vmin, 0.3rem)'
                 }}
               >
                 {isFullscreen ? '⤓' : '⤢'}

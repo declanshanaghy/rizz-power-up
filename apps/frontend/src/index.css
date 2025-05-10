@@ -3,6 +3,63 @@
 @tailwind components;
 @tailwind utilities;
 
+/* CSS Variables for responsive design */
+:root {
+  /* Base sizes */
+  --font-size-base: 1rem;
+  --spacing-base: 1rem;
+  
+  /* Color palette */
+  --color-bg-primary: #1A1A1A;
+  --color-bg-secondary: #2D2D2D;
+  --color-text-primary: #FFFFFF;
+  --color-accent-1: #F15BB5;
+  --color-accent-2: #00BBF9;
+  --color-accent-3: #00F5D4;
+  --color-accent-4: #9B5DE5;
+  --color-accent-5: #FEE440;
+  
+  /* Component sizes */
+  --button-padding: 0.75rem 1.5rem;
+  --border-radius-sm: 0.5rem;
+  --border-radius-md: 0.75rem;
+  --border-radius-lg: 1rem;
+  
+  /* Responsive breakpoints */
+  --container-max-width: 1200px;
+}
+
+/* Responsive typography */
+@media (max-width: 1200px) {
+  :root {
+    --font-size-base: 0.95rem;
+    --spacing-base: 0.95rem;
+  }
+}
+
+@media (max-width: 992px) {
+  :root {
+    --font-size-base: 0.9rem;
+    --spacing-base: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --font-size-base: 0.85rem;
+    --spacing-base: 0.85rem;
+    --button-padding: 0.7rem 1.4rem;
+  }
+}
+
+@media (max-width: 576px) {
+  :root {
+    --font-size-base: 0.8rem;
+    --spacing-base: 0.8rem;
+    --button-padding: 0.65rem 1.3rem;
+  }
+}
+
 /* Reset some basic elements */
 * {
   box-sizing: border-box;
@@ -13,24 +70,23 @@
 html, body {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* Prevent scrolling on the body */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  overflow-x: hidden; /* Allow vertical scrolling but prevent horizontal */
+  position: relative;
 }
 
 body {
-  background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
+  background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
   font-family: 'Source Sans Pro', sans-serif;
-  color: #FFFFFF;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
 }
 
 #root {
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto; /* Allow vertical scrolling */
 }
 
 /* Vaporwave-inspired animations */
@@ -55,48 +111,128 @@ body {
   }
 }
 
-/* Media queries for responsive design */
+/* Typography scale */
+h1 {
+  font-size: calc(var(--font-size-base) * 2);
+  margin-bottom: calc(var(--spacing-base) * 1.5);
+}
+
+h2 {
+  font-size: calc(var(--font-size-base) * 1.5);
+  margin-bottom: calc(var(--spacing-base) * 1);
+}
+
+h3 {
+  font-size: calc(var(--font-size-base) * 1.25);
+  margin-bottom: calc(var(--spacing-base) * 0.75);
+}
+
+p {
+  font-size: var(--font-size-base);
+  margin-bottom: var(--spacing-base);
+}
+
+/* Responsive grid system */
+.grid {
+  display: grid;
+  gap: var(--spacing-base);
+}
+
+.grid-cols-1 { grid-template-columns: 1fr; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+@media (max-width: 992px) {
+  .grid-cols-4 { grid-template-columns: repeat(3, 1fr); }
+}
+
 @media (max-width: 768px) {
-  h1 {
-    font-size: 1.5rem !important;
-  }
-  
-  button {
-    padding: 0.75rem 1.5rem !important;
-  }
+  .grid-cols-3, .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 480px) {
-  h1 {
-    font-size: 1.25rem !important;
-  }
-  
-  .grid-cols-2 {
-    grid-template-columns: 1fr !important; /* Stack grid items on small screens */
-  }
+@media (max-width: 576px) {
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr; }
 }
 
-/* Ensure the aspect ratio container adjusts for different screen orientations */
-@media (orientation: portrait) {
-  /* In portrait mode, limit the height to maintain aspect ratio */
-  .aspect-container {
-    width: 95vw !important;
-    height: auto !important;
-  }
-}
-
-@media (orientation: landscape) {
-  /* In landscape mode, limit the width to maintain aspect ratio */
-  .aspect-container {
-    height: 95vh !important;
-    width: auto !important;
-  }
-}
-
-/* Additional styling for the 18:9 container */
+/* Aspect ratio container with fluid responsive design */
 .aspect-container {
+  position: relative;
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin: 0 auto;
   transition: all 0.3s ease;
   box-shadow: 0 0 30px rgba(155, 93, 229, 0.2);
+}
+
+/* Fluid aspect ratio using modern CSS */
+.aspect-ratio {
+  position: relative;
+  width: 100%;
+}
+
+/* Mobile-first approach for 9:16 aspect ratio */
+@media (max-width: 768px) {
+  .aspect-container.aspect-ratio-9-16 {
+    width: auto;
+    height: min(95vh, calc(100vh - 20px));
+    max-height: 100vh;
+  }
+}
+
+/* For larger screens, maintain reasonable dimensions */
+@media (min-width: 769px) {
+  .aspect-container.aspect-ratio-9-16 {
+    width: auto;
+    height: min(95vh, calc(100vh - 20px));
+    max-height: 100vh;
+    max-width: 500px; /* Prevent excessive width on large screens */
+  }
+}
+
+.aspect-ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+
+.aspect-ratio-4-3 {
+  aspect-ratio: 4 / 3;
+}
+
+.aspect-ratio-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+.aspect-ratio-9-16 {
+  aspect-ratio: 9 / 16;
+}
+
+/* For browsers that don't support aspect-ratio */
+@supports not (aspect-ratio: 1 / 1) {
+  .aspect-ratio::before {
+    content: "";
+    display: block;
+    padding-top: 56.25%; /* Default 16:9 ratio */
+  }
+  
+  .aspect-ratio-4-3::before {
+    padding-top: 75%;
+  }
+  
+  .aspect-ratio-1-1::before {
+    padding-top: 100%;
+  }
+  
+  .aspect-ratio-9-16::before {
+    padding-top: 177.78%;
+  }
+  
+  .aspect-ratio > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 }
 
 /* Neon border effect */
@@ -180,19 +316,20 @@ body {
   position: relative;
   display: inline-block;
   transition: transform 0.1s ease;
-  /* Fallback styles in case the image doesn't load */
-  min-width: 200px;
-  min-height: 80px;
-  border-radius: 50px;
-  background-color: #2E0854;
-  /* Remove the pink box-shadow */
+  /* Responsive sizing */
+  width: 100%;
+  max-width: 300px;
+  min-height: clamp(60px, 10vw, 80px);
+  border-radius: calc(var(--border-radius-lg) * 2);
+  background-color: var(--color-accent-4);
 }
 
 /* Ensure the button image is properly loaded */
 .rizz-button-img {
   display: block;
-  max-width: 100%;
+  width: 100%;
   height: auto;
+  object-fit: contain;
 }
 
 /* Preload the button images to avoid flickering on state changes */
@@ -221,9 +358,41 @@ body::after {
 /* Card display classes */
 .card-display {
   transition: all 0.5s ease;
+  width: clamp(280px, 80%, 400px);
+  max-height: 90vh;
+  overflow-y: auto; /* Allow scrolling within cards if content is too large */
 }
 
 .card-display.fadeOut {
   animation: fadeOut 0.5s forwards !important;
   pointer-events: none;
 }
+
+/* Utility classes for spacing */
+.m-0 { margin: 0; }
+.m-1 { margin: calc(var(--spacing-base) * 0.25); }
+.m-2 { margin: calc(var(--spacing-base) * 0.5); }
+.m-3 { margin: var(--spacing-base); }
+.m-4 { margin: calc(var(--spacing-base) * 1.5); }
+.m-5 { margin: calc(var(--spacing-base) * 3); }
+
+.p-0 { padding: 0; }
+.p-1 { padding: calc(var(--spacing-base) * 0.25); }
+.p-2 { padding: calc(var(--spacing-base) * 0.5); }
+.p-3 { padding: var(--spacing-base); }
+.p-4 { padding: calc(var(--spacing-base) * 1.5); }
+.p-5 { padding: calc(var(--spacing-base) * 3); }
+
+/* Utility classes for flex layouts */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.gap-1 { gap: calc(var(--spacing-base) * 0.25); }
+.gap-2 { gap: calc(var(--spacing-base) * 0.5); }
+.gap-3 { gap: var(--spacing-base); }
+.gap-4 { gap: calc(var(--spacing-base) * 1.5); }
+.gap-5 { gap: calc(var(--spacing-base) * 3); }

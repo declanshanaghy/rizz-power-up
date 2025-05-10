@@ -72,6 +72,24 @@ Use time difference between now and the last commit timestamp for the developmen
    - After dealing a card, the main display should show:
       - The Rizz up Button
       - The bank score button
+- [] Extract the Bank Score button into a separate component
+   - It's marked by this comment in App.tsx: {/* Bank Score Button - Always visible */}
+   - It should not be visible when a new game starts
+   - Ensure it is not ALWAYS visible, it should only be visible after the user has clicked the Rizz Up button
+- [] Adjust the vertical scaling of the all component inside the main App to leave 5% space on top and bottom
+- [] Extract the stats Panel into a separate component
+- [] Extract the Rizz Level Panel into a separate component
+- [] Extract the High Score Panel into a separate component
+- [] Fix the sizing of main UI elements
+   - The parent container should always scale wider than the child elements
+      - The child elements are:
+         - BUTTONS CONTAINER
+         - STATS PANEL
+         - RIZZ LEVEL PANEL
+   - Remove the 4th phantom panel underneath the rizz level panel. It's not needed.
+   - The Rizz Up Button & Bank Score Button should be 25% smaller than the parent container
+   - The stats panel and rizz level panel should all scale together 
+   - The stats panel and rizz level panel should all be 10% less wide than the parent container.
 - [] Implement local storage for saving user progress
 - [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
 - [] Create special events system that trigger randomly ~ every 10 taps
