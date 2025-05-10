@@ -35,8 +35,8 @@ const RizzButton: React.FC<RizzButtonProps> = ({ onClick, disabled = false }) =>
           background: 'linear-gradient(90deg, var(--color-accent-2, #00BBF9), var(--color-accent-3, #00F5D4))',
           color: 'var(--color-text-primary, white)',
           cursor: disabled ? 'not-allowed' : 'pointer',
-          boxShadow: `0 0 clamp(10px, 2vmin, 20px) ${disabled ? 'rgba(0, 187, 249, 0.2)' : 'rgba(0, 187, 249, 0.7)'}`,
-          opacity: disabled ? 0.3 : 1,
+          boxShadow: `0 0 clamp(10px, 2vmin, 20px) ${disabled ? 'rgba(0, 187, 249, 0.1)' : 'rgba(0, 187, 249, 0.7)'}`,
+          opacity: disabled ? 0.15 : 1,
         }}
         onMouseOver={(e) => handleHover(e, true)}
         onMouseOut={(e) => handleHover(e, false)}

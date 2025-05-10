@@ -1,15 +1,9 @@
-/**
- * localStorage.ts
- * Utility functions for saving and loading game state from localStorage
- */
+// localStorage.ts - Simple localStorage utilities for the Rizz Power-Up Simulator
 
-// Key for storing game state in localStorage
-const STORAGE_KEY = 'rizz-power-up-state';
-
-// Interface for the game state that will be persisted
+// Define the game state interface
 export interface GameState {
-  rizzLevel: number;
-  stats: {
+  rizzLevel?: number;
+  stats?: {
     vibeLevel: number;
     swagger: number;
     cringeAvoidance: number;
@@ -17,78 +11,44 @@ export interface GameState {
   highScore: number;
 }
 
-/**
- * Check if localStorage is available in the current browser
- * @returns boolean indicating if localStorage is available
- */
-export const isLocalStorageAvailable = (): boolean => {
-  try {
-    const testKey = '__test__';
-    localStorage.setItem(testKey, testKey);
-    localStorage.removeItem(testKey);
-    return true;
-  } catch (e) {
-    console.warn('localStorage is not available:', e);
-    return false;
-  }
-};
+// Local storage key
+const STORAGE_KEY = 'rizz-power-up-state';
 
 /**
- * Save the current game state to localStorage
+ * Save game state to localStorage
  * @param state The game state to save
- * @returns boolean indicating if the save was successful
  */
-export const saveGameState = (state: GameState): boolean => {
+export const saveGameState = (state: GameState): void => {
   try {
-    if (!isLocalStorageAvailable()) {
-      return false;
-    }
-    
-    const serializedState = JSON.stringify(state);
-    localStorage.setItem(STORAGE_KEY, serializedState);
-    return true;
-  } catch (e) {
-    console.error('Failed to save game state:', e);
-    return false;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (error) {
+    console.error('Error saving game state to localStorage:', error);
   }
 };
 
 /**
- * Load the saved game state from localStorage
- * @returns The saved game state or null if no state is found or an error occurs
+ * Load game state from localStorage
+ * @returns The saved game state or null if not found
  */
 export const loadGameState = (): GameState | null => {
   try {
-    if (!isLocalStorageAvailable()) {
-      return null;
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      return JSON.parse(savedState) as GameState;
     }
-    
-    const serializedState = localStorage.getItem(STORAGE_KEY);
-    if (!serializedState) {
-      return null;
-    }
-    
-    return JSON.parse(serializedState) as GameState;
-  } catch (e) {
-    console.error('Failed to load game state:', e);
-    return null;
+  } catch (error) {
+    console.error('Error loading game state from localStorage:', error);
   }
+  return null;
 };
 
 /**
- * Clear the saved game state from localStorage
- * @returns boolean indicating if the clear was successful
+ * Clear game state from localStorage
  */
-export const clearGameState = (): boolean => {
+export const clearGameState = (): void => {
   try {
-    if (!isLocalStorageAvailable()) {
-      return false;
-    }
-    
     localStorage.removeItem(STORAGE_KEY);
-    return true;
-  } catch (e) {
-    console.error('Failed to clear game state:', e);
-    return false;
+  } catch (error) {
+    console.error('Error clearing game state from localStorage:', error);
   }
 };

@@ -239,9 +239,10 @@ function VaporwaveApp() {
       display: 'flex',
       flexDirection: 'column' as const,
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: 'flex-start',
       minHeight: '100vh',
       padding: 'clamp(1rem, 5vmin, 2rem)',
+      paddingTop: 'clamp(0.5rem, 2vmin, 1rem)',
       backgroundColor: 'var(--color-bg-primary, #1A1A1A)',
       color: 'var(--color-text-primary, #FFFFFF)',
       fontFamily: '"Source Sans Pro", sans-serif',
@@ -249,15 +250,8 @@ function VaporwaveApp() {
     },
     content: {
       maxWidth: 'min(90vw, 500px)',
-      width: '100%'
-    },
-    title: {
-      fontSize: 'clamp(1.25rem, 5vmin, 1.875rem)',
-      textAlign: 'center' as const,
-      fontFamily: '"Playfair Display", serif',
-      color: 'var(--color-accent-1, #F15BB5)',
-      marginBottom: 'clamp(0.5rem, 2vmin, 1rem)',
-      textShadow: '0 0 5px #FFF'
+      width: '100%',
+      marginTop: 0
     },
     quoteBox: {
       fontStyle: 'italic',
@@ -336,11 +330,6 @@ function VaporwaveApp() {
   return (
     <div style={styles.container}>
       <div style={styles.content}>
-        {/* Header */}
-        <h1 style={styles.title}>
-          ⚡ RIZZ POWER-UP SIMULATOR
-        </h1>
-        
         {/* Button Panel - with swapped button order */}
         <ButtonPanel
           rizzLevel={rizzLevel}
@@ -358,28 +347,7 @@ function VaporwaveApp() {
         {/* Rizz Level Panel - separate component */}
         <RizzLevelPanel rizzLevel={rizzLevel} getEmojiForScore={getEmojiForScore} />
         
-        {/* High Score Display */}
-        <div style={{
-          padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-          borderRadius: 'var(--border-radius-md, 0.75rem)',
-          background: 'rgba(46, 8, 84, 0.5)',
-          textAlign: 'center',
-          marginTop: 'clamp(0.25rem, 1.5vmin, 0.5rem)',
-          display: 'flex',
-          gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
-          justifyContent: 'center'
-        }}>
-          <span style={{
-            color: 'var(--color-accent-3, #00F5D4)',
-            fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'
-          }}>High Score:</span>
-          <span style={{
-            color: 'var(--color-accent-5, #FEE440)',
-            fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
-            fontWeight: 'bold',
-            textShadow: '0 0 5px var(--color-accent-5, #FEE440)'
-          }}>{highScore}</span>
-        </div>
+        {/* High Score Display moved to footer */}
         
         {/* Card Display */}
         {showCard && currentCard && (
@@ -499,8 +467,13 @@ function VaporwaveApp() {
         )}
         
         {/* Footer */}
-        <div style={styles.footer}>
-          {/* Menu button removed */}
+        <div style={{
+          ...styles.footer,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          {/* Buy Me A Coffee button */}
           <div style={styles.bmcContainer}>
             <a
               href="https://www.buymeacoffee.com/firemandecko"
@@ -524,6 +497,30 @@ function VaporwaveApp() {
                 }}
               />
             </a>
+          </div>
+          
+          {/* High Score Display */}
+          <div style={{
+            padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+            borderRadius: 'var(--border-radius-md, 0.75rem)',
+            background: 'rgba(46, 8, 84, 0.7)',
+            textAlign: 'center',
+            display: 'flex',
+            gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginTop: '10px'
+          }}>
+            <span style={{
+              color: 'var(--color-accent-3, #00F5D4)',
+              fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'
+            }}>High Score:</span>
+            <span style={{
+              color: 'var(--color-accent-5, #FEE440)',
+              fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
+              fontWeight: 'bold',
+              textShadow: '0 0 5px var(--color-accent-5, #FEE440)'
+            }}>{highScore}</span>
           </div>
         </div>
       </div>

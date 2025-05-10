@@ -1,0 +1,13 @@
+{
+  "name": "rizz-power-up-logo-generator",
+  "version": "1.0.0",
+  "description": "Logo generator for Rizz Power-Up Simulator",
+  "main": "generate_logo.js",
+  "scripts": {
+    "generate": "node generate_logo.js",
+    "generate-icons": "node generate_png_icons.js"
+  },
+  "dependencies": {
+    "canvas": "^2.11.2"
+  }
+}

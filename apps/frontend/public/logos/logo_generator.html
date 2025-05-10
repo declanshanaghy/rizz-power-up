@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rizz Power-Up Logo Generator</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        canvas {
+            border: 1px solid #333;
+            margin: 20px 0;
+            background-color: #000;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: linear-gradient(45deg, #ff00ff, #00ffff);
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.7);
+        }
+        .download-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        a {
+            color: #00ffff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #ff00ff;
+        }
+        .description {
+            background-color: #1e1e1e;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff00ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ Rizz Power-Up Logo Generator</h1>
+        
+        <div class="description">
+            <h2>🧠 Overview</h2>
+            <p><strong>Rizz Power-Up Simulator</strong> is a vaporwave-style mobile web app that allows users to tap a button to increase their "Rizz" (charisma) level. With each tap, users receive an AI-generated "Rizz Quote" and see their stats (e.g., Swagger, Vibe, Cringe Resistance) increase. The app offers instant feedback, occasional special events, and social sharing to drive engagement.</p>
+            
+            <h2>🎯 Goals</h2>
+            <ul>
+                <li>Deliver a meme-forward, mobile-first game that users can interact with in under 1 minute.</li>
+                <li>Use humor, AI, and pop culture to retain attention.</li>
+                <li>Optimize for virality with screenshot/share flows.</li>
+            </ul>
+        </div>
+        
+        <div class="controls">
+            <button id="generateLogo1">Generate Logo Style 1</button>
+            <button id="generateLogo2">Generate Logo Style 2</button>
+            <button id="generateLogo3">Generate Logo Style 3</button>
+        </div>
+        
+        <canvas id="logoCanvas" width="512" height="512"></canvas>
+        
+        <div class="download-links">
+            <button id="downloadPNG">Download as PNG</button>
+            <p>Note: After generating a logo you like, click the download button to save it.</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('logoCanvas');
+        const ctx = canvas.getContext('2d');
+        let currentLogo = 1;
+
+        // Utility functions
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function drawGradientText(text, x, y, size, color1, color2, outline = false, outlineColor = '#000') {
+            ctx.font = `bold ${size}px "Arial Black", Gadget, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Create gradient
+            const gradient = ctx.createLinearGradient(x - 100, y - 50, x + 100, y + 50);
+            gradient.addColorStop(0, color1);
+            gradient.addColorStop(1, color2);
+            
+            // Draw outline if needed
+            if (outline) {
+                ctx.strokeStyle = outlineColor;
+                ctx.lineWidth = size / 10;
+                ctx.strokeText(text, x, y);
+            }
+            
+            // Fill with gradient
+            ctx.fillStyle = gradient;
+            ctx.fillText(text, x, y);
+        }
+
+        function drawNeonGlow(text, x, y, size, color, glowColor, glowSize = 20) {
+            // Draw multiple layers with decreasing alpha for glow effect
+            for (let i = glowSize; i > 0; i -= 2) {
+                ctx.font = `bold ${size}px "Arial Black", Gadget, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = glowColor;
+                ctx.globalAlpha = i / glowSize * 0.3;
+                ctx.fillText(text, x, y);
+            }
+            
+            // Reset alpha and draw the main text
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+        }
+
+        function drawGrid(spacing, color, alpha) {
+            ctx.strokeStyle = color;
+            ctx.globalAlpha = alpha;
+            ctx.lineWidth = 1;
+            
+            // Horizontal lines
+            for (let y = 0; y < canvas.height; y += spacing) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Vertical lines
+            for (let x = 0; x < canvas.width; x += spacing) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            ctx.globalAlpha = 1;
+        }
+
+        function drawVaporwaveSun(x, y, radius, innerColor, outerColor) {
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+            gradient.addColorStop(0, innerColor);
+            gradient.addColorStop(1, outerColor);
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawLightning(startX, startY, length, angle, branches, lineWidth) {
+            if (branches <= 0) return;
+            
+            const endX = startX + Math.cos(angle) * length;
+            const endY = startY + Math.sin(angle) * length;
+            
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            
+            // Create zigzag path
+            const segments = randomInt(3, 5);
+            let currentX = startX;
+            let currentY = startY;
+            
+            for (let i = 0; i < segments; i++) {
+                const segLength = length / segments;
+                const offsetAngle = angle + (Math.random() * 0.5 - 0.25);
+                const nextX = currentX + Math.cos(offsetAngle) * segLength;
+                const nextY = currentY + Math.sin(offsetAngle) * segLength;
+                
+                ctx.lineTo(nextX, nextY);
+                currentX = nextX;
+                currentY = nextY;
+            }
+            
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+            
+            // Add glow
+            ctx.shadowColor = '#00ffff';
+            ctx.shadowBlur = 15;
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            
+            // Create branches
+            if (branches > 1) {
+                const branchAngle1 = angle + Math.random() * 0.8 - 0.4;
+                const branchAngle2 = angle + Math.random() * 0.8 - 0.4;
+                
+                drawLightning(
+                    currentX, 
+                    currentY, 
+                    length * 0.6, 
+                    branchAngle1, 
+                    branches - 1,
+                    lineWidth * 0.7
+                );
+                
+                drawLightning(
+                    currentX, 
+                    currentY, 
+                    length * 0.6, 
+                    branchAngle2, 
+                    branches - 1,
+                    lineWidth * 0.7
+                );
+            }
+        }
+
+        // Logo style 1: Vaporwave Grid with Lightning
+        function generateLogo1() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bgGradient.addColorStop(0, '#120458');
+            bgGradient.addColorStop(1, '#4d0f8e');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            drawGrid(20, '#ff00ff', 0.3);
+            
+            // Draw sun
+            drawVaporwaveSun(canvas.width / 2, canvas.height * 0.3, 80, '#ff9500', '#ff00ff');
+            
+            // Draw lightning bolts
+            ctx.save();
+            for (let i = 0; i < 3; i++) {
+                const startX = canvas.width * (0.3 + i * 0.2);
+                const startY = canvas.height * 0.2;
+                const angle = Math.PI / 2 + (Math.random() * 0.4 - 0.2);
+                
+                drawLightning(startX, startY, 150, angle, 2, 4);
+            }
+            ctx.restore();
+            
+            // Draw text
+            drawNeonGlow("RIZZ", canvas.width / 2, canvas.height * 0.5, 80, '#ffffff', '#00ffff', 30);
+            drawGradientText("POWER-UP", canvas.width / 2, canvas.height * 0.65, 40, '#ff00ff', '#00ffff', true, '#000000');
+            drawGradientText("SIMULATOR", canvas.width / 2, canvas.height * 0.75, 30, '#00ffff', '#ff00ff', true, '#000000');
+            
+            // Draw emoji
+            ctx.font = '40px Arial';
+            ctx.fillText('⚡', canvas.width / 2 - 100, canvas.height * 0.5);
+            ctx.fillText('⚡', canvas.width / 2 + 100, canvas.height * 0.5);
+        }
+
+        // Logo style 2: Retro Cyberpunk
+        function generateLogo2() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw retro horizon
+            const horizonY = canvas.height * 0.6;
+            
+            // Draw sun
+            const sunGradient = ctx.createRadialGradient(
+                canvas.width / 2, horizonY - 50, 0,
+                canvas.width / 2, horizonY - 50, 100
+            );
+            sunGradient.addColorStop(0, '#ff0066');
+            sunGradient.addColorStop(1, '#ff6600');
+            
+            ctx.fillStyle = sunGradient;
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, horizonY - 50, 80, 0, Math.PI, true);
+            ctx.fill();
+            
+            // Draw grid floor
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(0, horizonY);
+            ctx.lineTo(canvas.width, horizonY);
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.lineTo(0, canvas.height);
+            ctx.closePath();
+            ctx.fillStyle = '#1a0033';
+            ctx.fill();
+            
+            // Draw grid lines
+            const vanishingPointX = canvas.width / 2;
+            const vanishingPointY = horizonY - 50;
+            
+            ctx.strokeStyle = '#ff00ff';
+            ctx.lineWidth = 2;
+            
+            // Horizontal grid lines
+            for (let y = horizonY; y <= canvas.height; y += 20) {
+                const lineWidth = (y - horizonY) / (canvas.height - horizonY);
+                
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Vertical grid lines
+            const gridCount = 20;
+            for (let i = 0; i <= gridCount; i++) {
+                const x = (i / gridCount) * canvas.width;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, horizonY);
+                ctx.lineTo(vanishingPointX + (x - vanishingPointX) * 0.2, vanishingPointY);
+                ctx.stroke();
+            }
+            ctx.restore();
+            
+            // Draw main text
+            drawNeonGlow("RIZZ", canvas.width / 2, canvas.height * 0.3, 90, '#ffffff', '#ff00ff', 30);
+            
+            // Draw power-up text with chrome effect
+            ctx.font = 'bold 45px "Arial Black", Gadget, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Chrome effect
+            const powerUpText = "POWER-UP";
+            const powerUpX = canvas.width / 2;
+            const powerUpY = canvas.height * 0.45;
+            
+            // Outline
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 8;
+            ctx.strokeText(powerUpText, powerUpX, powerUpY);
+            
+            // Chrome gradient
+            const chromeGradient = ctx.createLinearGradient(
+                powerUpX - 100, powerUpY - 20, 
+                powerUpX + 100, powerUpY + 20
+            );
+            chromeGradient.addColorStop(0, '#7b7b7b');
+            chromeGradient.addColorStop(0.5, '#ffffff');
+            chromeGradient.addColorStop(1, '#7b7b7b');
+            
+            ctx.fillStyle = chromeGradient;
+            ctx.fillText(powerUpText, powerUpX, powerUpY);
+            
+            // Draw lightning bolt icon
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height * 0.75);
+            
+            // Lightning bolt shape
+            ctx.beginPath();
+            ctx.moveTo(-15, -40);
+            ctx.lineTo(5, -10);
+            ctx.lineTo(-5, -10);
+            ctx.lineTo(15, 40);
+            ctx.lineTo(5, 10);
+            ctx.lineTo(15, 10);
+            ctx.closePath();
+            
+            // Lightning gradient
+            const boltGradient = ctx.createLinearGradient(-15, -40, 15, 40);
+            boltGradient.addColorStop(0, '#ffff00');
+            boltGradient.addColorStop(1, '#ff9900');
+            
+            ctx.fillStyle = boltGradient;
+            ctx.fill();
+            
+            // Glow effect
+            ctx.shadowColor = '#ffff00';
+            ctx.shadowBlur = 20;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        // Logo style 3: Glitch Aesthetic
+        function generateLogo3() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background
+            const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            bgGradient.addColorStop(0, '#000033');
+            bgGradient.addColorStop(1, '#330033');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add noise texture
+            for (let i = 0; i < 5000; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 2;
+                const alpha = Math.random() * 0.2;
+                
+                ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                ctx.fillRect(x, y, size, size);
+            }
+            
+            // Draw glitch rectangles
+            for (let i = 0; i < 10; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const width = Math.random() * 200 + 50;
+                const height = Math.random() * 20 + 5;
+                
+                ctx.fillStyle = `rgba(0, 255, 255, ${Math.random() * 0.3})`;
+                ctx.fillRect(x, y, width, height);
+            }
+            
+            for (let i = 0; i < 10; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const width = Math.random() * 200 + 50;
+                const height = Math.random() * 20 + 5;
+                
+                ctx.fillStyle = `rgba(255, 0, 255, ${Math.random() * 0.3})`;
+                ctx.fillRect(x, y, width, height);
+            }
+            
+            // Draw main text with glitch effect
+            const mainText = "RIZZ";
+            const mainX = canvas.width / 2;
+            const mainY = canvas.height * 0.4;
+            const mainSize = 100;
+            
+            // Draw shadow copies for glitch effect
+            ctx.font = `bold ${mainSize}px "Arial Black", Gadget, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Red channel offset
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.8)';
+            ctx.fillText(mainText, mainX + 5, mainY - 5);
+            
+            // Blue channel offset
+            ctx.fillStyle = 'rgba(0, 0, 255, 0.8)';
+            ctx.fillText(mainText, mainX - 5, mainY + 5);
+            
+            // Green channel offset
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.8)';
+            ctx.fillText(mainText, mainX, mainY);
+            
+            // Main text
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(mainText, mainX, mainY);
+            
+            // Draw "POWER-UP" text
+            drawGradientText("POWER-UP", mainX, mainY + 80, 40, '#00ffff', '#ff00ff', true, '#000000');
+            
+            // Draw lightning symbol
+            ctx.save();
+            ctx.translate(mainX, mainY - 100);
+            
+            // Lightning bolt
+            ctx.beginPath();
+            ctx.moveTo(-20, -30);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(-10, 0);
+            ctx.lineTo(20, 30);
+            ctx.lineTo(0, 0);
+            ctx.lineTo(10, 0);
+            ctx.closePath();
+            
+            // Lightning gradient
+            const boltGradient = ctx.createLinearGradient(-20, -30, 20, 30);
+            boltGradient.addColorStop(0, '#ffff00');
+            boltGradient.addColorStop(1, '#ff00ff');
+            
+            ctx.fillStyle = boltGradient;
+            ctx.fill();
+            
+            // Add glow
+            ctx.shadowColor = '#ffff00';
+            ctx.shadowBlur = 20;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.restore();
+            
+            // Add scanlines
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            for (let y = 0; y < canvas.height; y += 4) {
+                ctx.fillRect(0, y, canvas.width, 2);
+            }
+            
+            // Add "SIMULATOR" text at bottom
+            drawNeonGlow("SIMULATOR", mainX, mainY + 140, 30, '#ffffff', '#00ffff', 15);
+        }
+
+        // Event listeners
+        document.getElementById('generateLogo1').addEventListener('click', () => {
+            currentLogo = 1;
+            generateLogo1();
+        });
+        
+        document.getElementById('generateLogo2').addEventListener('click', () => {
+            currentLogo = 2;
+            generateLogo2();
+        });
+        
+        document.getElementById('generateLogo3').addEventListener('click', () => {
+            currentLogo = 3;
+            generateLogo3();
+        });
+        
+        document.getElementById('downloadPNG').addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `rizz-power-up-logo-style-${currentLogo}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Generate first logo on load
+        window.onload = generateLogo1;
+    </script>
+</body>
+</html>

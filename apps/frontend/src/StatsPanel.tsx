@@ -20,13 +20,7 @@ const StatsPanel: React.FC<StatsPanelProps> = ({ stats, getEmojiForScore }) => {
       gap: 'clamp(0.3rem, 1.2vmin, 0.4rem)',
       flex: '0 0 auto' // Prevent flex growth/shrink
     }}>
-      <h2 style={{
-        fontSize: 'clamp(1rem, 3vmin, 1.1rem)',
-        color: 'var(--color-accent-3, #00F5D4)',
-        textAlign: 'center',
-        marginBottom: 'clamp(0.15rem, 0.75vmin, 0.25rem)',
-        textShadow: '0 0 5px var(--color-accent-3, #00F5D4)'
-      }}>STATS PANEL</h2>
+      {/* Title removed as requested */}
       
       {/* 1-row layout with all three stats */}
       <div className="flex justify-between items-center">

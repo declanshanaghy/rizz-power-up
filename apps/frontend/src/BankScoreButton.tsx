@@ -47,8 +47,8 @@ const BankScoreButton: React.FC<BankScoreButtonProps> = ({
           ...buttonElementStyle,
           background: `linear-gradient(90deg, var(--color-accent-1, #F15BB5), var(--color-accent-4, #9B5DE5))`,
           color: 'white',
-          boxShadow: `0 0 clamp(10px, 2vmin, 20px) ${isDisabled ? 'rgba(241, 91, 181, 0.2)' : 'rgba(241, 91, 181, 0.7)'}`,
-          opacity: isDisabled ? 0.3 : 1,
+          boxShadow: `0 0 clamp(10px, 2vmin, 20px) ${isDisabled ? 'rgba(241, 91, 181, 0.1)' : 'rgba(241, 91, 181, 0.7)'}`,
+          opacity: isDisabled ? 0.15 : 1,
           cursor: isDisabled ? 'not-allowed' : 'pointer',
         }}
         onMouseOver={(e) => handleHover(e, true)}

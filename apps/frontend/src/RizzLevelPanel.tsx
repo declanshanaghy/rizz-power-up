@@ -13,16 +13,10 @@ const RizzLevelPanel: React.FC<RizzLevelPanelProps> = ({ rizzLevel, getEmojiForS
       background: 'rgba(46, 8, 84, 0.8)',
       boxShadow: `0 0 clamp(15px, 4vmin, 20px) rgba(241, 91, 181, 0.6),
                  inset 0 0 clamp(20px, 5vmin, 25px) rgba(241, 91, 181, 0.4)`,
-      marginTop: 'clamp(0.25rem, 1.5vmin, 0.5rem)',
+      marginTop: 'clamp(1rem, 4vmin, 1.5rem)', // Increased margin to create a gap between panels
       flex: '0 0 auto' // Prevent flex growth/shrink
     }}>
-      <h2 style={{
-        fontSize: 'clamp(1.1rem, 3.5vmin, 1.2rem)',
-        color: 'var(--color-accent-1, #F15BB5)',
-        textAlign: 'center',
-        marginBottom: 'clamp(0.15rem, 0.75vmin, 0.25rem)',
-        textShadow: '0 0 8px var(--color-accent-1, #F15BB5)'
-      }}>RIZZ LEVEL</h2>
+      {/* Title removed as requested */}
       
       <div className="flex justify-center items-center" style={{
         gap: 'clamp(0.5rem, 3vmin, 1rem)'

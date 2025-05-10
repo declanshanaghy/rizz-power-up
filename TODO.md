@@ -84,7 +84,9 @@ Use time difference between now and the last commit timestamp for the developmen
 - [x] Implement local storage for banking the user's high score
 - [x] Modify the main display so that the Bank score button only shows when the user has scored more than the high score.
 - [x] Implement stats system (Vibe Level, Swagger, Cringe Avoidance, Rizz Level)
-- [x] Ensure that the images display within the card component with the right aspect ratio
+- [x] Remove the title from the app that reads "RIZZ POWER-UP SIMULATOR"
+   - Add a background image to the app using bg1.png
+- [] Ensure that the images display within the card component with the right aspect ratio
    - The images are 1024 × 1536 pixels maintain the aspect ratio when displayed in the card component but scale it down to fit on the screen comfortably
 - [] Create special events system that trigger randomly ~ every 18 taps
 - [] Incorporate sound effects for the followign events

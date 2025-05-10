@@ -48,8 +48,8 @@ const GiveUpButton: React.FC<GiveUpButtonProps> = ({
           ...buttonElementStyle,
           background: `linear-gradient(90deg, #FF5733, #FFC300)`, // Red to orange gradient
           color: 'white',
-          boxShadow: `0 0 clamp(10px, 2vmin, 20px) ${isDisabled ? 'rgba(255, 87, 51, 0.2)' : 'rgba(255, 87, 51, 0.7)'}`,
-          opacity: isDisabled ? 0.3 : 1,
+          boxShadow: `0 0 clamp(10px, 2vmin, 20px) ${isDisabled ? 'rgba(255, 87, 51, 0.1)' : 'rgba(255, 87, 51, 0.7)'}`,
+          opacity: isDisabled ? 0.15 : 1,
           cursor: isDisabled ? 'not-allowed' : 'pointer',
         }}
         onMouseOver={(e) => handleHover(e, true)}

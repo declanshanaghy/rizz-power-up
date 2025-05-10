@@ -1,0 +1,18 @@
+{
+  "name": "Rizz Power-Up",
+  "short_name": "Rizz Power-Up",
+  "description": "Increase your Rizz level with this vaporwave-style mobile web app!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#2E0854",
+  "theme_color": "#5B0E91",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logos/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
