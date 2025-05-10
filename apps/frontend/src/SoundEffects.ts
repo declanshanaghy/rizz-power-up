@@ -2,10 +2,7 @@
 // This module handles loading and playing sound effects with optimized formats and lazy loading
 
 import { 
-  getOptimalAudioFormat, 
-  getOptimizedAudioUrl, 
-  AudioFormat,
-  createLazyAudio
+  getOptimizedAudioUrl
 } from './MediaOptimizer';
 
 // Define the types of sound effects
@@ -81,8 +78,7 @@ let isMuted = false;
 // Track which sound types have been preloaded
 const preloadedTypes = new Set<SoundEffectType>();
 
-// Get the optimal audio format based on browser support
-const optimalAudioFormat = getOptimalAudioFormat();
+// Get the optimal audio format (not used directly but needed for getOptimizedAudioUrl)
 
 /**
  * Preload critical sound effects to avoid delays when playing
@@ -133,10 +129,11 @@ function preloadSoundType(type: SoundEffectType): void {
     
     soundPath.forEach(path => {
       // Use optimized audio URL based on browser support
-      const optimizedPath = getOptimizedAudioUrl(path, optimalAudioFormat);
+      const optimizedPath = getOptimizedAudioUrl(path);
       
       // Create audio element with lazy loading
-      const audio = createLazyAudio(optimizedPath, 'metadata');
+      const audio = new Audio(optimizedPath);
+      audio.preload = 'metadata';
       
       // Set volume
       audio.volume = soundEffectsVolume;
@@ -155,8 +152,9 @@ function preloadSoundType(type: SoundEffectType): void {
     audioCache[type] = audioArray;
   } else {
     // Handle single sound path
-    const optimizedPath = getOptimizedAudioUrl(soundPath, optimalAudioFormat);
-    const audio = createLazyAudio(optimizedPath, 'metadata');
+    const optimizedPath = getOptimizedAudioUrl(soundPath);
+    const audio = new Audio(optimizedPath);
+    audio.preload = 'metadata';
     
     // Set volume
     audio.volume = soundEffectsVolume;

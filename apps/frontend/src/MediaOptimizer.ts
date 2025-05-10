@@ -106,8 +106,8 @@ export function getOptimalVideoFormat(): VideoFormat {
  */
 export function getOptimizedImageUrl(
   originalUrl: string,
-  size: ImageSize = ImageSize.ORIGINAL,
-  format?: ImageFormat
+  _size: ImageSize = ImageSize.ORIGINAL,
+  _format?: ImageFormat
 ): string {
   // For now, just return the original URL to avoid issues
   return originalUrl;
@@ -133,7 +133,7 @@ export function getOptimizedImageUrl(
  */
 export function getOptimizedAudioUrl(
   originalUrl: string,
-  format?: AudioFormat
+  _format?: AudioFormat
 ): string {
   // Always return the original URL since we don't have converted formats
   return originalUrl;
@@ -147,7 +147,7 @@ export function getOptimizedAudioUrl(
  */
 export function getOptimizedVideoUrl(
   originalUrl: string,
-  format?: VideoFormat
+  _format?: VideoFormat
 ): string {
   // Always return the original URL since we don't have converted formats
   return originalUrl;

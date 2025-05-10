@@ -5,7 +5,7 @@ import RizzLevelPanel from './RizzLevelPanel'
 import SpecialEvent from './SpecialEvent'
 import BankScoreModal from './BankScoreModal'
 import GiveUpModal from './GiveUpModal'
-import OptimizedResourceLoader, { ResourceType } from './OptimizedResourceLoader'
+import OptimizedResourceLoader from './OptimizedResourceLoader'
 import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
 import attributeEmojis from './rizz_attributes_emojis'
@@ -31,8 +31,8 @@ function VaporwaveApp() {
   const [currentCard, setCurrentCard] = useState<MemeImage | null>(null)
   const [showBankModal, setShowBankModal] = useState(false)
   const [showGiveUpModal, setShowGiveUpModal] = useState(false)
-  const [criticalResourcesLoaded, setCriticalResourcesLoaded] = useState(false)
-  const [allResourcesLoaded, setAllResourcesLoaded] = useState(false)
+  // State for tracking resource loading (used in handleCriticalResourcesLoaded)
+  const [_, setResourcesLoaded] = useState(false)
   const [currentAttributes, setCurrentAttributes] = useState<{
     vibeLevel: number;
     swagger: number;
@@ -415,7 +415,7 @@ function VaporwaveApp() {
 
   // Handle critical resources loaded
   const handleCriticalResourcesLoaded = useCallback(() => {
-    setCriticalResourcesLoaded(true);
+    setResourcesLoaded(true);
     console.log('Critical resources loaded, app is now interactive!');
     
     // Start loading non-critical resources in the background
@@ -424,7 +424,6 @@ function VaporwaveApp() {
 
   // Handle all resources loaded
   const handleAllResourcesLoaded = useCallback(() => {
-    setAllResourcesLoaded(true);
     console.log('All resources loaded successfully!');
   }, []);
 
