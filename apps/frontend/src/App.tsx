@@ -366,13 +366,13 @@ function App() {
           padding: 'clamp(0.5rem, 2vmin, 1rem)',
           boxSizing: 'border-box'
         }}>
-          {/* Header space - title removed */}
-          <div style={{ height: '1rem' }}></div>
+          {/* Header space - ensuring 5% space above Rizz Up Button */}
+          <div style={{ height: '5vh', minHeight: '1.5rem' }}></div>
           
           {/* Buttons Container - Both buttons in one component */}
           <div className="flex flex-col items-center justify-center w-full" style={{
             maxWidth: 'min(calc(100% - clamp(20px, 5vw, 50px)), 400px)',
-            margin: 'clamp(0.25rem, 1.5vmin, 0.5rem) auto',
+            margin: '0 auto', // Removed top/bottom margin since we have the header space div
             gap: 'clamp(0.5rem, 2vmin, 0.75rem)', // Consistent spacing between buttons
             flex: '0 0 auto' // Prevent flex growth/shrink
           }}>
