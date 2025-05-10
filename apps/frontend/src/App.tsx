@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import RizzButton from './RizzButton'
 import BankScoreButton from './BankScoreButton'
+import GiveUpButton from './GiveUpButton'
 import StatsPanel from './StatsPanel'
 import RizzLevelPanel from './RizzLevelPanel'
 import HighScorePanel from './HighScorePanel'
@@ -248,6 +249,18 @@ function App() {
     setClickCount(0); // Reset click count when banking score
   };
 
+  // Handle giving up (reset game without updating high score)
+  const handleGiveUp = () => {
+    // Reset game without updating high score
+    setRizzLevel(0);
+    setStats({
+      vibeLevel: 0,
+      swagger: 0,
+      cringeAvoidance: 0
+    });
+    setClickCount(0); // Reset click count when giving up
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen relative" style={{
       background: 'linear-gradient(135deg, var(--color-bg-primary, #2E0854) 0%, #5B0E91 50%, #FF1B6B 100%)',
@@ -387,15 +400,22 @@ function App() {
               <RizzButton onClick={handleRizzTap} disabled={showCard} />
             </div>
             
-            {/* Bank Score Button - Only visible after first Rizz Up click */}
+            {/* Bank Score Button or Give Up Button - Only visible after first Rizz Up click */}
             <div className="flex justify-center" style={{
               margin: 'clamp(0.15rem, 1vmin, 0.25rem) 0',
               flex: '1 1 40%' // Take 40% of the available space
             }}>
-              <BankScoreButton
-                onClick={handleBankScore}
-                visible={!showCard && clickCount > 0}
-              />
+              {rizzLevel >= highScore ? (
+                <BankScoreButton
+                  onClick={handleBankScore}
+                  visible={!showCard && clickCount > 0}
+                />
+              ) : (
+                <GiveUpButton
+                  onClick={handleGiveUp}
+                  visible={!showCard && clickCount > 0}
+                />
+              )}
             </div>
           </div>
           
