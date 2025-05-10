@@ -112,6 +112,20 @@ function App() {
     }
   }, [])
   
+  // Save high score to localStorage whenever it changes
+  useEffect(() => {
+    // Only save if high score is greater than 0
+    if (highScore > 0) {
+      const gameState: GameState = {
+        rizzLevel: rizzLevel,
+        stats: stats,
+        highScore: highScore
+      };
+      saveGameState(gameState);
+      console.log("High score saved to localStorage:", highScore);
+    }
+  }, [highScore])
+  
   // We're removing the complex dimension calculation function and using CSS for responsive design
   
   // Set up resize listener and fullscreen change detection
@@ -255,19 +269,8 @@ function App() {
     // Update high score if current rizz level is higher
     if (rizzLevel > highScore) {
       setHighScore(newHighScore);
+      // Note: We don't need to explicitly save here as the useEffect will handle it
     }
-    
-    // Save game state to localStorage
-    const gameState: GameState = {
-      rizzLevel: 0, // Reset rizz level
-      stats: {
-        vibeLevel: 0,
-        swagger: 0,
-        cringeAvoidance: 0
-      },
-      highScore: newHighScore
-    };
-    saveGameState(gameState);
     
     // Reset game
     setRizzLevel(0);
@@ -472,10 +475,10 @@ function App() {
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                width: 'min(85%, 300px)',
+                width: 'min(85%, 350px)', // Increased max width to better accommodate the 2:3 aspect ratio
                 height: 'auto',
                 maxHeight: '80vh',
-                padding: 'clamp(0.75rem, 3vmin, 1rem)',
+                padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
                 borderRadius: 'var(--border-radius-lg, 1rem)',
                 background: 'rgba(46, 8, 84, 0.95)', // More opaque background
                 boxShadow: `0 0 clamp(20px, 5vmin, 30px) rgba(241, 91, 181, 0.8),
@@ -503,10 +506,11 @@ function App() {
               
               <div style={{
                 width: '100%',
-                aspectRatio: '16/9',
+                aspectRatio: '2/3', // Changed to match the original 1024 × 1536 aspect ratio
                 backgroundImage: `url(${currentCard.path})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'top center',
+                backgroundSize: 'contain', // Changed from 'cover' to 'contain' to ensure the entire image is visible
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
                 borderRadius: 'var(--border-radius-md, 0.75rem)',
                 boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
                 marginTop: 'clamp(-5px, -1vmin, -2px)'
