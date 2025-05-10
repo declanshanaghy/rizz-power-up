@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { getRandomVideoPath, getRandomAudioPath } from './MediaUtils';
 
 interface BankScoreModalProps {
   isOpen: boolean;
@@ -12,22 +13,65 @@ interface BankScoreModalProps {
 const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Generate random media paths when the modal opens
+  const [videoPath, setVideoPath] = useState<string>('');
+  const [audioPath, setAudioPath] = useState<string>('');
 
-  // Handle modal open/close effects
+  // Generate new random paths when the modal opens
+  useEffect(() => {
+    if (isOpen) {
+      // Generate random paths
+      const newVideoPath = getRandomVideoPath('bank');
+      const newAudioPath = getRandomAudioPath('bank');
+      
+      // Set the paths
+      setVideoPath(newVideoPath);
+      setAudioPath(newAudioPath);
+      
+      console.log('Bank modal opened with:', { video: newVideoPath, audio: newAudioPath });
+    }
+  }, [isOpen]);
+  
+  // Handle playing media when paths are set
+  useEffect(() => {
+    // Only proceed if modal is open and paths are set
+    if (!isOpen || !videoPath || !audioPath) return;
+    
+    console.log('Attempting to play bank modal media:', { video: videoPath, audio: audioPath });
+    
+    // Store ref values in variables to use in cleanup function
+    const videoElement = videoRef.current;
+    const audioElement = audioRef.current;
+    
+    // Small delay to ensure elements are ready
+    const playTimer = setTimeout(() => {
+      // Start video and audio
+      if (videoElement) {
+        videoElement.play()
+          .then(() => console.log('Bank video started playing successfully'))
+          .catch((err: Error) => console.error('Error playing bank video:', err));
+      }
+      
+      if (audioElement) {
+        audioElement.play()
+          .then(() => console.log('Bank audio started playing successfully'))
+          .catch((err: Error) => console.error('Error playing bank audio:', err));
+      }
+    }, 100);
+    
+    return () => {
+      clearTimeout(playTimer);
+    };
+  }, [isOpen, videoPath, audioPath]);
+  
+  // Handle modal close effects
   useEffect(() => {
     // Store ref values in variables to use in cleanup function
     const videoElement = videoRef.current;
     const audioElement = audioRef.current;
     
-    if (isOpen) {
-      // Start video and audio when modal opens
-      if (videoElement) {
-        videoElement.play().catch((err: Error) => console.error('Error playing video:', err));
-      }
-      if (audioElement) {
-        audioElement.play().catch((err: Error) => console.error('Error playing audio:', err));
-      }
-    } else {
+    if (!isOpen) {
       // Stop video and audio when modal closes
       if (videoElement) {
         videoElement.pause();
@@ -38,7 +82,7 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
         audioElement.currentTime = 0;
       }
     }
-
+    
     // Cleanup function to stop media when component unmounts
     return () => {
       if (videoElement) {
@@ -124,7 +168,7 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
           <video 
             ref={videoRef}
             style={modalStyles.video}
-            src="/video/bank_01.mp4"
+            src={videoPath}
             loop
             muted={false}
           />
@@ -133,7 +177,7 @@ const BankScoreModal: React.FC<BankScoreModalProps> = ({ isOpen, onClose }) => {
         {/* Hidden audio element for sound effect */}
         <audio 
           ref={audioRef}
-          src="/sounds/bank_01.wav"
+          src={audioPath}
           loop
         />
         

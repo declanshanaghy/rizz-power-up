@@ -12,6 +12,7 @@ export enum SoundEffectType {
   SPECIAL_EVENT_GOOD = 'specialEventGood',
   SPECIAL_EVENT_BAD = 'specialEventBad',
   TOAST_NOTIFICATION = 'toastNotification',
+  GIVE_UP = 'giveUp',
 }
 
 // Define the paths to the sound effect files
@@ -34,7 +35,10 @@ const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
     '/sounds/card_bad_03.wav',
     '/sounds/card_bad_04.wav',
   ],
-  [SoundEffectType.BANK_SCORE]: '/sounds/bank_01.wav',
+  [SoundEffectType.BANK_SCORE]: [
+    '/sounds/bank_00.wav',
+    '/sounds/bank_01.wav',
+  ],
   [SoundEffectType.RIZZ_LEVEL]: '/sounds/rizz_level_up.mp3',
   [SoundEffectType.SPECIAL_EVENT]: '/sounds/card_good_00.wav', // Use an existing sound file
   [SoundEffectType.SPECIAL_EVENT_GOOD]: [
@@ -52,6 +56,10 @@ const SOUND_PATHS: Record<SoundEffectType, SoundPath> = {
     '/sounds/card_bad_04.wav',
   ], // Reuse the bad card sounds for bad events
   [SoundEffectType.TOAST_NOTIFICATION]: '/sounds/button_click.wav', // Use .wav extension instead of .mp3
+  [SoundEffectType.GIVE_UP]: [
+    '/sounds/giveup_00.wav',
+    '/sounds/giveup_01.wav',
+  ], // Sounds for give up modal
 };
 
 // Cache for preloaded audio elements
@@ -257,4 +265,11 @@ export function playSpecialEventSound(isGood?: boolean): void {
  */
 export function playToastSound(): void {
   playSoundEffect(SoundEffectType.TOAST_NOTIFICATION);
+}
+
+/**
+ * Play the give up sound
+ */
+export function playGiveUpSound(): void {
+  playSoundEffect(SoundEffectType.GIVE_UP);
 }

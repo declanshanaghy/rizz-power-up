@@ -4,6 +4,8 @@ import StatsPanel from './StatsPanel'
 import RizzLevelPanel from './RizzLevelPanel'
 import SpecialEvent from './SpecialEvent'
 import BankScoreModal from './BankScoreModal'
+import GiveUpModal from './GiveUpModal'
+import ResourcePreloader from './ResourcePreloader'
 import { loadGameState, saveGameState, GameState } from './localStorage'
 import { getRandomImage, MemeImage, generateAttributes, calculateRizzLevel } from './memeImages'
 import attributeEmojis from './rizz_attributes_emojis'
@@ -13,7 +15,8 @@ import {
   playButtonClickSound,
   playDealCardSound,
   playRizzLevelSound,
-  playSpecialEventSound
+  playSpecialEventSound,
+  playGiveUpSound
 } from './SoundEffects'
 
 function VaporwaveApp() {
@@ -24,6 +27,8 @@ function VaporwaveApp() {
   const [showCard, setShowCard] = useState(false)
   const [currentCard, setCurrentCard] = useState<MemeImage | null>(null)
   const [showBankModal, setShowBankModal] = useState(false)
+  const [showGiveUpModal, setShowGiveUpModal] = useState(false)
+  const [resourcesLoaded, setResourcesLoaded] = useState(false)
   const [currentAttributes, setCurrentAttributes] = useState<{
     vibeLevel: number;
     swagger: number;
@@ -174,11 +179,32 @@ function VaporwaveApp() {
     playDealCardSound(isBadCard);
     
     // Update stats based on the card's attributes
-    let newStats = {
-      vibeLevel: stats.vibeLevel + attributes.vibeLevel,
-      swagger: stats.swagger + attributes.swagger,
-      cringeAvoidance: stats.cringeAvoidance + attributes.cringeAvoidance
-    };
+    // Apply a 1.25x multiplier to good cards
+    let newStats;
+    if (!isBadCard) {
+      // For good cards, apply a 1.25x multiplier to the attribute values
+      const multiplier = 1.25;
+      newStats = {
+        vibeLevel: stats.vibeLevel + Math.round(attributes.vibeLevel * multiplier),
+        swagger: stats.swagger + Math.round(attributes.swagger * multiplier),
+        cringeAvoidance: stats.cringeAvoidance + Math.round(attributes.cringeAvoidance * multiplier)
+      };
+      console.log(`Applied 1.25x multiplier to good card attributes:`, {
+        original: attributes,
+        multiplied: {
+          vibeLevel: Math.round(attributes.vibeLevel * multiplier),
+          swagger: Math.round(attributes.swagger * multiplier),
+          cringeAvoidance: Math.round(attributes.cringeAvoidance * multiplier)
+        }
+      });
+    } else {
+      // For bad cards, use the original attribute values
+      newStats = {
+        vibeLevel: stats.vibeLevel + attributes.vibeLevel,
+        swagger: stats.swagger + attributes.swagger,
+        cringeAvoidance: stats.cringeAvoidance + attributes.cringeAvoidance
+      };
+    }
     
     // Check if a special event should trigger (approximately every 18 taps)
     if (shouldTriggerSpecialEvent(newClickCount)) {
@@ -275,6 +301,14 @@ function VaporwaveApp() {
   const handleGiveUp = () => {
     // Play button click sound
     playButtonClickSound();
+    
+    // Show the give up modal instead of immediately resetting
+    setShowGiveUpModal(true);
+  };
+  
+  // Handle closing the give up modal
+  const handleCloseGiveUpModal = () => {
+    setShowGiveUpModal(false);
     
     // Reset game without updating high score
     setRizzLevel(0);
@@ -439,8 +473,73 @@ function VaporwaveApp() {
     }
   }
 
+  // Handle resource preloading completion
+  const handleResourcesLoaded = useCallback(() => {
+    setResourcesLoaded(true);
+    console.log('All resources preloaded successfully!');
+  }, []);
+
+  // Only preload resources once when the component mounts
+  useEffect(() => {
+    console.log('Initializing resource preloading...');
+    // The ResourcePreloader component will be rendered only once
+  }, []);
+
   return (
     <div style={styles.container}>
+      {/* Resource Preloader - only render once when the app loads */}
+      {!resourcesLoaded && <ResourcePreloader onComplete={handleResourcesLoaded} />}
+      
+      {/* Loading indicator */}
+      {!resourcesLoaded && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+        }}>
+          <div style={{
+            color: 'var(--color-accent-3, #00F5D4)',
+            fontSize: 'clamp(1.5rem, 5vmin, 2rem)',
+            textAlign: 'center',
+            marginBottom: 'clamp(1rem, 4vmin, 1.5rem)',
+            textShadow: '0 0 10px var(--color-accent-3, #00F5D4)',
+          }}>
+            Loading Rizz Power-Up...
+          </div>
+          <div style={{
+            width: 'min(80%, 300px)',
+            height: '10px',
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderRadius: '5px',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'var(--color-accent-1, #F15BB5)',
+              backgroundImage: 'linear-gradient(90deg, var(--color-accent-1, #F15BB5), var(--color-accent-2, #00BBF9), var(--color-accent-3, #00F5D4), var(--color-accent-4, #9B5DE5), var(--color-accent-5, #FEE440))',
+              backgroundSize: '200% 100%',
+              animation: 'gradient 2s linear infinite',
+            }} />
+          </div>
+          <style>
+            {`
+              @keyframes gradient {
+                0% { background-position: 0% 50%; }
+                100% { background-position: 200% 50%; }
+              }
+            `}
+          </style>
+        </div>
+      )}
       <div style={styles.content}>
         {/* Button Panel - with swapped button order */}
         <ButtonPanel
@@ -590,6 +689,12 @@ function VaporwaveApp() {
         <BankScoreModal
           isOpen={showBankModal}
           onClose={handleCloseBankModal}
+        />
+        
+        {/* Give Up Modal */}
+        <GiveUpModal
+          isOpen={showGiveUpModal}
+          onClose={handleCloseGiveUpModal}
         />
         
         {/* Footer */}
