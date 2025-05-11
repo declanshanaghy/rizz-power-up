@@ -2,6 +2,8 @@
 
 This directory contains tools for generating the logo for the Rizz Power-Up Simulator app.
 
+![Rizz Power-Up Logo](./logo.png)
+
 ## Option 1: Interactive HTML Generator
 
 The `logo_generator.html` file provides an interactive way to generate and preview different logo styles in your browser.
@@ -72,3 +74,11 @@ The `generate_png_icons.js` script creates PNG versions of the logo in various s
 - 16x16, 32x32, 48x48 (favicons)
 - 72x72, 96x96, 120x120, 128x128, 144x144, 152x152, 180x180, 192x192 (app icons)
 - 384x384, 512x512 (large app icons)
+
+---
+
+*Crafted with conscious code & single-origin coffee* ☕✨
+
+## 📚 Documentation
+
+For complete project documentation, please see the [Table of Contents](../../../../TOC.md) which provides links to all documentation files in this project.

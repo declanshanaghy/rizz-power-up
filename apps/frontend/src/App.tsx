@@ -22,7 +22,7 @@ function App() {
       {/* Sound Control component */}
       <SoundControl position="bottom-left" />
       
-      {/* Footer container for Buy Me a Coffee button and High Score panel */}
+      {/* Footer container for Buy Me a Coffee button, GitHub link, and High Score panel */}
       <div className="footer-container" style={{
         position: 'fixed',
         bottom: 'clamp(5px, 1.5vmin, 10px)',
@@ -34,35 +34,73 @@ function App() {
         padding: '0 clamp(5px, 1.5vmin, 10px)',
         zIndex: 9999
       }}>
-        {/* Buy Me a Coffee button - left side */}
-        <a
-          href="https://www.buymeacoffee.com/firemandecko"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-block',
-            backgroundColor: '#FFDD00',
-            color: '#000000',
-            padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
-            borderRadius: '0.5rem',
-            fontFamily: 'Cookie, cursive',
-            fontSize: 'clamp(16px, 4vmin, 18px)',
-            fontWeight: 'bold',
-            textDecoration: 'none',
-            boxShadow: '0 0 10px rgba(255, 221, 0, 0.5)',
-            transition: 'all 0.3s ease'
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.transform = 'scale(1.05)';
-            e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 221, 0, 0.8)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 0 10px rgba(255, 221, 0, 0.5)';
-          }}
-        >
-          ☕ Buy me a coffee
-        </a>
+        {/* Left side container for buttons */}
+        <div style={{
+          display: 'flex',
+          gap: 'clamp(8px, 2vmin, 15px)',
+          alignItems: 'center'
+        }}>
+          {/* Buy Me a Coffee button */}
+          <a
+            href="https://www.buymeacoffee.com/firemandecko"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              backgroundColor: '#FFDD00',
+              color: '#000000',
+              padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
+              borderRadius: '0.5rem',
+              fontFamily: 'Cookie, cursive',
+              fontSize: 'clamp(16px, 4vmin, 18px)',
+              fontWeight: 'bold',
+              textDecoration: 'none',
+              boxShadow: '0 0 10px rgba(255, 221, 0, 0.5)',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 221, 0, 0.8)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(255, 221, 0, 0.5)';
+            }}
+          >
+            ☕ Buy me a coffee
+          </a>
+          
+          {/* GitHub Link */}
+          <a
+            href="https://github.com/declanshanaghy/rizz-power-up"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              background: 'linear-gradient(135deg, #00F5D4 0%, #00BBF9 100%)',
+              color: '#ffffff',
+              padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
+              borderRadius: '0.5rem',
+              fontSize: 'clamp(16px, 4vmin, 18px)',
+              fontWeight: 'bold',
+              textDecoration: 'none',
+              boxShadow: '0 0 10px rgba(0, 245, 212, 0.7)',
+              textShadow: '0 0 5px rgba(255, 255, 255, 0.7)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 245, 212, 0.9)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 245, 212, 0.7)';
+            }}
+          >
+            💻 GitHub
+          </a>
+        </div>
         
         {/* Custom High Score display - right side */}
         <div style={{

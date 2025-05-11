@@ -1,54 +1,106 @@
-# React + TypeScript + Vite
+# Rizz Power-Up Frontend ✨💻
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> *"The frontend is where the digital energy of rizz manifests into visual harmony."*
 
-Currently, two official plugins are available:
+## Overview 🌈
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This directory contains the React frontend application for the Rizz Power-Up Simulator. Built with React, TypeScript, and Vite, it delivers a vaporwave-inspired experience that allows users to tap a button to increase their "Rizz" level.
 
-## Expanding the ESLint configuration
+![Rizz Button Interface](../frontend/public/memes/good/primal-power-unleashed-01jtfbzvwhfs6scng73tg4qkwg.png)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Tech Stack 🔮
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+| Category | Technology |
+|----------|------------|
+| **Framework** | React 19 + TypeScript |
+| **Styling** | TailwindCSS 4.1.5 |
+| **Build Tool** | Vite 6.3.1 |
+| **Package Manager** | pnpm |
+| **State Management** | React Hooks + Context |
+| **Media Handling** | Custom optimized resource loader |
+
+## Development 🧙‍♂️
+
+### Setup
+
+```bash
+# Navigate to the frontend directory
+cd apps/frontend
+
+# Install dependencies
+pnpm install
+
+# Start the development server
+pnpm dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The development server will be available at `http://localhost:5173` by default.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Available Scripts
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Preview production build
+pnpm preview
+
+# Run linter
+pnpm lint
 ```
+
+## Project Structure 🏗️
+
+```
+frontend/
+├── public/           # Static assets
+│   ├── buttons/      # Button images
+│   ├── logos/        # Logo assets
+│   ├── memes/        # Card images
+│   ├── sounds/       # Audio files
+│   └── video/        # Video files
+├── src/              # Source code
+│   ├── components/   # React components
+│   ├── hooks/        # Custom React hooks
+│   ├── utils/        # Utility functions
+│   ├── App.tsx       # Main application component
+│   └── main.tsx      # Application entry point
+└── index.html        # HTML entry point
+```
+
+## Key Features 🚀
+
+- **Vaporwave Aesthetic**: Neon colors, retro grid backgrounds, and nostalgic design elements
+- **Responsive Design**: Adapts to all screen sizes for optimal mobile and desktop experience
+- **Optimized Media Loading**: Preloads and caches images, sounds, and videos for smooth performance
+- **Interactive Animations**: Dynamic animations that respond to user interactions
+- **Local Storage**: Saves user progress between sessions
+
+## Styling Guidelines 🎨
+
+This project follows the styling guidelines defined in the [Style Guide](../../style-guide.md). Key points:
+
+- Use TailwindCSS for styling
+- Follow the defined color palette for consistency
+- Implement animations that feel organic and natural
+- Use emojis sparingly to enhance the user experience
+
+## Contributing 🌱
+
+When contributing to the frontend:
+
+1. Follow the established code structure
+2. Maintain the vaporwave aesthetic
+3. Ensure responsive design across all devices
+4. Optimize for performance, especially with media assets
+
+---
+
+*Crafted with conscious code & single-origin coffee* ☕✨
+
+## 📚 Documentation
+
+For complete project documentation, please see the [Table of Contents](../../TOC.md) which provides links to all documentation files in this project.

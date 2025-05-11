@@ -1,3 +1,27 @@
+<!--
+
+Create a Markdown file for rizz image prompts.
+
+The file should contain 20 illustrated meme image prompts based on 
+exaggerated "rizz" (charisma) phrases. Each prompt should describe 
+a full visual scene (e.g., characters, environment, atmosphere) that 
+could be used by an illustrator or AI model to create a meme-style image.
+
+Important instructions for each prompt:
+- DO NOT overlay or include any text or captions in the image.
+- Describe the characters' pose, setting, lighting, and meme tone.
+- Include both absurdly positive and painfully negative rizz moments.
+- Group the prompts into 2 sections:
+  1. 🔥 Positive Rizz Meme Prompts (10 items)
+  2. 💀 Negative Rizz Meme Prompts (10 items)
+
+The output should be valid Markdown, formatted with H1, H2, and H3 
+headers where appropriate, and stored in a file named 
+`rizz_image_prompts_no_text_overlay_00.md`.
+
+-->
+
+
 
 # 🎨 Rizz Meme Image Prompts (No Text Overlay)
 

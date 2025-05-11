@@ -2,9 +2,13 @@
 
 > *"In the digital realm of charisma and swagger, we find not merely a game, but a profound meditation on the interconnectedness of all rizz, man."* — Anonymous F1r3m4n D3ck0 sipping a single-origin pour-over
 
+**[✨ Try the Live App ✨](https://rizz-power-up.firemandecko.com/)**
+
 ## 🧠 C0sm1c 0v3rv13w
 
 **Rizz Power-Up Simulator** is a vaporwave-style mobile web app that allows users to tap a button to increase their "Rizz" (charisma) level. With each tap, users receive a "Rizz Quote" from a predefined set and see their stats (e.g., Swagger, Vibe, Cringe Resistance) increase. The app offers instant feedback, occasional special events, and social sharing to drive engagement.
+
+![Rizz Power-Up Main Screen](./apps/frontend/public/memes/good/sigma-mode-initiated-01jtw2gb9ses3t1sfn1yw6gnst.png)
 
 This project embodies the **l33tc0dzr, l4tt3 drinking, hippy trousers architect** aesthetic, harmonizing technical precision with free-spirited energy of bohemian sensibilities.
 
@@ -28,6 +32,8 @@ This project embodies the **l33tc0dzr, l4tt3 drinking, hippy trousers architect*
 - **Special Events** ✨
   - Appear every 10 taps with over-the-top effects
   - Feature glitchy animations and unique messages
+
+![Special Event Card](./apps/frontend/public/memes/good/renaissance-elegance-with-cherubs-01jtw0pz06ea5rz1gt42dsq80z.png)
 
 - **Local Storage** 💾
   - Saves user progress between sessions
@@ -140,6 +146,10 @@ The application is deployed automatically using GitHub Actions workflows:
 ## 📜 L1c3ns3
 
 This project is licensed under the Apache License 2.0.
+
+## 📚 Documentation
+
+For complete project documentation, please see the [Table of Contents](./TOC.md) which provides links to all documentation files in this project.
 
 ---
 

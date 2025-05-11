@@ -658,39 +658,105 @@ function VaporwaveApp() {
             ...styles.footer,
             flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'flex-start', // Align items at the top
+            height: 'clamp(40px, 10vmin, 50px)' // Set consistent height for the footer
           }}>
-            {/* Buy Me A Coffee button */}
-            <div style={styles.bmcContainer}>
+            {/* Left side container for buttons */}
+            <div style={{
+              display: 'flex',
+              gap: 'clamp(8px, 2vmin, 15px)',
+              alignItems: 'flex-start', // Align items at the top
+              height: '100%'
+            }}>
+              {/* Buy Me A Coffee button */}
+              <div style={{
+                ...styles.bmcContainer,
+                height: '100%',
+                display: 'flex',
+                alignItems: 'flex-start', // Align at the top
+                position: 'relative',
+                top: '-15px' // Move up by 15px (was -20px, moved down by 5px)
+              }}>
+                <a
+                  href="https://www.buymeacoffee.com/firemandecko"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: 'clamp(36px, 9vmin, 46px)', // Fixed height for all buttons
+                    transition: 'transform 0.2s ease',
+                    backgroundColor: '#FFDD00',
+                    padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
+                    borderRadius: 'var(--border-radius-md, 0.75rem)',
+                    boxShadow: '0 0 10px rgba(255, 221, 0, 0.5)'
+                  }}
+                  onClick={() => {
+                    trackEvent('user_interaction', 'button_click', 'buy_me_coffee');
+                    trackGameEvents.buttonClick('buy_me_coffee');
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                    e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 221, 0, 0.8)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                    e.currentTarget.style.boxShadow = '0 0 10px rgba(255, 221, 0, 0.5)';
+                  }}
+                >
+                  <span style={{
+                    fontFamily: 'Cookie, cursive',
+                    fontSize: 'clamp(16px, 4vmin, 18px)',
+                    fontWeight: 'bold',
+                    color: '#000000'
+                  }}>☕ Buy me a coffee</span>
+                </a>
+              </div>
+              
+              {/* GitHub Link */}
               <a
-                href="https://www.buymeacoffee.com/firemandecko"
+                href="https://github.com/declanshanaghy/rizz-power-up"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
-                  display: 'inline-block',
-                  marginTop: '10px',
-                  transition: 'transform 0.2s ease'
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: 'clamp(36px, 9vmin, 46px)', // Fixed height for all buttons
+                  background: 'linear-gradient(135deg, #00F5D4 0%, #00BBF9 100%)',
+                  color: '#ffffff',
+                  padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
+                  borderRadius: 'var(--border-radius-md, 0.75rem)',
+                  fontSize: 'clamp(0.9rem, 3vmin, 1.1rem)',
+                  fontWeight: 'bold',
+                  textDecoration: 'none',
+                  boxShadow: '0 0 10px rgba(0, 245, 212, 0.7)',
+                  textShadow: '0 0 5px rgba(255, 255, 255, 0.7)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  transition: 'all 0.3s ease'
                 }}
-                onClick={() => trackEvent('user_interaction', 'button_click', 'buy_me_coffee')}
-                onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                onClick={() => {
+                  trackEvent('user_interaction', 'button_click', 'github_link');
+                  trackGameEvents.buttonClick('github_link');
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                  e.currentTarget.style.boxShadow = '0 0 15px rgba(0, 245, 212, 0.9)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                  e.currentTarget.style.boxShadow = '0 0 10px rgba(0, 245, 212, 0.7)';
+                }}
               >
-                <img
-                  src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-                  alt="Buy Me A Coffee"
-                  style={{
-                    height: 'clamp(30px, 8vmin, 40px)',
-                    width: 'auto',
-                    maxWidth: '100%'
-                  }}
-                  loading="lazy" // Add lazy loading for this image
-                />
+                💻 GitHub
               </a>
             </div>
             
             {/* High Score Display */}
             <div style={{
-              padding: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
+              height: 'clamp(36px, 9vmin, 46px)', // Fixed height for all buttons
+              padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
               borderRadius: 'var(--border-radius-md, 0.75rem)',
               background: 'rgba(46, 8, 84, 0.7)',
               textAlign: 'center',
@@ -698,8 +764,13 @@ function VaporwaveApp() {
               gap: 'clamp(0.3rem, 1.5vmin, 0.5rem)',
               justifyContent: 'center',
               alignItems: 'center',
-              marginTop: '10px'
-            }}>
+              boxShadow: '0 0 10px rgba(0, 245, 212, 0.5)'
+            }}
+            onClick={() => {
+              trackEvent('user_interaction', 'button_click', 'high_score_panel');
+              trackGameEvents.buttonClick('high_score_panel');
+            }}
+            >
               <span style={{
                 color: 'var(--color-accent-3, #00F5D4)',
                 fontSize: 'clamp(0.8rem, 2.5vmin, 0.9rem)'

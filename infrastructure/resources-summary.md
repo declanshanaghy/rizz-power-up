@@ -1,12 +1,12 @@
-# Rizz Power Up Infrastructure Resources
+# R1zz P0w3r Up 1nfr4structur3 R3s0urc3s ☁️🔧
 
-## S3 Bucket
+## S3 Buck3t 🗄️
 - **Name**: rizz-power-up-firemandecko
 - **Region**: us-east-1 (default region)
 - **ARN**: arn:aws:s3:::rizz-power-up-firemandecko
 - **Website URL**: http://rizz-power-up-firemandecko.s3-website-us-east-1.amazonaws.com
 
-## Website Configuration
+## W3bs1t3 C0nf1gur4t10n 🌐
 ```json
 {
     "IndexDocument": {
@@ -18,7 +18,7 @@
 }
 ```
 
-## Bucket Policy
+## Buck3t P0l1cy 🔒
 ```json
 {
     "Version": "2012-10-17",
@@ -36,7 +36,7 @@
 }
 ```
 
-## Public Access Block Configuration
+## Publ1c 4cc3ss Bl0ck C0nf1gur4t10n 🛡️
 ```json
 {
     "BlockPublicAcls": false,
@@ -46,7 +46,7 @@
 }
 ```
 
-## CloudFront Distribution
+## Cl0udFr0nt D1str1but10n ☁️
 - **Domain**: rizz-power-up.firemandecko.com
 - **Aliases**: rizz-power-up.firemandecko.com, www.rizz-power-up.firemandecko.com
 - **Origin**: S3 bucket (rizz-power-up-firemandecko)
@@ -56,19 +56,19 @@
 - **SSL Certificate**: ACM Certificate for rizz-power-up.firemandecko.com
 - **Custom Error Response**: 404 errors return index.html with 200 status code (for SPA routing)
 
-## Route 53 and DNS
+## R0ut3 53 4nd DNS 🌐
 - **Hosted Zone**: firemandecko.com
 - **DNS Records**:
   - rizz-power-up.firemandecko.com -> CloudFront distribution
   - www.rizz-power-up.firemandecko.com -> CloudFront distribution
 
-## SSL/TLS Certificate
+## SSL/TLS C3rt1f1c4t3 🔐
 - **Domain**: rizz-power-up.firemandecko.com
 - **Alternative Names**: www.rizz-power-up.firemandecko.com
 - **Validation Method**: DNS
 - **Region**: us-east-1 (required for CloudFront)
 
-## Estimated Costs
+## 3st1m4t3d C0sts 💰
 
 | Service | Estimated Monthly Cost |
 |---------|------------------------|
@@ -82,7 +82,7 @@
 
 **Total Estimated Monthly Cost**: $1-5 for low traffic sites
 
-## Deployment Process
+## D3pl0ym3nt Pr0c3ss 🚀
 
 The application is deployed automatically using GitHub Actions workflows:
 
@@ -98,7 +98,7 @@ The application is deployed automatically using GitHub Actions workflows:
    - Invalidates the CloudFront cache to ensure the latest content is served
    - Verifies the deployment
 
-## CloudFront Cache Invalidation
+## Cl0udFr0nt C4ch3 1nv4l1d4t10n 🔄
 
 When new content is deployed to S3, the CloudFront cache is invalidated to ensure the latest content is served to users. This is done automatically as part of the GitHub Actions workflow.
 
@@ -112,7 +112,7 @@ DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.It
 aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*" --profile rizz-power-up
 ```
 
-## Troubleshooting
+## Tr0ubl3sh00t1ng 🔍
 
 If you encounter 403 Forbidden errors from CloudFront:
 
@@ -120,3 +120,11 @@ If you encounter 403 Forbidden errors from CloudFront:
 2. Verify that the CloudFront distribution is properly configured to use the OAI
 3. Ensure that the CloudFront cache has been invalidated after deploying new content
 4. Check the CloudFront distribution status in the AWS Console
+
+---
+
+*Crafted with conscious code & single-origin coffee* ☕✨
+
+## 📚 Documentation
+
+For complete project documentation, please see the [Table of Contents](../TOC.md) which provides links to all documentation files in this project.
