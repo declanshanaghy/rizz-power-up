@@ -3,12 +3,12 @@
 // Container style for all buttons
 export const buttonContainerStyle = {
   margin: 0,
-  aspectRatio: '1.61803398875/1', // Golden ratio
-  minWidth: 'min(580px, 100%)', // Responsive minimum width
-  minHeight: 'min(358px, 20vh)', // Height based on golden ratio (580/1.618)
+  aspectRatio: '3/1', // Even wider aspect ratio (was 2/1)
+  minWidth: 'min(800px, 100%)', // Further increased width (was 680px)
+  minHeight: 'min(266px, 20vh)', // Height based on new aspect ratio
   maxWidth: '100%', // Ensure it doesn't overflow its container
   boxSizing: 'border-box' as const, // Include padding in width/height calculations
-  padding: 'clamp(0.5rem, 2vmin, 1rem)' // Padding for visual appeal
+  padding: 'clamp(0.25rem, 1vmin, 0.5rem)' // Reduced padding to decrease spacing between buttons
 };
 
 // Button element style for all buttons
@@ -47,7 +47,7 @@ export const textSpanStyle = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  gap: 'clamp(0.3rem, 1vmin, 0.5rem)',
+  gap: 'clamp(0.8rem, 2vmin, 1.2rem)', // Increased gap for better emoji spacing
   textAlign: 'center' as const,
   maxWidth: '100%', // Ensure text doesn't overflow
   overflow: 'hidden' as const, // Hide any overflow

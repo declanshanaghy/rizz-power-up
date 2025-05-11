@@ -249,10 +249,53 @@ export const specialEventAnimations = `
   }
 `;
 
+// CSS for text animations
+export const textAnimations = `
+  @keyframes textShimmer {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+  }
+  
+  @keyframes textPulse {
+    0% {
+      text-shadow: 0 0 5px rgba(255,0,0,0.8), 0 0 10px rgba(255,0,0,0.5);
+      transform: scale(1);
+    }
+    50% {
+      text-shadow: 0 0 10px rgba(255,0,0,0.9), 0 0 20px rgba(255,0,0,0.7), 0 0 30px rgba(255,0,0,0.5);
+      transform: scale(1.1);
+    }
+    100% {
+      text-shadow: 0 0 5px rgba(255,0,0,0.8), 0 0 10px rgba(255,0,0,0.5);
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes textGlitter {
+    0% { background-position: 0% 50%; filter: brightness(1); }
+    25% { background-position: 50% 50%; filter: brightness(1.2); }
+    50% { background-position: 100% 50%; filter: brightness(1.5); }
+    75% { background-position: 150% 50%; filter: brightness(1.2); }
+    100% { background-position: 200% 50%; filter: brightness(1); }
+  }
+  
+  @keyframes textRainbow {
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
+  }
+  
+  @keyframes textWave {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-5px) rotate(-2deg); }
+    75% { transform: translateY(5px) rotate(2deg); }
+  }
+`;
+
 // All animations combined
 export const allAnimations = `
   ${statsAnimations}
   ${cardAnimations}
   ${modalAnimations}
   ${specialEventAnimations}
+  ${textAnimations}
 `;
