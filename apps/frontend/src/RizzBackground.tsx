@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './RizzBackground.css';
 import { getOptimizedImageUrl, ImageSize } from './MediaOptimizer';
-import { reducedAnimations, initializePerformanceMode } from './Animations';
+import { initializePerformanceMode } from './Animations';
 
 const RizzBackground: React.FC = () => {
   const starsRef = useRef<HTMLDivElement>(null);
