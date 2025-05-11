@@ -716,7 +716,7 @@ function VaporwaveApp() {
               
               {/* GitHub Link */}
               <a
-                href="https://github.com/declanshanaghy/rizz-power-up"
+                href="https://github.com/declanshanaghy/rizz-power-up/blob/main/README.md"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
