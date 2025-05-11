@@ -1,16 +1,23 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './RizzBackground.css';
 import { getOptimizedImageUrl, ImageSize } from './MediaOptimizer';
+import { reducedAnimations, initializePerformanceMode } from './Animations';
 
 const RizzBackground: React.FC = () => {
   const starsRef = useRef<HTMLDivElement>(null);
   const sparklesRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
+  const [isLowPerformanceMode, setIsLowPerformanceMode] = useState(false);
 
   useEffect(() => {
-    // Create stars
+    // Initialize performance mode
+    const lowPerformance = initializePerformanceMode();
+    setIsLowPerformanceMode(lowPerformance);
+    
+    // Create stars - reduced count on low-performance devices
     if (starsRef.current) {
-      for (let i = 0; i < 100; i++) {
+      const starCount = lowPerformance ? 30 : 60;
+      for (let i = 0; i < starCount; i++) {
         const star = document.createElement('div');
         star.classList.add('rizz-star');
         star.style.width = `${Math.random() * 3 + 1}px`;
@@ -22,9 +29,10 @@ const RizzBackground: React.FC = () => {
       }
     }
 
-    // Create sparkles
+    // Create sparkles - reduced count on low-performance devices
     if (sparklesRef.current) {
-      for (let i = 0; i < 50; i++) {
+      const sparkleCount = lowPerformance ? 15 : 30;
+      for (let i = 0; i < sparkleCount; i++) {
         const sparkle = document.createElement('div');
         sparkle.classList.add('rizz-sparkle');
         sparkle.style.top = `${Math.random() * 100}%`;
@@ -38,7 +46,22 @@ const RizzBackground: React.FC = () => {
     if (backgroundRef.current) {
       const optimizedBgUrl = getOptimizedImageUrl('/bg1.png', ImageSize.LARGE);
       backgroundRef.current.style.backgroundImage = `url(${optimizedBgUrl}), linear-gradient(135deg, #120458 0%, #5B0E91 50%, #FF1B6B 100%)`;
+      
+      // Add performance class if needed
+      if (lowPerformance) {
+        backgroundRef.current.classList.add('low-performance');
+      }
     }
+    
+    // Cleanup function
+    return () => {
+      if (starsRef.current) {
+        starsRef.current.innerHTML = '';
+      }
+      if (sparklesRef.current) {
+        sparklesRef.current.innerHTML = '';
+      }
+    };
   }, []);
 
   return (
@@ -47,10 +70,15 @@ const RizzBackground: React.FC = () => {
       <div className="rizz-horizon"></div>
       <div className="rizz-sun"></div>
       
-      <div className="rizz-lightning rizz-lightning1"></div>
-      <div className="rizz-lightning rizz-lightning2"></div>
-      <div className="rizz-lightning rizz-lightning3"></div>
-      <div className="rizz-lightning rizz-lightning4"></div>
+      {/* Only show lightning effects in high-performance mode */}
+      {!isLowPerformanceMode && (
+        <>
+          <div className="rizz-lightning rizz-lightning1"></div>
+          <div className="rizz-lightning rizz-lightning2"></div>
+          <div className="rizz-lightning rizz-lightning3"></div>
+          <div className="rizz-lightning rizz-lightning4"></div>
+        </>
+      )}
       
       <div ref={starsRef} className="rizz-stars"></div>
       <div ref={sparklesRef} className="rizz-sparkles"></div>

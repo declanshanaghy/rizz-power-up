@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { MemeImage } from './memeImages';
+import { reducedAnimations } from './Animations';
 
 interface GiveUpAnimationProps {
   onAnimationComplete: () => void;
@@ -19,92 +20,55 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
     const styleEl = document.createElement('style');
     styleEl.textContent = `
       @keyframes fadeIn {
-        0% {
-          opacity: 0;
-        }
-        100% {
-          opacity: 1;
-        }
+        0% { opacity: 0; }
+        100% { opacity: 1; }
       }
       
       @keyframes sadShake {
-        0%, 100% {
-          transform: translateX(0);
-        }
-        10%, 30%, 50%, 70%, 90% {
-          transform: translateX(-5px);
-        }
-        20%, 40%, 60%, 80% {
-          transform: translateX(5px);
-        }
+        0%, 100% { transform: translateX(0); }
+        25%, 75% { transform: translateX(-3px); }
+        50% { transform: translateX(3px); }
       }
       
       @keyframes slowDrop {
-        0% {
-          transform: translateY(-50px);
-          opacity: 0;
-        }
-        100% {
-          transform: translateY(0);
-          opacity: 1;
-        }
+        0% { transform: translateY(-20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
       }
       
       @keyframes sadPulse {
-        0%, 100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.05);
-        }
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.03); }
       }
       
       @keyframes desaturate {
-        0% {
-          filter: saturate(100%);
-        }
-        100% {
-          filter: saturate(0%) brightness(0.7);
-        }
+        0% { filter: saturate(100%); }
+        100% { filter: saturate(30%) brightness(0.8); }
       }
       
       @keyframes gloomyGlow {
-        0% {
-          box-shadow: 0 0 10px rgba(100, 100, 100, 0.5);
-        }
-        50% {
-          box-shadow: 0 0 20px rgba(100, 100, 100, 0.7);
-        }
-        100% {
-          box-shadow: 0 0 10px rgba(100, 100, 100, 0.5);
-        }
+        0% { box-shadow: 0 0 5px rgba(100, 100, 100, 0.4); }
+        50% { box-shadow: 0 0 10px rgba(100, 100, 100, 0.6); }
+        100% { box-shadow: 0 0 5px rgba(100, 100, 100, 0.4); }
       }
       
       @keyframes sadRain {
-        0% {
-          transform: translateY(-10px);
-          opacity: 0;
-        }
-        70% {
-          opacity: 0.7;
-        }
-        100% {
-          transform: translateY(100vh);
-          opacity: 0;
-        }
+        0% { transform: translateY(-10px); opacity: 0; }
+        70% { opacity: 0.5; }
+        100% { transform: translateY(100vh); opacity: 0; }
       }
     `;
     document.head.appendChild(styleEl);
     
-    // Start the animation sequence
-    const timer1 = setTimeout(() => setAnimationStage(1), 500);
-    const timer2 = setTimeout(() => setAnimationStage(2), 1500);
-    const timer3 = setTimeout(() => setAnimationStage(3), 3000);
+    // Start the animation sequence - faster in reduced animations mode
+    const baseDelay = reducedAnimations ? 0.6 : 1;
+    const timer1 = setTimeout(() => setAnimationStage(1), 500 * baseDelay);
+    const timer2 = setTimeout(() => setAnimationStage(2), 1500 * baseDelay);
+    const timer3 = setTimeout(() => setAnimationStage(3), 2500 * baseDelay);
     const timer4 = setTimeout(() => {
       setAnimationStage(4);
       // Call the onAnimationComplete callback after the animation finishes
-      setTimeout(onAnimationComplete, 2000);
-    }, 5000);
+      setTimeout(onAnimationComplete, 1500 * baseDelay);
+    }, 4000 * baseDelay);
     
     return () => {
       clearTimeout(timer1);
@@ -115,12 +79,13 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
     };
   }, [onAnimationComplete]);
   
-  // Generate raindrops
-  const raindrops = Array.from({ length: 50 }, (_, i) => {
-    const size = Math.random() * 3 + 1;
+  // Generate raindrops - reduced count in low performance mode
+  const raindropCount = reducedAnimations ? 15 : 30;
+  const raindrops = Array.from({ length: raindropCount }, (_, i) => {
+    const size = Math.random() * 2 + 1;
     const left = `${Math.random() * 100}%`;
-    const animationDuration = Math.random() * 2 + 2;
-    const animationDelay = Math.random() * 3;
+    const animationDuration = Math.random() * 2 + 3;
+    const animationDelay = Math.random() * 2;
     
     return (
       <div
@@ -130,26 +95,28 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
           top: '-20px',
           left,
           width: `${size}px`,
-          height: `${size * 5}px`,
-          backgroundColor: 'rgba(150, 150, 200, 0.5)',
+          height: `${size * 4}px`,
+          backgroundColor: 'rgba(150, 150, 200, 0.4)',
           borderRadius: '50%',
           opacity: 0,
           animation: `sadRain ${animationDuration}s linear ${animationDelay}s infinite`,
+          willChange: 'transform, opacity',
         }}
       />
     );
   });
   
-  // Generate sad emojis that float down
-  const sadEmojis = Array.from({ length: 15 }, (_, i) => {
-    const emojis = ['😢', '😭', '💔', '😞', '😔', '😟', '😥', '😰', '😩', '😫', '🥀', '☔', '⛈️', '🌧️', '🌫️'];
+  // Generate sad emojis - reduced count in low performance mode
+  const emojiCount = reducedAnimations ? 5 : 8;
+  const sadEmojis = Array.from({ length: emojiCount }, (_, i) => {
+    const emojis = ['😢', '😭', '💔', '😞', '😔', '🥀', '☔', '🌧️'];
     const emoji = emojis[i % emojis.length];
-    const size = Math.random() * 20 + 15;
+    const size = Math.random() * 15 + 15;
     const left = `${Math.random() * 80 + 10}%`;
     const top = `${Math.random() * 80 + 10}%`;
-    const animationDuration = Math.random() * 3 + 2;
-    const animationDelay = Math.random() * 2;
-    const opacity = Math.random() * 0.5 + 0.2;
+    const animationDuration = Math.random() * 2 + 2;
+    const animationDelay = Math.random() * 1.5;
+    const opacity = Math.random() * 0.4 + 0.2;
     
     return (
       <div
@@ -160,9 +127,10 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
           left,
           fontSize: `${size}px`,
           opacity: animationStage >= 2 ? opacity : 0,
-          animation: animationStage >= 2 ? `slowDrop ${animationDuration}s ease-in ${animationDelay}s forwards, sadPulse 3s ease-in-out infinite` : 'none',
+          animation: animationStage >= 2 ? `slowDrop ${animationDuration}s ease-in ${animationDelay}s forwards` : 'none',
           zIndex: 5,
           filter: 'grayscale(50%)',
+          willChange: 'transform, opacity',
         }}
       >
         {emoji}
@@ -188,8 +156,8 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
         animation: 'fadeIn 0.5s ease-out forwards',
       }}
     >
-      {/* Raindrops */}
-      {animationStage >= 1 && raindrops}
+      {/* Raindrops - only show in stage 1+ and not in reduced animations mode */}
+      {animationStage >= 1 && !reducedAnimations && raindrops}
       
       {/* Sad Emojis */}
       {animationStage >= 2 && sadEmojis}
@@ -202,15 +170,16 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
             padding: 'clamp(0.5rem, 2vmin, 0.75rem)',
             borderRadius: 'var(--border-radius-lg, 1rem)',
             background: 'rgba(40, 40, 50, 0.95)',
-            boxShadow: '0 0 20px rgba(0, 0, 0, 0.7)',
+            boxShadow: '0 0 15px rgba(0, 0, 0, 0.6)',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: 'clamp(0.5rem, 2vmin, 0.75rem)',
             zIndex: 10,
-            animation: animationStage >= 1 ? 'sadShake 0.5s ease-in-out, gloomyGlow 3s infinite' : 'none',
+            animation: animationStage >= 1 ? (reducedAnimations ? 'none' : 'sadShake 0.5s ease-in-out, gloomyGlow 4s infinite') : 'none',
             border: '2px solid #444',
             opacity: animationStage >= 1 ? 1 : 0,
+            willChange: 'opacity, transform, box-shadow',
           }}
         >
           <h3
@@ -221,7 +190,7 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
               margin: 0,
               fontWeight: 'bold',
               textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-              animation: animationStage >= 2 ? 'sadPulse 3s infinite' : 'none',
+              animation: animationStage >= 2 && !reducedAnimations ? 'sadPulse 4s infinite' : 'none',
             }}
           >
             {randomBadCard.name}
@@ -238,9 +207,10 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
               backgroundPosition: 'center',
               backgroundRepeat: 'no-repeat',
               borderRadius: 'var(--border-radius-md, 0.75rem)',
-              boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)',
+              boxShadow: '0 0 8px rgba(0, 0, 0, 0.4)',
               margin: '0 auto',
-              animation: animationStage >= 2 ? 'desaturate 2s forwards' : 'none',
+              animation: animationStage >= 2 ? 'desaturate 1.5s forwards' : 'none',
+              willChange: 'filter',
             }}
           />
           
@@ -253,7 +223,7 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
               fontWeight: 'bold',
               fontStyle: 'italic',
               textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
-              animation: animationStage >= 3 ? 'sadPulse 2s infinite' : 'none',
+              animation: animationStage >= 3 && !reducedAnimations ? 'sadPulse 3s infinite' : 'none',
               letterSpacing: '1px',
             }}
           >
@@ -269,6 +239,7 @@ const GiveUpAnimation: React.FC<GiveUpAnimationProps> = ({ onAnimationComplete }
               marginTop: '1rem',
               opacity: animationStage >= 3 ? 1 : 0,
               animation: animationStage >= 3 ? 'slowDrop 1s ease-out' : 'none',
+              willChange: 'opacity, transform',
             }}
           >
             GAME OVER

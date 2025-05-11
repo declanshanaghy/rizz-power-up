@@ -19,13 +19,20 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: 
-    linear-gradient(to right, rgba(255, 0, 255, 0.3) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 0, 255, 0.3) 1px, transparent 1px);
+  background-image:
+    linear-gradient(to right, rgba(255, 0, 255, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 0, 255, 0.2) 1px, transparent 1px);
   background-size: 40px 40px;
   transform: perspective(500px) rotateX(30deg);
   transform-origin: center bottom;
-  animation: grid-move 20s linear infinite;
+  animation: grid-move 30s linear infinite;
+  will-change: background-position;
+}
+
+/* Low performance mode styles */
+.low-performance .rizz-grid {
+  background-size: 80px 80px;
+  animation: grid-move 60s linear infinite;
 }
 
 .rizz-horizon {
@@ -46,8 +53,14 @@
   height: 200px;
   background: radial-gradient(circle, #ff9500 0%, #ff00ff 70%, transparent 100%);
   border-radius: 50%;
-  box-shadow: 0 0 100px rgba(255, 0, 255, 0.8);
-  animation: sun-pulse 4s infinite alternate;
+  box-shadow: 0 0 50px rgba(255, 0, 255, 0.6);
+  animation: sun-pulse 6s infinite alternate;
+  will-change: transform, opacity;
+}
+
+.low-performance .rizz-sun {
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.4);
+  animation: sun-pulse 10s infinite alternate;
 }
 
 .rizz-title {
@@ -90,36 +103,37 @@
 .rizz-lightning {
   position: absolute;
   top: 0;
-  width: 5px;
+  width: 3px;
   height: 0;
   background-color: #fff;
-  box-shadow: 0 0 10px #fff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+  box-shadow: 0 0 5px #fff, 0 0 10px #00ffff;
   z-index: 5;
   opacity: 0;
+  will-change: height, opacity;
 }
 
 .rizz-lightning1 {
   left: 30%;
-  animation: lightning 3s infinite;
+  animation: lightning 6s infinite;
   animation-delay: 0.5s;
 }
 
 .rizz-lightning2 {
   left: 70%;
-  animation: lightning 3s infinite;
-  animation-delay: 1.5s;
+  animation: lightning 6s infinite;
+  animation-delay: 3.5s;
 }
 
 .rizz-lightning3 {
   left: 20%;
-  animation: lightning 3s infinite;
-  animation-delay: 2.5s;
+  animation: lightning 6s infinite;
+  animation-delay: 7.5s;
 }
 
 .rizz-lightning4 {
   left: 80%;
-  animation: lightning 3s infinite;
-  animation-delay: 3.5s;
+  animation: lightning 6s infinite;
+  animation-delay: 10.5s;
 }
 
 .rizz-stars {
@@ -135,7 +149,12 @@
   position: absolute;
   background-color: #fff;
   border-radius: 50%;
-  animation: twinkle 2s infinite alternate;
+  animation: twinkle 3s infinite alternate;
+  will-change: opacity;
+}
+
+.low-performance .rizz-star {
+  animation: twinkle 5s infinite alternate;
 }
 
 .rizz-sparkles {
@@ -149,16 +168,22 @@
 
 .rizz-sparkle {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   background-color: #fff;
   border-radius: 50%;
   z-index: 15;
   opacity: 0;
-  animation: sparkle 1s infinite;
+  animation: sparkle 2s infinite;
+  will-change: transform, opacity;
+}
+
+.low-performance .rizz-sparkle {
+  animation: sparkle 4s infinite;
 }
 
 /* Animations */
+/* Optimized animations */
 @keyframes grid-move {
   0% { background-position: 0 0; }
   100% { background-position: 40px 40px; }
@@ -166,33 +191,33 @@
 
 @keyframes sun-pulse {
   0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
-  100% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+  100% { transform: translateX(-50%) scale(1.05); opacity: 0.9; }
 }
 
 @keyframes title-glow {
-  0% { text-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff, 0 0 60px #00ffff; }
-  100% { text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff, 0 0 90px #00ffff; }
+  0% { text-shadow: 0 0 10px #00ffff, 0 0 20px #ff00ff; }
+  100% { text-shadow: 0 0 15px #00ffff, 0 0 30px #ff00ff; }
 }
 
 @keyframes subtitle-glow {
-  0% { text-shadow: 0 0 20px #00ffff; }
-  100% { text-shadow: 0 0 40px #00ffff; }
+  0% { text-shadow: 0 0 10px #00ffff; }
+  100% { text-shadow: 0 0 20px #00ffff; }
 }
 
 @keyframes lightning {
   0% { height: 0; opacity: 0; }
-  5% { height: 80%; opacity: 1; }
-  10% { height: 0; opacity: 0; }
+  2% { height: 70%; opacity: 0.8; }
+  4% { height: 0; opacity: 0; }
   100% { height: 0; opacity: 0; }
 }
 
 @keyframes twinkle {
   0% { opacity: 0.3; }
-  100% { opacity: 1; }
+  100% { opacity: 0.8; }
 }
 
 @keyframes sparkle {
   0% { transform: scale(0); opacity: 0; }
-  50% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1); opacity: 0.8; }
   100% { transform: scale(0); opacity: 0; }
 }

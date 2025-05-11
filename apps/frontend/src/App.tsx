@@ -2,18 +2,31 @@ import { useState, useEffect } from 'react'
 import RizzBackground from './RizzBackground'
 import SoundControl from './SoundControl'
 import { loadGameState } from './localStorage'
+import { initializePerformanceMode, setReducedAnimations } from './Animations'
 import './App.css'
 
 function App() {
   const [highScore, setHighScore] = useState(0);
+  const [isLowPerformanceMode, setIsLowPerformanceMode] = useState(true);
   
-  // Load high score from localStorage on initial render
+  // Initialize performance mode and load high score from localStorage on initial render
   useEffect(() => {
+    // Initialize performance mode - always starts in performance mode
+    initializePerformanceMode();
+    
+    // Load high score from localStorage
     const savedState = loadGameState();
     if (savedState) {
       setHighScore(savedState.highScore);
     }
   }, []);
+  
+  // Toggle performance mode
+  const togglePerformanceMode = () => {
+    const newMode = !isLowPerformanceMode;
+    setIsLowPerformanceMode(newMode);
+    setReducedAnimations(newMode);
+  };
 
   return (
     <div className="app-container">
@@ -21,6 +34,29 @@ function App() {
       
       {/* Sound Control component */}
       <SoundControl position="bottom-left" />
+      
+      {/* Performance mode toggle */}
+      <button
+        onClick={togglePerformanceMode}
+        style={{
+          position: 'fixed',
+          top: 'clamp(5px, 1.5vmin, 10px)',
+          right: 'clamp(5px, 1.5vmin, 10px)',
+          background: isLowPerformanceMode ? 'rgba(0, 245, 212, 0.7)' : 'rgba(241, 91, 181, 0.7)',
+          color: isLowPerformanceMode ? '#1A1A1A' : '#FFFFFF',
+          border: 'none',
+          borderRadius: '0.5rem',
+          padding: 'clamp(3px, 1vmin, 5px) clamp(10px, 3vmin, 15px)',
+          fontSize: 'clamp(12px, 3vmin, 14px)',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+          zIndex: 9999,
+          boxShadow: '0 0 10px rgba(0, 0, 0, 0.3)',
+          transition: 'all 0.3s ease'
+        }}
+      >
+        {isLowPerformanceMode ? '🚀 Performance Mode (Default)' : '✨ Full Animations (May Slow Game)'}
+      </button>
       
       {/* Footer container for Buy Me a Coffee button, GitHub link, and High Score panel */}
       <div className="footer-container" style={{
